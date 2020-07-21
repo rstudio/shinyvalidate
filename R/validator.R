@@ -1,4 +1,4 @@
-# The overall implementation of ShinyValidator is extremely simple right now, at
+# The overall implementation of InputValidator is extremely simple right now, at
 # the expense of performance. My assumption is that validation rule functions
 # will run extremely quickly and not have meaningful side effects. We have an
 # opportunity to optimize so that validation rules only execute when 1) they are
@@ -28,7 +28,7 @@
 #' @description An R6 class for adding realtime input validation to Shiny apps.
 #'
 #' @export
-ShinyValidator <- R6::R6Class("ShinyValidator", cloneable = FALSE,
+InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
   private = list(
     session = NULL,
     enabled = FALSE,
@@ -50,7 +50,7 @@ ShinyValidator <- R6::R6Class("ShinyValidator", cloneable = FALSE,
     #'   the default.)
     initialize = function(priority = 1000, session = getDefaultReactiveDomain()) {
       if (is.null(session)) {
-        stop("ShinyValidator objects must be created in the context of Shiny server functions or Shiny module server functions")
+        stop("InputValidator objects must be created in the context of Shiny server functions or Shiny module server functions")
       }
       private$session <- session
       private$priority <- priority
@@ -62,20 +62,20 @@ ShinyValidator <- R6::R6Class("ShinyValidator", cloneable = FALSE,
         session$userData[["shinyvalidate-initialized"]] <- TRUE
       }
     },
-    #' @description Add another `ShinyValidator` object to this one, as a
+    #' @description Add another `InputValidator` object to this one, as a
     #' "child". Any time this validator object is asked for its validity, it
     #' will only return `TRUE` if all of its child validators are also valid;
     #' and when this validator object is enabled (or disabled), then all of its
     #' child validators are enabled (or disabled) as well.
     #'
     #' This is intended to help with validating Shiny modules. Each module can
-    #' create its own `ShinyValidator` object and populate it with rules, then
+    #' create its own `InputValidator` object and populate it with rules, then
     #' return that object to the caller.
     #'
-    #' @param validator A `ShinyValidator` object.
+    #' @param validator A `InputValidator` object.
     add_validator = function(validator) {
-      if (!inherits(validator, "ShinyValidator")) {
-        stop("add_validator was called with an invalid `validator` argument; ShinyValidator object expected")
+      if (!inherits(validator, "InputValidator")) {
+        stop("add_validator was called with an invalid `validator` argument; InputValidator object expected")
       }
       private$validators <- c(private$validators, list(validator))
       invisible(self)

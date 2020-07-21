@@ -1,7 +1,7 @@
 htmldep <- function() {
   htmltools::htmlDependency(
     "shinyvalidate",
-    version = packageVersion("shinyvalidate"),
+    version = utils::packageVersion("shinyvalidate"),
     src = "assets",
     script = "shinyvalidate.js",
     package = "shinyvalidate",

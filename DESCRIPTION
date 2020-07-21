@@ -12,7 +12,9 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    shiny (>= 1.5.0.9001)
+    shiny (>= 1.5.0.9001),
+    utils,
+    htmltools
 Remotes: 
     rstudio/shiny#2975
 RoxygenNote: 7.1.1

@@ -55,7 +55,11 @@ ShinyValidator <- R6::R6Class("ShinyValidator", cloneable = FALSE,
       private$validators <- c(private$validators, list(validator))
       invisible(self)
     },
-    #' @description Add an input validation rule.
+    #' @description Add an input validation rule. Each input validation rule
+    #'   applies to a single input. You can add multiple validation rules for a
+    #'   single input, by calling `add_rules()` multiple times; the first
+    #'   validation rule for an input that fails will be used, and will prevent
+    #'   subsequent rules for that input from executing.
     #'
     #' @param inputId A single-element character vector indicating the ID of the
     #'   input that this rule applies to. (Note that this name should _not_ be
@@ -74,7 +78,7 @@ ShinyValidator <- R6::R6Class("ShinyValidator", cloneable = FALSE,
     add_rule = function(inputId, rule, ..., session. = getDefaultReactiveDomain()) {
       args <- rlang::list2(...)
       if (is.null(rule)) {
-        rule <- function(value) NULL
+        rule <- function(value, ...) NULL
       }
       if (inherits(rule, "formula")) {
         rule <- rlang::as_function(rule)

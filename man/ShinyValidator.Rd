@@ -71,7 +71,11 @@ return that object to the caller.
 \if{html}{\out{<a id="method-add_rule"></a>}}
 \if{latex}{\out{\hypertarget{method-add_rule}{}}}
 \subsection{Method \code{add_rule()}}{
-Add an input validation rule.
+Add an input validation rule. Each input validation rule
+  applies to a single input. You can add multiple validation rules for a
+  single input, by calling `add_rules()` multiple times; the first
+  validation rule for an input that fails will be used, and will prevent
+  subsequent rules for that input from executing.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ShinyValidator$add_rule(
   inputId,

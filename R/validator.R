@@ -30,6 +30,12 @@ ShinyValidator <- R6::R6Class("ShinyValidator", cloneable = FALSE,
       private$session <- session
       private$priority <- priority
       private$rules <- reactiveVal(list(), label = "validation_rules")
+      
+      # Inject shinyvalidate dependencies (just once)
+      if (!isTRUE(session$userData[["shinyvalidate-initialized"]])) {
+        shiny::insertUI("body", "beforeEnd", list(htmldep(), HTML("")), immediate = TRUE)
+        session$userData[["shinyvalidate-initialized"]] <- TRUE
+      }
     },
     #' @description Add another `ShinyValidator` object to this one, as a
     #' "child". Any time this validator object is asked for its validity, it

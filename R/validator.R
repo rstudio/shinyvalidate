@@ -1,3 +1,28 @@
+# The overall implementation of ShinyValidator is extremely simple right now, at
+# the expense of performance. My assumption is that validation rule functions
+# will run extremely quickly and not have meaningful side effects. We have an
+# opportunity to optimize so that validation rules only execute when 1) they are
+# added, 2) the input value changes, 3) a reactive read that's performed during
+# the validation invalidates, or 4) a prior rule around the input that was
+# formerly failing now passes.
+#
+# The way to accomplish this would be to create a reactive expression for each
+# rule, plus a reactiveValues object to track the rules for each input. Each
+# input would also get a reactive expression for the overall validity of that
+# input. It would look something like:
+#
+#   reactive({
+#     for (rule in rv_rules[[id]]) {
+#       result <- rule()  # rule is a reactive that has a read to input[[id]]
+#       if (!is.null(result)) {
+#         return(result)
+#       }
+#     }
+#     return(NULL)
+#   })
+#
+# Then sv$validate() would just be collecting all of these.
+
 #' Shiny validation object
 #'
 #' @description An R6 class for adding realtime input validation to Shiny apps.
@@ -83,8 +108,12 @@ ShinyValidator <- R6::R6Class("ShinyValidator", cloneable = FALSE,
       if (inherits(rule, "formula")) {
         rule <- rlang::as_function(rule)
       }
-      rule <- purrr::partial(rule, ...)
-      rule_info <- list(rule = rule, session = session.)
+      applied_rule <- function(value) {
+        # Do this instead of purrr::partial because purrr::partial doesn't
+        # support leaving a "hole" for the first argument
+        do.call(rule, c(list(value), args))
+      }
+      rule_info <- list(rule = applied_rule, session = session.)
       private$rules(c(isolate(private$rules()), setNames(list(rule_info), inputId)))
       invisible(self)
     },

@@ -1,11 +1,6 @@
 library(shiny)
 library(shinyvalidate)
 
-# From https://www.nicebread.de/validating-email-adresses-in-r/
-is_valid_email <- function(x) {
-  grepl("^\\s*[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\s*$", as.character(x), ignore.case=TRUE)
-}
-
 ui <- fluidPage(
   includeMarkdown("README.md"),
   hr(),
@@ -30,6 +25,11 @@ server <- function(input, output, session) {
     else
       tags$span(class = "text-danger", "No")
   })
+}
+
+# From https://www.nicebread.de/validating-email-adresses-in-r/
+is_valid_email <- function(x) {
+  grepl("^\\s*[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\s*$", as.character(x), ignore.case=TRUE)
 }
 
 shinyApp(ui, server)

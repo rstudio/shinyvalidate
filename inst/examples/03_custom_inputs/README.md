@@ -1,6 +1,6 @@
 ## Custom inputs
 
-This example app shows how custom input controls can decide where and how to display their input validation feedback.
+In this example, the picture-taking control is a custom input control. shinyvalidate lets custom input controls decide where and how to display their input validation feedback.
 
 **Note: As of this writing, this app doesn't work in RStudio; view it in an external browser like Chrome or Firefox instead.**
 

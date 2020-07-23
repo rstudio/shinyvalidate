@@ -1,7 +1,10 @@
-camera_input <- function(inputId, label, button_label = "Take photo", width = 400) {
+camera_input <- function(inputId, label, button_label = "Take photo", width = 400, height = 300) {
   tagList(
     div(id = inputId, class = "shiny-camera-input",
-      style = htmltools::css(width = htmltools::validateCssUnit(width)),
+      style = htmltools::css(
+        width = htmltools::validateCssUnit(width),
+        height = htmltools::validateCssUnit(height)
+      ),
       
       tags$div(class = "curtain", icon("camera")),
       tags$video(autoplay = NA),

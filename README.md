@@ -1,12 +1,14 @@
 # shinyvalidate
 
+**WARNING: Highly experimental, API still in flux**
+
 ## Overview
 
 shinyvalidate adds input validation capabilities to [Shiny](https://shiny.rstudio.com).
 
 ## Prior art
 
-* [shinyFeedback](https://github.com/merlinoa/shinyFeedback) by [@merlinoa](https://github.com/merlinoa)
+* [shinyFeedback](https://github.com/merlinoa/shinyFeedback) by [@merlinoa](https://github.com/merlinoa), who graciously provided feedback on the design of shinyvalidate.
 
 ## Installation
 

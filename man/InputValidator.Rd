@@ -31,12 +31,12 @@ Create a new validator object.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{priority}}{When a validator object is enabled, it creates an
-internal [shiny::observe()] to keep validation feedback in the UI
+internal \code{\link[shiny:observe]{shiny::observe()}} to keep validation feedback in the UI
 up-to-date. This parameter controls the priority of that observer. It's
 highly recommended to keep this value higher than the priorities of any
 observers that do actual work, so users see validation updates quickly.}
 
-\item{\code{session}}{The Shiny `session` object. (You should probably just use
+\item{\code{session}}{The Shiny \code{session} object. (You should probably just use
 the default.)}
 }
 \if{html}{\out{</div>}}
@@ -46,14 +46,14 @@ the default.)}
 \if{html}{\out{<a id="method-add_validator"></a>}}
 \if{latex}{\out{\hypertarget{method-add_validator}{}}}
 \subsection{Method \code{add_validator()}}{
-Add another `InputValidator` object to this one, as a
+Add another \code{InputValidator} object to this one, as a
 "child". Any time this validator object is asked for its validity, it
-will only return `TRUE` if all of its child validators are also valid;
+will only return \code{TRUE} if all of its child validators are also valid;
 and when this validator object is enabled (or disabled), then all of its
 child validators are enabled (or disabled) as well.
 
 This is intended to help with validating Shiny modules. Each module can
-create its own `InputValidator` object and populate it with rules, then
+create its own \code{InputValidator} object and populate it with rules, then
 return that object to the caller.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{InputValidator$add_validator(validator)}\if{html}{\out{</div>}}
@@ -62,7 +62,7 @@ return that object to the caller.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{validator}}{A `InputValidator` object.}
+\item{\code{validator}}{A \code{InputValidator} object.}
 }
 \if{html}{\out{</div>}}
 }
@@ -72,10 +72,10 @@ return that object to the caller.
 \if{latex}{\out{\hypertarget{method-add_rule}{}}}
 \subsection{Method \code{add_rule()}}{
 Add an input validation rule. Each input validation rule
-  applies to a single input. You can add multiple validation rules for a
-  single input, by calling `add_rules()` multiple times; the first
-  validation rule for an input that fails will be used, and will prevent
-  subsequent rules for that input from executing.
+applies to a single input. You can add multiple validation rules for a
+single input, by calling \code{add_rules()} multiple times; the first
+validation rule for an input that fails will be used, and will prevent
+subsequent rules for that input from executing.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{InputValidator$add_rule(
   inputId,
@@ -89,18 +89,18 @@ Add an input validation rule. Each input validation rule
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{inputId}}{A single-element character vector indicating the ID of the
-input that this rule applies to. (Note that this name should _not_ be
-qualified by a module namespace; e.g. pass `"x"` and not
-`session$ns("x")`.)}
+input that this rule applies to. (Note that this name should \emph{not} be
+qualified by a module namespace; e.g. pass \code{"x"} and not
+\code{session$ns("x")}.)}
 
 \item{\code{rule}}{A function that takes (at least) one argument: the input's
-value. The function should return `NULL` if it passes validation, and
+value. The function should return \code{NULL} if it passes validation, and
 if not, a single-element character vector containing an error message
 to display to the user near the input. You can alternatively provide a
-single-sided formula instead of a function, using `.` as the variable
+single-sided formula instead of a function, using \code{.} as the variable
 name for the input value being validated.}
 
-\item{\code{...}}{Optional: Additional arguments to pass to the `rule` function
+\item{\code{...}}{Optional: Additional arguments to pass to the \code{rule} function
 whenever it is invoked.}
 
 \item{\code{session.}}{The session object to which the input belongs. (There's
@@ -114,9 +114,9 @@ almost never a reason to change this from the default.)}
 \if{latex}{\out{\hypertarget{method-enable}{}}}
 \subsection{Method \code{enable()}}{
 Begin displaying input validation feedback in the user
-  interface. Once enabled, this validator object will automatically keep
-  the feedback up-to-date. (It's safe to call the `enable()` method
-  on an already-enabled validator.)
+interface. Once enabled, this validator object will automatically keep
+the feedback up-to-date. (It's safe to call the \code{enable()} method
+on an already-enabled validator.)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{InputValidator$enable()}\if{html}{\out{</div>}}
 }
@@ -127,9 +127,9 @@ Begin displaying input validation feedback in the user
 \if{latex}{\out{\hypertarget{method-disable}{}}}
 \subsection{Method \code{disable()}}{
 Clear existing input validation feedback in the user
-  interface for all inputs represented in this validator's ruleset, and
-  stop providing feedback going forward. Once disabled, `enable()` can be
-  called to resume input validation.
+interface for all inputs represented in this validator's ruleset, and
+stop providing feedback going forward. Once disabled, \code{enable()} can be
+called to resume input validation.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{InputValidator$disable()}\if{html}{\out{</div>}}
 }
@@ -139,8 +139,8 @@ Clear existing input validation feedback in the user
 \if{html}{\out{<a id="method-is_valid"></a>}}
 \if{latex}{\out{\hypertarget{method-is_valid}{}}}
 \subsection{Method \code{is_valid()}}{
-Returns `TRUE` if all input validation rules currently pass,
-  `FALSE` if not.
+Returns \code{TRUE} if all input validation rules currently pass,
+\code{FALSE} if not.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{InputValidator$is_valid(include_child_validators = TRUE)}\if{html}{\out{</div>}}
 }
@@ -148,8 +148,8 @@ Returns `TRUE` if all input validation rules currently pass,
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{include_child_validators}}{If `TRUE`, this method will only return
-`TRUE` if all child validators also return `TRUE`. If `FALSE`, then
+\item{\code{include_child_validators}}{If \code{TRUE}, this method will only return
+\code{TRUE} if all child validators also return \code{TRUE}. If \code{FALSE}, then
 only the rules registered directly against this validator object will
 be considered.}
 }
@@ -161,11 +161,11 @@ be considered.}
 \if{latex}{\out{\hypertarget{method-validate}{}}}
 \subsection{Method \code{validate()}}{
 Run validation rules and gather results. For advanced usage
-  only; most apps should use the `is_valid()` and `enable()` methods
-  instead. The return value of this method is a named list, where the
-  names are (fully namespace qualified) input IDs, and the values are
-  either `NULL` (if the input value is passing) or a single-element
-  character vector describing a validation problem.
+only; most apps should use the \code{is_valid()} and \code{enable()} methods
+instead. The return value of this method is a named list, where the
+names are (fully namespace qualified) input IDs, and the values are
+either \code{NULL} (if the input value is passing) or a single-element
+character vector describing a validation problem.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{InputValidator$validate(include_child_validators = TRUE)}\if{html}{\out{</div>}}
 }
@@ -173,9 +173,9 @@ Run validation rules and gather results. For advanced usage
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{include_child_validators}}{If `TRUE`, this method will call the
-`validate()` method on all child validator objects and merge the
-results with this validator's results. If `FALSE`, then only the rules
+\item{\code{include_child_validators}}{If \code{TRUE}, this method will call the
+\code{validate()} method on all child validator objects and merge the
+results with this validator's results. If \code{FALSE}, then only the rules
 directly added to this validator object will be considered.}
 }
 \if{html}{\out{</div>}}

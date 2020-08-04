@@ -3,7 +3,14 @@
 
 #' @export
 sv_required <- function(message = "Required", test = isTruthy) {
-  sv_predicate(test, message)
+  force(message)
+  force(test)
+  
+  function(value) {
+    if (!test(value)) {
+      message
+    }
+  }
 }
 
 #' Validate based on regular expression
@@ -48,6 +55,12 @@ sv_regex <- function(pattern, message, ignore.case = FALSE, perl = FALSE,
 sv_integer <- function(message, allowMultiple = FALSE, allowNA = FALSE,
   allowNaN = FALSE, allowInfinite = FALSE) {
   
+  force(message)
+  force(allowMultiple)
+  force(allowNA)
+  force(allowNaN)
+  force(allowInfinite)
+  
   function(value) {
     if (!is.integer(value)) {
       return(message)
@@ -73,7 +86,13 @@ sv_integer <- function(message, allowMultiple = FALSE, allowNA = FALSE,
 #' @export
 sv_numeric <- function(message, allowMultiple = FALSE, allowNA = FALSE,
   allowNaN = FALSE, allowInfinite = FALSE) {
-  
+
+  force(message)
+  force(allowMultiple)
+  force(allowNA)
+  force(allowNaN)
+  force(allowInfinite)
+
   function(value) {
     if (!is.numeric(value)) {
       return(message)

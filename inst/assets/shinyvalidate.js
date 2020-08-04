@@ -136,6 +136,7 @@ if (window.Shiny) {
       const input = boundInputsMap.get(key);
       if (!input) {
         console.warn("Couldn't perform validation update on input with id '" + key + "': input not found");
+        continue;
       }
       
       if (value === null) {

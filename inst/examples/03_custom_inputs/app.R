@@ -29,11 +29,12 @@ server <- function(input, output, session) {
   iv <- InputValidator$new()
   
   selfie_iv <- InputValidator$new()
-  selfie_iv$add_rule("selfie", sv_required())
+  selfie_iv$add_rule("selfie",
+    sv_required("Click the 'Take photo' button before submitting"))
   iv$add_validator(selfie_iv, when = ~ input$type == "selfie")
   
   upload_iv <- InputValidator$new()
-  upload_iv$add_rule("upload", sv_required())
+  upload_iv$add_rule("upload", sv_required("Please choose a file"))
   upload_iv$add_rule("upload", function(upload) {
     if (!tools::file_ext(upload$name) %in% c("jpg", "jpeg", "png")) {
       "A JPEG or PNG file is required"
@@ -43,6 +44,7 @@ server <- function(input, output, session) {
   
   gravatar_iv <- InputValidator$new()
   gravatar_iv$add_rule("email", sv_required())
+  gravatar_iv$add_rule("email", ~ if (!is_valid_email(.)) "Please provide a valid email")
   iv$add_validator(gravatar_iv, when = ~ input$type == "gravatar")
   
   output$upload_preview <- renderUI({

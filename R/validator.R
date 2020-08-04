@@ -27,6 +27,28 @@
 #'
 #' @description An R6 class for adding realtime input validation to Shiny apps.
 #'
+#'   `InputValidator` objects are designed to be created as local variables in
+#'   Shiny server functions and Shiny module server functions. The Shiny app
+#'   author can register zero, one, or multiple validation rules for each input
+#'   field in their UI, using the `InputValidator$add_rule()` method.
+#'
+#'   Once an `InputValidator` object is created and populated with rules, it can
+#'   be used in a few ways:
+#'
+#'   1. The `InputValidator$enable()` method can be called to display real-time
+#'      feedback to users about what inputs are failing validation, and why.
+#'   2. The `InputValidator$is_valid()` method returns `TRUE` if and only if all
+#'      of the validation rules are passing; this can be checked before
+#'      executing actions that depend on the inputs being valid.
+#'   3. The `InputValidator$validate()` method is a lower-level feature that
+#'      directly returns information about what fields failed validation, and
+#'      why.
+#'
+#'   It's possible to have multiple `InputValidator` objects for each Shiny app.
+#'   One scenario where this makes sense is if an app contains multiple forms
+#'   that are completely unrelated to each other; each form would have its own
+#'   `InputValidator` instance with a distinct set of rules.
+#'
 #' @export
 InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
   private = list(
@@ -64,21 +86,29 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         session$userData[["shinyvalidate-initialized"]] <- TRUE
       }
     },
+    #' @description For internal use only.
+    #' @param validator An `InputValidator` object.
     parent = function(validator) {
       self$disable()
       private$is_child <- TRUE
     },
     #' @description Add another `InputValidator` object to this one, as a
-    #' "child". Any time this validator object is asked for its validity, it
-    #' will only return `TRUE` if all of its child validators are also valid;
-    #' and when this validator object is enabled (or disabled), then all of its
-    #' child validators are enabled (or disabled) as well.
+    #'   "child". Any time this validator object is asked for its validity, it
+    #'   will only return `TRUE` if all of its child validators are also valid;
+    #'   and when this validator object is enabled (or disabled), then all of
+    #'   its child validators are enabled (or disabled) as well.
     #'
-    #' This is intended to help with validating Shiny modules. Each module can
-    #' create its own `InputValidator` object and populate it with rules, then
-    #' return that object to the caller.
+    #'   This is intended to help with validating Shiny modules. Each module can
+    #'   create its own `InputValidator` object and populate it with rules, then
+    #'   return that object to the caller.
     #'
-    #' @param validator A `InputValidator` object.
+    #'   You can also use child validators to group fields/rules together and
+    #'   turn them on and off as a whole based on the `when` parameter.
+    #'
+    #' @param validator An `InputValidator` object.
+    #' @param when Either a no-argument function, or a single-sided formula,
+    #'   that returns `TRUE` when the child validator's rules should be invoked
+    #'   and `FALSE` when the rules should be skipped.
     add_validator = function(validator, when = ~ TRUE) {
       if (!inherits(validator, "InputValidator")) {
         stop("add_validator was called with an invalid `validator` argument; InputValidator object expected")
@@ -142,7 +172,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       if (!private$enabled) {
         withReactiveDomain(private$session, {
           private$observer_handle <- observe({
-            results <- self$validate(include_child_validators = TRUE)
+            results <- self$validate()
             private$session$sendCustomMessage("validation-jcheng5", results)
           }, priority = private$priority)
         })
@@ -161,13 +191,15 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         private$observer_handle <- NULL
         private$enabled <- FALSE
         if (!private$is_child) {
-          results <- self$validate(include_child_validators = TRUE)
+          results <- self$validate()
           results <- lapply(results, function(x) NULL)
           private$session$sendCustomMessage("validation-jcheng5", results)
         }
       }
     },
-    fields = function(include_child_validators = TRUE) {
+    #' @description Returns `TRUE` if all input validation rules currently pass,
+    #'   `FALSE` if not.
+    fields = function() {
       fieldslist <- unlist(lapply(private$validators(), function(validator_info) {
         validator_info$validator$fields()
       }))
@@ -175,12 +207,8 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     },
     #' @description Returns `TRUE` if all input validation rules currently pass,
     #'   `FALSE` if not.
-    #' @param include_child_validators If `TRUE`, this method will only return
-    #'   `TRUE` if all child validators also return `TRUE`. If `FALSE`, then
-    #'   only the rules registered directly against this validator object will
-    #'   be considered.
-    is_valid = function(include_child_validators = TRUE) {
-      results <- self$validate(include_child_validators = include_child_validators)
+    is_valid = function() {
+      results <- self$validate()
       all(vapply(results, is.null, logical(1), USE.NAMES = FALSE))
     },
     #' @description Run validation rules and gather results. For advanced usage
@@ -189,22 +217,16 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   names are (fully namespace qualified) input IDs, and the values are
     #'   either `NULL` (if the input value is passing) or a single-element
     #'   character vector describing a validation problem.
-    #' @param include_child_validators If `TRUE`, this method will call the
-    #'   `validate()` method on all child validator objects and merge the
-    #'   results with this validator's results. If `FALSE`, then only the rules
-    #'   directly added to this validator object will be considered.
-    validate = function(include_child_validators = TRUE) {
+    validate = function() {
       dependency_results <- list()
-      if (include_child_validators) {
-        for (validator_info in private$validators()) {
-          if (validator_info$when()) {
-            child_results <- validator_info$validator$validate(include_child_validators = TRUE)
-          } else {
-            fields <- validator_info$validator$fields()
-            child_results <- setNames(rep_len(list(), length(fields)), fields)
-          }
-          dependency_results <- merge_results(dependency_results, child_results)
+      for (validator_info in private$validators()) {
+        if (validator_info$when()) {
+          child_results <- validator_info$validator$validate()
+        } else {
+          fields <- validator_info$validator$fields()
+          child_results <- setNames(rep_len(list(), length(fields)), fields)
         }
+        dependency_results <- merge_results(dependency_results, child_results)
       }
 
       results <- list()

@@ -5,6 +5,29 @@
 \title{Shiny validation object}
 \description{
 An R6 class for adding realtime input validation to Shiny apps.
+
+\code{InputValidator} objects are designed to be created as local variables in
+Shiny server functions and Shiny module server functions. The Shiny app
+author can register zero, one, or multiple validation rules for each input
+field in their UI, using the \code{InputValidator$add_rule()} method.
+
+Once an \code{InputValidator} object is created and populated with rules, it can
+be used in a few ways:
+\enumerate{
+\item The \code{InputValidator$enable()} method can be called to display real-time
+feedback to users about what inputs are failing validation, and why.
+\item The \code{InputValidator$is_valid()} method returns \code{TRUE} if and only if all
+of the validation rules are passing; this can be checked before
+executing actions that depend on the inputs being valid.
+\item The \code{InputValidator$validate()} method is a lower-level feature that
+directly returns information about what fields failed validation, and
+why.
+}
+
+It's possible to have multiple \code{InputValidator} objects for each Shiny app.
+One scenario where this makes sense is if an app contains multiple forms
+that are completely unrelated to each other; each form would have its own
+\code{InputValidator} instance with a distinct set of rules.
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -48,10 +71,18 @@ the default.)}
 \if{html}{\out{<a id="method-parent"></a>}}
 \if{latex}{\out{\hypertarget{method-parent}{}}}
 \subsection{Method \code{parent()}}{
+For internal use only.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{InputValidator$parent(validator)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{validator}}{An \code{InputValidator} object.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add_validator"></a>}}
@@ -60,12 +91,15 @@ the default.)}
 Add another \code{InputValidator} object to this one, as a
 "child". Any time this validator object is asked for its validity, it
 will only return \code{TRUE} if all of its child validators are also valid;
-and when this validator object is enabled (or disabled), then all of its
-child validators are enabled (or disabled) as well.
+and when this validator object is enabled (or disabled), then all of
+its child validators are enabled (or disabled) as well.
 
 This is intended to help with validating Shiny modules. Each module can
 create its own \code{InputValidator} object and populate it with rules, then
 return that object to the caller.
+
+You can also use child validators to group fields/rules together and
+turn them on and off as a whole based on the \code{when} parameter.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{InputValidator$add_validator(validator, when = ~TRUE)}\if{html}{\out{</div>}}
 }
@@ -73,7 +107,11 @@ return that object to the caller.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{validator}}{A \code{InputValidator} object.}
+\item{\code{validator}}{An \code{InputValidator} object.}
+
+\item{\code{when}}{Either a no-argument function, or a single-sided formula,
+that returns \code{TRUE} when the child validator's rules should be invoked
+and \code{FALSE} when the rules should be skipped.}
 }
 \if{html}{\out{</div>}}
 }
@@ -150,8 +188,10 @@ called to resume input validation.
 \if{html}{\out{<a id="method-fields"></a>}}
 \if{latex}{\out{\hypertarget{method-fields}{}}}
 \subsection{Method \code{fields()}}{
+Returns \code{TRUE} if all input validation rules currently pass,
+\code{FALSE} if not.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{InputValidator$fields(include_child_validators = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{InputValidator$fields()}\if{html}{\out{</div>}}
 }
 
 }
@@ -162,19 +202,9 @@ called to resume input validation.
 Returns \code{TRUE} if all input validation rules currently pass,
 \code{FALSE} if not.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{InputValidator$is_valid(include_child_validators = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{InputValidator$is_valid()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{include_child_validators}}{If \code{TRUE}, this method will only return
-\code{TRUE} if all child validators also return \code{TRUE}. If \code{FALSE}, then
-only the rules registered directly against this validator object will
-be considered.}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-validate"></a>}}
@@ -187,18 +217,8 @@ names are (fully namespace qualified) input IDs, and the values are
 either \code{NULL} (if the input value is passing) or a single-element
 character vector describing a validation problem.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{InputValidator$validate(include_child_validators = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{InputValidator$validate()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{include_child_validators}}{If \code{TRUE}, this method will call the
-\code{validate()} method on all child validator objects and merge the
-results with this validator's results. If \code{FALSE}, then only the rules
-directly added to this validator object will be considered.}
-}
-\if{html}{\out{</div>}}
-}
 }
 }

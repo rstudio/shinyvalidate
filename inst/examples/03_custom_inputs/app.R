@@ -27,14 +27,23 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   iv <- InputValidator$new()
-  iv$add_rule("selfie", ~if (input$type == "selfie") need(., label = "Selfie"))
-  iv$add_rule("upload", ~if (input$type == "upload") need(., label = "Upload"))
-  iv$add_rule("upload", function(upload) {
-    if (input$type == "upload" && !tools::file_ext(upload$name) %in% c("jpg", "jpeg", "png")) {
+  
+  selfie_iv <- InputValidator$new()
+  selfie_iv$add_rule("selfie", sv_required())
+  iv$add_validator(selfie_iv, when = ~ input$type == "selfie")
+  
+  upload_iv <- InputValidator$new()
+  upload_iv$add_rule("upload", sv_required())
+  upload_iv$add_rule("upload", function(upload) {
+    if (!tools::file_ext(upload$name) %in% c("jpg", "jpeg", "png")) {
       "A JPEG or PNG file is required"
     }
   })
-  iv$add_rule("email", ~if (input$type == "gravatar") need(., label = "Email"))
+  iv$add_validator(upload_iv, when = ~ input$type == "upload")
+  
+  gravatar_iv <- InputValidator$new()
+  gravatar_iv$add_rule("email", sv_required())
+  iv$add_validator(gravatar_iv, when = ~ input$type == "gravatar")
   
   output$upload_preview <- renderUI({
     req(input$upload)

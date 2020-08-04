@@ -10,10 +10,12 @@ An R6 class for adding realtime input validation to Shiny apps.
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{InputValidator$new()}}
+\item \href{#method-parent}{\code{InputValidator$parent()}}
 \item \href{#method-add_validator}{\code{InputValidator$add_validator()}}
 \item \href{#method-add_rule}{\code{InputValidator$add_rule()}}
 \item \href{#method-enable}{\code{InputValidator$enable()}}
 \item \href{#method-disable}{\code{InputValidator$disable()}}
+\item \href{#method-fields}{\code{InputValidator$fields()}}
 \item \href{#method-is_valid}{\code{InputValidator$is_valid()}}
 \item \href{#method-validate}{\code{InputValidator$validate()}}
 }
@@ -43,6 +45,15 @@ the default.)}
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-parent"></a>}}
+\if{latex}{\out{\hypertarget{method-parent}{}}}
+\subsection{Method \code{parent()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{InputValidator$parent(validator)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add_validator"></a>}}
 \if{latex}{\out{\hypertarget{method-add_validator}{}}}
 \subsection{Method \code{add_validator()}}{
@@ -56,7 +67,7 @@ This is intended to help with validating Shiny modules. Each module can
 create its own \code{InputValidator} object and populate it with rules, then
 return that object to the caller.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{InputValidator$add_validator(validator)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{InputValidator$add_validator(validator, when = ~TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -132,6 +143,15 @@ stop providing feedback going forward. Once disabled, \code{enable()} can be
 called to resume input validation.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{InputValidator$disable()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-fields"></a>}}
+\if{latex}{\out{\hypertarget{method-fields}{}}}
+\subsection{Method \code{fields()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{InputValidator$fields(include_child_validators = TRUE)}\if{html}{\out{</div>}}
 }
 
 }

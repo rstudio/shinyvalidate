@@ -35,7 +35,8 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     observer_handle = NULL,
     priority = numeric(0),
     rules = NULL,
-    validators = list()
+    validators = NULL,
+    is_child = FALSE
   ),
   public = list(
     #' @description
@@ -55,12 +56,17 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       private$session <- session
       private$priority <- priority
       private$rules <- reactiveVal(list(), label = "validation_rules")
+      private$validators <- reactiveVal(list(), label = "child_validators")
       
       # Inject shinyvalidate dependencies (just once)
       if (!isTRUE(session$userData[["shinyvalidate-initialized"]])) {
         shiny::insertUI("body", "beforeEnd", list(htmldep(), HTML("")), immediate = TRUE)
         session$userData[["shinyvalidate-initialized"]] <- TRUE
       }
+    },
+    parent = function(validator) {
+      self$disable()
+      private$is_child <- TRUE
     },
     #' @description Add another `InputValidator` object to this one, as a
     #' "child". Any time this validator object is asked for its validity, it
@@ -73,11 +79,19 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #' return that object to the caller.
     #'
     #' @param validator A `InputValidator` object.
-    add_validator = function(validator) {
+    add_validator = function(validator, when = ~ TRUE) {
       if (!inherits(validator, "InputValidator")) {
         stop("add_validator was called with an invalid `validator` argument; InputValidator object expected")
       }
-      private$validators <- c(private$validators, list(validator))
+      
+      if (inherits(when, "formula")) {
+        when <- rlang::as_function(when)
+      }
+      
+      validator$parent(self)
+      private$validators(c(isolate(private$validators()), list(
+        list(validator = validator, when = when)
+      )))
       invisible(self)
     },
     #' @description Add an input validation rule. Each input validation rule
@@ -122,13 +136,13 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   the feedback up-to-date. (It's safe to call the `enable()` method
     #'   on an already-enabled validator.)
     enable = function() {
-      for (validator in private$validators) {
-        validator$enable()
+      if (private$is_child) {
+        return()
       }
       if (!private$enabled) {
         withReactiveDomain(private$session, {
           private$observer_handle <- observe({
-            results <- self$validate(include_child_validators = FALSE)
+            results <- self$validate(include_child_validators = TRUE)
             private$session$sendCustomMessage("validation-jcheng5", results)
           }, priority = private$priority)
         })
@@ -142,17 +156,22 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   stop providing feedback going forward. Once disabled, `enable()` can be
     #'   called to resume input validation.
     disable = function() {
-      for (validator in private$validators) {
-        validator$disable()
-      }
       if (private$enabled) {
         private$observer_handle$destroy()
         private$observer_handle <- NULL
         private$enabled <- FALSE
-        results <- self$validate(include_child_validators = FALSE)
-        results <- lapply(results, function(x) NULL)
-        private$session$sendCustomMessage("validation-jcheng5", results)
+        if (!private$is_child) {
+          results <- self$validate(include_child_validators = TRUE)
+          results <- lapply(results, function(x) NULL)
+          private$session$sendCustomMessage("validation-jcheng5", results)
+        }
       }
+    },
+    fields = function(include_child_validators = TRUE) {
+      fieldslist <- unlist(lapply(private$validators(), function(validator_info) {
+        validator_info$validator$fields()
+      }))
+      unique(c(fieldslist, names(private$rules())))
     },
     #' @description Returns `TRUE` if all input validation rules currently pass,
     #'   `FALSE` if not.
@@ -177,8 +196,14 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     validate = function(include_child_validators = TRUE) {
       dependency_results <- list()
       if (include_child_validators) {
-        for (validator in private$validators) {
-          dependency_results <- merge_results(dependency_results, validator$validate())
+        for (validator_info in private$validators()) {
+          if (validator_info$when()) {
+            child_results <- validator_info$validator$validate(include_child_validators = TRUE)
+          } else {
+            fields <- validator_info$validator$fields()
+            child_results <- setNames(rep_len(list(), length(fields)), fields)
+          }
+          dependency_results <- merge_results(dependency_results, child_results)
         }
       }
 

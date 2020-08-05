@@ -25,18 +25,22 @@ value is present. By default, the definition of "is present" is based on
 as well.
 }
 \examples{
-\dontrun{
-iv <- InputValidator$new()
+# Ignore withReactiveDomain(), it's just required to get this example to run
+# outside of Shiny
+shiny::withReactiveDomain(shiny::MockShinySession$new(), {
 
-# Basic usage: ensure that `input$title` is present, and return a terse
-# validation message if not
-iv$add_rule("title", sv_required())
+  iv <- InputValidator$
 
-# You can easily provide a custom message to display
-iv$add_rule("email", sv_required("An email is required"))
+  # Basic usage: ensure that `input$title` is present, and return a terse
+  # validation message if not
+  iv$add_rule("title", sv_required())
 
-# Provide a `test` argument to change the definition of "is present";
-# in this example, any non-NULL value will be accepted.
-iv$add_rule("choices", sv_required(test = is.null))
-}
+  # You can easily provide a custom message to display
+  iv$add_rule("email", sv_required("An email is required"))
+
+  # Provide a `test` argument to change the definition of "is present";
+  # in this example, any non-NULL value will be accepted.
+  iv$add_rule("choices", sv_required(test = is.null))
+
+})
 }

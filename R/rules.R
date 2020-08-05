@@ -17,20 +17,24 @@
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
-#' \dontrun{
-#' iv <- InputValidator$new()
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
 #' 
-#' # Basic usage: ensure that `input$title` is present, and return a terse
-#' # validation message if not
-#' iv$add_rule("title", sv_required())
+#'   iv <- InputValidator$
 #' 
-#' # You can easily provide a custom message to display
-#' iv$add_rule("email", sv_required("An email is required"))
+#'   # Basic usage: ensure that `input$title` is present, and return a terse
+#'   # validation message if not
+#'   iv$add_rule("title", sv_required())
 #' 
-#' # Provide a `test` argument to change the definition of "is present";
-#' # in this example, any non-NULL value will be accepted.
-#' iv$add_rule("choices", sv_required(test = is.null))
-#' }
+#'   # You can easily provide a custom message to display
+#'   iv$add_rule("email", sv_required("An email is required"))
+#' 
+#'   # Provide a `test` argument to change the definition of "is present";
+#'   # in this example, any non-NULL value will be accepted.
+#'   iv$add_rule("choices", sv_required(test = is.null))
+#'
+#' })
 #' @export
 sv_required <- function(message = "Required", test = shiny::isTruthy) {
   force(message)
@@ -60,6 +64,23 @@ sv_required <- function(message = "Required", test = shiny::isTruthy) {
 #' @param ignore.case,perl,fixed,useBytes,invert Passed through to [base::grepl()].
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @examples
+#' #' # shiny::MockSession$new() is used to get this example to run outside of
+#' # Shiny. In a real Shiny app, you should just call InputValidator$new().
+#' iv <- InputValidator$new(session = shiny::MockSession$new())
+#'
+#' iv$add_rule("lookup_id",
+#'   sv_regex("^[a-zA-Z0-9]$", "Only alphanumeric characters are allowed")
+#' )
+#'
+#' # If you're more comfortable with wildcards than regex, use glob2rx
+#' iv$add_rule("image_filename",
+#'   sv_regex(glob2rx("*.png"),
+#'     message = "A filename ending in png was expected",
+#'     ignore.case = TRUE
+#'   )
+#' )
 #'
 #' @export
 sv_regex <- function(pattern, message, ignore.case = FALSE, perl = FALSE,
@@ -109,9 +130,17 @@ sv_regex <- function(pattern, message, ignore.case = FALSE, perl = FALSE,
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
+#' @examples
+#' # shiny::MockSession$new() is used to get this example to run outside of
+#' # Shiny. In a real Shiny app, you'd just call InputValidator$new().
+#' iv <- InputValidator$new(session = shiny::MockSession$new())
+#' 
+#' iv$add_rule("count", sv_integer())
+#' iv$add_rule("count", ~if (. <= 0) "A positive value is required")
+#'
 #' @export
-sv_numeric <- function(message, allowMultiple = FALSE, allowNA = FALSE,
-  allowNaN = FALSE, allowInfinite = FALSE) {
+sv_numeric <- function(message = "A number is required", allowMultiple = FALSE,
+  allowNA = FALSE, allowNaN = FALSE, allowInfinite = FALSE) {
 
   force(message)
   force(allowMultiple)
@@ -143,8 +172,9 @@ sv_numeric <- function(message, allowMultiple = FALSE, allowNA = FALSE,
 
 #' @rdname sv_numeric
 #' @export
-sv_integer <- function(message, allowMultiple = FALSE, allowNA = FALSE,
-  allowNaN = FALSE, allowInfinite = FALSE) {
+sv_integer <- function(message = "An integer is required",
+  allowMultiple = FALSE, allowNA = FALSE, allowNaN = FALSE,
+  allowInfinite = FALSE) {
   
   force(message)
   force(allowMultiple)

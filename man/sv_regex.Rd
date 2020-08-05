@@ -32,3 +32,21 @@ A function suitable for using as an
 A validation function, suitable for use with \code{InputValidator$add_rule()},
 that checks whether input values match the specified regular expression.
 }
+\examples{
+#' # shiny::MockSession$new() is used to get this example to run outside of
+# Shiny. In a real Shiny app, you should just call InputValidator$new().
+iv <- InputValidator$new(session = shiny::MockSession$new())
+
+iv$add_rule("lookup_id",
+  sv_regex("^[a-zA-Z0-9]$", "Only alphanumeric characters are allowed")
+)
+
+# If you're more comfortable with wildcards than regex, use glob2rx
+iv$add_rule("image_filename",
+  sv_regex(glob2rx("*.png"),
+    message = "A filename ending in png was expected",
+    ignore.case = TRUE
+  )
+)
+
+}

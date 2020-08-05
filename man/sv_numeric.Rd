@@ -6,7 +6,7 @@
 \title{Validate that a field is a number}
 \usage{
 sv_numeric(
-  message,
+  message = "A number is required",
   allowMultiple = FALSE,
   allowNA = FALSE,
   allowNaN = FALSE,
@@ -14,7 +14,7 @@ sv_numeric(
 )
 
 sv_integer(
-  message,
+  message = "An integer is required",
   allowMultiple = FALSE,
   allowNA = FALSE,
   allowNaN = FALSE,
@@ -48,4 +48,13 @@ A function suitable for using as an
 \code{is.integer}, respectively. By default, only a single, finite, not-missing,
 valid number/integer is allowed, but each of those criteria can be controlled
 via arguments.
+}
+\examples{
+# shiny::MockSession$new() is used to get this example to run outside of
+# Shiny. In a real Shiny app, you'd just call InputValidator$new().
+iv <- InputValidator$new(session = shiny::MockSession$new())
+
+iv$add_rule("count", sv_integer())
+iv$add_rule("count", ~if (. <= 0) "A positive value is required")
+
 }

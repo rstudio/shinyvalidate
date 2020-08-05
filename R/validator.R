@@ -167,7 +167,9 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #' @description Begin displaying input validation feedback in the user
     #'   interface. Once enabled, this validator object will automatically keep
     #'   the feedback up-to-date. (It's safe to call the `enable()` method
-    #'   on an already-enabled validator.)
+    #'   on an already-enabled validator.) If this validator object has been
+    #'   added to another validator object using `InputValidator$add_validator`,
+    #'   calls to `enable()` on this validator will be ignored.
     enable = function() {
       if (private$is_child) {
         return()

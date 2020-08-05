@@ -168,7 +168,9 @@ almost never a reason to change this from the default.)}
 Begin displaying input validation feedback in the user
 interface. Once enabled, this validator object will automatically keep
 the feedback up-to-date. (It's safe to call the \code{enable()} method
-on an already-enabled validator.)
+on an already-enabled validator.) If this validator object has been
+added to another validator object using \code{InputValidator$add_validator},
+calls to \code{enable()} on this validator will be ignored.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{InputValidator$enable()}\if{html}{\out{</div>}}
 }

@@ -47,7 +47,7 @@ sv_required <- function(message = "Required", test = shiny::isTruthy) {
   }
 }
 
-#' Validate based on regular expression
+#' Validate that a field matches a regular expression
 #'
 #' A validation function, suitable for use with `InputValidator$add_rule()`,
 #' that checks whether input values match the specified regular expression.
@@ -58,6 +58,8 @@ sv_required <- function(message = "Required", test = shiny::isTruthy) {
 #' @param message The validation error message to use if a value fails to match
 #'   the pattern.
 #' @param ignore.case,perl,fixed,useBytes,invert Passed through to [base::grepl()].
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @export
 sv_regex <- function(pattern, message, ignore.case = FALSE, perl = FALSE,
@@ -85,18 +87,40 @@ sv_regex <- function(pattern, message, ignore.case = FALSE, perl = FALSE,
   }
 }
 
+#' Validate that a field is a number
+#'
+#' `sv_numeric` and `sv_integer` validate that a field `is.numeric` and
+#' `is.integer`, respectively. By default, only a single, finite, not-missing,
+#' valid number/integer is allowed, but each of those criteria can be controlled
+#' via arguments.
+#'
+#' @param message The validation error message to use if a value fails to match
+#'   the rule.
+#' @param allowMultiple If `FALSE` (the default), then the length of the input
+#'   vector must be exactly one; if `TRUE`, then any length is allowed
+#'   (including a length of zero; use [sv_required()] if one or more values
+#'   should be required).
+#' @param allowNA If `FALSE` (the default), then any `NA` element will cause
+#'   validation to fail.
+#' @param allowNaN If `FALSE` (the default), then any `NaN` element will cause
+#'   validation to fail.
+#' @param allowInfinite If `FALSE` (the default), then any `Inf` or `-Inf`
+#'   element will cause validation to fail.
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
 #' @export
-sv_integer <- function(message, allowMultiple = FALSE, allowNA = FALSE,
+sv_numeric <- function(message, allowMultiple = FALSE, allowNA = FALSE,
   allowNaN = FALSE, allowInfinite = FALSE) {
-  
+
   force(message)
   force(allowMultiple)
   force(allowNA)
   force(allowNaN)
   force(allowInfinite)
-  
+
   function(value) {
-    if (!is.integer(value)) {
+    if (!is.numeric(value)) {
       return(message)
     }
     if (length(value) == 0) {
@@ -117,18 +141,19 @@ sv_integer <- function(message, allowMultiple = FALSE, allowNA = FALSE,
   }
 }
 
+#' @rdname sv_numeric
 #' @export
-sv_numeric <- function(message, allowMultiple = FALSE, allowNA = FALSE,
+sv_integer <- function(message, allowMultiple = FALSE, allowNA = FALSE,
   allowNaN = FALSE, allowInfinite = FALSE) {
-
+  
   force(message)
   force(allowMultiple)
   force(allowNA)
   force(allowNaN)
   force(allowInfinite)
-
+  
   function(value) {
-    if (!is.numeric(value)) {
+    if (!is.integer(value)) {
       return(message)
     }
     if (length(value) == 0) {

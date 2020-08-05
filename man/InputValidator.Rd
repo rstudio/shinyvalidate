@@ -49,7 +49,10 @@ that are completely unrelated to each other; each form would have its own
 \subsection{Method \code{new()}}{
 Create a new validator object.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{InputValidator$new(priority = 1000, session = getDefaultReactiveDomain())}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{InputValidator$new(
+  priority = 1000,
+  session = shiny::getDefaultReactiveDomain()
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -130,7 +133,7 @@ subsequent rules for that input from executing.
   inputId,
   rule,
   ...,
-  session. = getDefaultReactiveDomain()
+  session. = shiny::getDefaultReactiveDomain()
 )}\if{html}{\out{</div>}}
 }
 

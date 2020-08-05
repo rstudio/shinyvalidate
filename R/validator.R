@@ -71,18 +71,21 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   observers that do actual work, so users see validation updates quickly.
     #' @param session The Shiny `session` object. (You should probably just use
     #'   the default.)
-    initialize = function(priority = 1000, session = getDefaultReactiveDomain()) {
+    initialize = function(priority = 1000, session = shiny::getDefaultReactiveDomain()) {
       if (is.null(session)) {
-        stop("InputValidator objects must be created in the context of Shiny server functions or Shiny module server functions")
+        stop("InputValidator objects should be created in the context of Shiny server functions or Shiny module server functions")
       }
       private$session <- session
       private$priority <- priority
-      private$rules <- reactiveVal(list(), label = "validation_rules")
-      private$validators <- reactiveVal(list(), label = "child_validators")
+      private$rules <- shiny::reactiveVal(list(), label = "validation_rules")
+      private$validators <- shiny::reactiveVal(list(), label = "child_validators")
       
       # Inject shinyvalidate dependencies (just once)
       if (!isTRUE(session$userData[["shinyvalidate-initialized"]])) {
-        shiny::insertUI("body", "beforeEnd", list(htmldep(), HTML("")), immediate = TRUE)
+        shiny::insertUI("body", "beforeEnd",
+          list(htmldep(), htmltools::HTML("")),
+          immediate = TRUE, session = session
+        )
         session$userData[["shinyvalidate-initialized"]] <- TRUE
       }
     },
@@ -119,7 +122,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       }
       
       validator$parent(self)
-      private$validators(c(isolate(private$validators()), list(
+      private$validators(c(shiny::isolate(private$validators()), list(
         list(validator = validator, when = when)
       )))
       invisible(self)
@@ -144,7 +147,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   whenever it is invoked.
     #' @param session. The session object to which the input belongs. (There's
     #'   almost never a reason to change this from the default.)
-    add_rule = function(inputId, rule, ..., session. = getDefaultReactiveDomain()) {
+    add_rule = function(inputId, rule, ..., session. = shiny::getDefaultReactiveDomain()) {
       args <- rlang::list2(...)
       if (is.null(rule)) {
         rule <- function(value, ...) NULL
@@ -158,7 +161,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         do.call(rule, c(list(value), args))
       }
       rule_info <- list(rule = applied_rule, session = session.)
-      private$rules(c(isolate(private$rules()), setNames(list(rule_info), inputId)))
+      private$rules(c(shiny::isolate(private$rules()), stats::setNames(list(rule_info), inputId)))
       invisible(self)
     },
     #' @description Begin displaying input validation feedback in the user
@@ -170,8 +173,8 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         return()
       }
       if (!private$enabled) {
-        withReactiveDomain(private$session, {
-          private$observer_handle <- observe({
+        shiny::withReactiveDomain(private$session, {
+          private$observer_handle <- shiny::observe({
             results <- self$validate()
             private$session$sendCustomMessage("validation-jcheng5", results)
           }, priority = private$priority)
@@ -224,7 +227,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
           child_results <- validator_info$validator$validate()
         } else {
           fields <- validator_info$validator$fields()
-          child_results <- setNames(rep_len(list(), length(fields)), fields)
+          child_results <- stats::setNames(rep_len(list(), length(fields)), fields)
         }
         dependency_results <- merge_results(dependency_results, child_results)
       }
@@ -245,7 +248,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
           if (is.null(result)) {
             if (!fullname %in% names(results)) {
               # Can't do results[[fullname]] <<- NULL, that just removes the element
-              results <<- c(results, setNames(list(NULL), fullname))
+              results <<- c(results, stats::setNames(list(NULL), fullname))
             }
           } else {
             results[[fullname]] <<- result

@@ -14,7 +14,8 @@ LazyData: true
 Imports: 
     shiny (>= 1.5.0.9001),
     utils,
-    htmltools
+    htmltools,
+    rlang
 Remotes: 
     rstudio/shiny#2975
 RoxygenNote: 7.1.1

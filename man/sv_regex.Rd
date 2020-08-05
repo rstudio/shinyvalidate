@@ -2,7 +2,7 @@
 % Please edit documentation in R/rules.R
 \name{sv_regex}
 \alias{sv_regex}
-\title{Validate based on regular expression}
+\title{Validate that a field matches a regular expression}
 \usage{
 sv_regex(
   pattern,
@@ -23,6 +23,10 @@ length 2 or more is supplied, the first element is used with a warning.}
 the pattern.}
 
 \item{ignore.case, perl, fixed, useBytes, invert}{Passed through to \code{\link[base:grep]{base::grepl()}}.}
+}
+\value{
+A function suitable for using as an
+\code{\link[=InputValidator]{InputValidator$add_rule()}} rule.
 }
 \description{
 A validation function, suitable for use with \code{InputValidator$add_rule()},

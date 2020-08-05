@@ -1,10 +1,44 @@
 # TODO:
 # sv_lookup - make sure value is in a list of choices
 
+#' Validate that the field is present
+#'
+#' Call `sv_required()` to generate a validation function that ensures an input
+#' value is present. By default, the definition of "is present" is based on
+#' [shiny::isTruthy()], which is the logic used by the [shiny::req()] function
+#' as well.
+#'
+#' @param message The validation error message to be displayed if the test does
+#'   not pass.
+#' @param test A single-argument function, or single-sided formula (using `.` to
+#'   access the value to test), that returns `TRUE` for success and `FALSE` for
+#'   failure.
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @examples
+#' \dontrun{
+#' iv <- InputValidator$new()
+#' 
+#' # Basic usage: ensure that `input$title` is present, and return a terse
+#' # validation message if not
+#' iv$add_rule("title", sv_required())
+#' 
+#' # You can easily provide a custom message to display
+#' iv$add_rule("email", sv_required("An email is required"))
+#' 
+#' # Provide a `test` argument to change the definition of "is present";
+#' # in this example, any non-NULL value will be accepted.
+#' iv$add_rule("choices", sv_required(test = is.null))
+#' }
 #' @export
-sv_required <- function(message = "Required", test = isTruthy) {
+sv_required <- function(message = "Required", test = shiny::isTruthy) {
   force(message)
   force(test)
+  
+  if (inherits(test, "formula")) {
+    test <- rlang::as_function(test)
+  }
   
   function(value) {
     if (!test(value)) {

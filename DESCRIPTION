@@ -20,3 +20,5 @@ Remotes:
     rstudio/shiny#2975
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
+Suggests: 
+    testthat

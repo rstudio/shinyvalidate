@@ -21,7 +21,7 @@
 #' # outside of Shiny
 #' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
 #' 
-#'   iv <- InputValidator$
+#'   iv <- InputValidator$new()
 #' 
 #'   # Basic usage: ensure that `input$title` is present, and return a terse
 #'   # validation message if not
@@ -66,21 +66,25 @@ sv_required <- function(message = "Required", test = shiny::isTruthy) {
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
-#' #' # shiny::MockSession$new() is used to get this example to run outside of
-#' # Shiny. In a real Shiny app, you should just call InputValidator$new().
-#' iv <- InputValidator$new(session = shiny::MockSession$new())
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' 
+#'   iv <- InputValidator$new()
 #'
-#' iv$add_rule("lookup_id",
-#'   sv_regex("^[a-zA-Z0-9]$", "Only alphanumeric characters are allowed")
-#' )
-#'
-#' # If you're more comfortable with wildcards than regex, use glob2rx
-#' iv$add_rule("image_filename",
-#'   sv_regex(glob2rx("*.png"),
-#'     message = "A filename ending in png was expected",
-#'     ignore.case = TRUE
+#'   iv$add_rule("lookup_id",
+#'     sv_regex("^[a-zA-Z0-9]$", "Only alphanumeric characters are allowed")
 #'   )
-#' )
+#'
+#'   # If you're more comfortable with wildcards than regex, use glob2rx
+#'   iv$add_rule("image_filename",
+#'     sv_regex(glob2rx("*.png"),
+#'       message = "A filename ending in png was expected",
+#'       ignore.case = TRUE
+#'     )
+#'   )
+#'
+#' })
 #'
 #' @export
 sv_regex <- function(pattern, message, ignore.case = FALSE, perl = FALSE,
@@ -131,13 +135,16 @@ sv_regex <- function(pattern, message, ignore.case = FALSE, perl = FALSE,
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
-#' # shiny::MockSession$new() is used to get this example to run outside of
-#' # Shiny. In a real Shiny app, you'd just call InputValidator$new().
-#' iv <- InputValidator$new(session = shiny::MockSession$new())
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
 #' 
-#' iv$add_rule("count", sv_integer())
-#' iv$add_rule("count", ~if (. <= 0) "A positive value is required")
+#'   iv <- InputValidator$new()
+#' 
+#'   iv$add_rule("count", sv_integer())
+#'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
 #'
+#' })
 #' @export
 sv_numeric <- function(message = "A number is required", allowMultiple = FALSE,
   allowNA = FALSE, allowNaN = FALSE, allowInfinite = FALSE) {

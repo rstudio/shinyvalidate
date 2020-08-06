@@ -50,11 +50,14 @@ valid number/integer is allowed, but each of those criteria can be controlled
 via arguments.
 }
 \examples{
-# shiny::MockSession$new() is used to get this example to run outside of
-# Shiny. In a real Shiny app, you'd just call InputValidator$new().
-iv <- InputValidator$new(session = shiny::MockSession$new())
+# Ignore withReactiveDomain(), it's just required to get this example to run
+# outside of Shiny
+shiny::withReactiveDomain(shiny::MockShinySession$new(), {
 
-iv$add_rule("count", sv_integer())
-iv$add_rule("count", ~if (. <= 0) "A positive value is required")
+  iv <- InputValidator$new()
 
+  iv$add_rule("count", sv_integer())
+  iv$add_rule("count", ~if (. <= 0) "A positive value is required")
+
+})
 }

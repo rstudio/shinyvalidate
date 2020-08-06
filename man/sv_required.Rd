@@ -29,7 +29,7 @@ as well.
 # outside of Shiny
 shiny::withReactiveDomain(shiny::MockShinySession$new(), {
 
-  iv <- InputValidator$
+  iv <- InputValidator$new()
 
   # Basic usage: ensure that `input$title` is present, and return a terse
   # validation message if not

@@ -1,5 +1,5 @@
 Package: shinyvalidate
-Title: Add input validation to Shiny apps
+Title: Input validation for Shiny apps
 Version: 0.0.0.9000
 Authors@R: c(
     person("Joe", "Cheng", , "joe@rstudio.com", c("aut", "cre")),

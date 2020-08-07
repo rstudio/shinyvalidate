@@ -6,24 +6,26 @@ ui <- fluidPage(
   hr(),
   textInput("name", "Name"),
   textInput("email", "Email"),
-  p(
-    "Is user input valid: ",
-    uiOutput("valid", container = tags$strong)
-  )
+  textOutput("greeting")
 )
 
 server <- function(input, output, session) {
+  # Create an InputValidator object
   iv <- InputValidator$new()
-  iv$add_rule("name", need, label = "Name")
-  iv$add_rule("email", need, label = "Email")
-  iv$add_rule("email", ~ if (!is_valid_email(.)) "Please provide a valid email")
+  
+  # Add validation rules
+  iv$add_rule("name", sv_required())
+  iv$add_rule("email", sv_required())
+  iv$add_rule("email", ~ if (!is_valid_email(.)) "Not a valid email")
+  
+  # Start displaying errors in the UI
   iv$enable()
   
-  output$valid <- renderUI({
-    if (iv$is_valid())
-      tags$span(class = "text-success", "Yes!")
-    else
-      tags$span(class = "text-danger", "No")
+  output$greeting <- renderText({
+    # Don't proceed if any input is invalid
+    req(iv$is_valid())
+    
+    paste0("Nice to meet you, ", input$name, " <", input$email, ">!")
   })
 }
 

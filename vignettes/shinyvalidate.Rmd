@@ -1,0 +1,69 @@
+---
+title: "Introduction to shinyvalidate"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to shinyvalidate}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(shinyvalidate)
+```
+
+When we present users of our apps with opportunities to input data, there's often the possibility that they can input data incorrectly. They might leave a required input blank, or make a series of choices that make no sense in combination, or fill the "Email address" field with a value that is clearly not a valid email address.
+
+In these cases, we want to provide feedback to the user that they've made a mistake.
+
+[screenshot]
+
+## Basic usage
+
+To add input validation to your app:
+
+1.  Create an `InputValidator` object (in this doc, we will usually name the variable `iv`).
+
+2.  Add one or more validation rules to `iv`.
+
+3.  Start displaying realtime feedback in the UI by calling `iv$enable()`.
+
+4.  Protect calculations and operations that rely on valid inputs, by checking that `iv$is_valid()` returns `TRUE`.
+
+Note that all of these steps must be performed in your Shiny app's `server` function.
+
+To see this in action, let's look at the server function from the `01_simple` example app [[source](https://github.com/jcheng5/shinyvalidate/blob/master/inst/examples/01_simple/app.R), [live demo](javascript:alert("TODO");)].
+
+``` {.r}
+server <- function(input, output, session) {
+  # 1. Create an InputValidator object
+  iv <- InputValidator$new()
+  
+  # 2. Add validation rules
+  iv$add_rule("name", sv_required())
+  iv$add_rule("email", sv_required())
+  iv$add_rule("email", ~ if (!is_valid_email(.)) "Not a valid email")
+  
+  # 3. Start displaying errors in the UI
+  iv$enable()
+  
+  output$greeting <- renderText({
+    # 4. Don't proceed if any input is invalid
+    req(iv$is_valid())
+    
+    paste0("Nice to meet you, ", input$name, " <", input$email, ">!")
+  })
+}
+```
+
+This validator has rules that check that a value is provided for `name` and `email`, and that the provided email is valid.
+
+### What about `shiny::validate()`?
+
+While Shiny has long had [validation features](https://shiny.rstudio.com/articles/validation.html) around [`shiny::validate()`](https://shiny.rstudio.com/reference/shiny/latest/validate.html), a big problem with that function is that it only shows validation feedback in downstream reactive *outputs*, instead of providing the feedback next to the incorrect *inputs*. This behavior is surprising to app authors and users alike, and as a result, not a lot of Shiny apps use `validate()`.

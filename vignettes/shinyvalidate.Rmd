@@ -14,10 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(shinyvalidate)
-```
-
 When we present users of our apps with opportunities to input data, there's often the possibility that they can input data incorrectly. They might leave a required input blank, or make a series of choices that make no sense in combination, or fill the "Email address" field with a value that is clearly not a valid email address.
 
 In these cases, we want to provide feedback to the user that they've made a mistake.
@@ -28,17 +24,19 @@ In these cases, we want to provide feedback to the user that they've made a mist
 
 To add input validation to your app:
 
-1.  Create an `InputValidator` object (in this doc, we will usually name the variable `iv`).
+1.  Create an [`InputValidator`](https://jcheng5.github.io/shinyvalidate/reference/InputValidator.html) object (in this doc, we will usually name the variable `iv`).
 
 2.  Add one or more validation rules to `iv`.
 
-3.  Start displaying realtime feedback in the UI by calling `iv$enable()`.
+3.  Start displaying realtime feedback in the UI by calling [`iv$enable()`](https://jcheng5.github.io/shinyvalidate/reference/InputValidator.html#method-enable-).
 
-4.  Protect calculations and operations that rely on valid inputs, by checking that `iv$is_valid()` returns `TRUE`.
+4.  Guard calculations and operations that rely on valid inputs, by checking that `iv$is_valid()` returns `TRUE`.
 
 Note that all of these steps must be performed in your Shiny app's `server` function.
 
-To see this in action, let's look at the server function from the `01_simple` example app [[source](https://github.com/jcheng5/shinyvalidate/blob/master/inst/examples/01_simple/app.R), [live demo](javascript:alert("TODO");)].
+To see this in action, let's look at the server function from the `01_simple` example app [[source](https://github.com/jcheng5/shinyvalidate/blob/master/inst/examples/01_simple/app.R), [live demo](javascript:alert(%22TODO%22);)].
+
+one `two` three `four` five
 
 ``` {.r}
 server <- function(input, output, session) {
@@ -62,7 +60,81 @@ server <- function(input, output, session) {
 }
 ```
 
-This validator has rules that check that a value is provided for `name` and `email`, and that the provided email is valid.
+This validator has rules that check that a value is provided for `input$name` and `input$email`, and that the provided email is valid.
+
+## Adding rules
+
+The most important part of the code above is the expression of validation rules via `add_rule()` calls. The function signature of `add_rule()` looks like this (minus the `session.` argument, which can generally be ignored):
+
+    InputValidator$add_rule(inputId, rule, ...)
+
+`inputId` should be a single-element character vector, with the ID of the input to be validated. Note that each call to `add_rule` must check the validness of one and only one input.
+
+The `rule` argument can take various forms:
+
+### Rules from helper functions
+
+For maximum convenience, shinyvalidate comes with a few helper functions that implement common validation rules. The [`sv_required`](https://jcheng5.github.io/shinyvalidate/reference/sv_required.html) helper is likely to be the one you reach for most often:
+
+``` {.r}
+iv$add_rule("title", sv_required(message = "Title must be provided"))
+```
+
+The `message` argument is optional; if you omit it, the default message is simply "Required". Keep in mind that validation error messages will be displayed next to the erroneous input, so it's generally not strictly necessary for the error message to spell out which input it refers to.
+
+Currently, shinyvalidate provides only a handful of validation helper functions. Besides `sv_required`, there's also [`sv_numeric`](https://jcheng5.github.io/shinyvalidate/reference/sv_numeric.html), [`sv_integer`](https://jcheng5.github.io/shinyvalidate/reference/sv_numeric.html), and [`sv_regex`](https://jcheng5.github.io/shinyvalidate/reference/sv_regex.html); see their help topics for more information.
+
+### Rules as formulas
+
+If your validation logic differs from the helper functions described above, you can use a formula to implement custom rules.
+
+``` {.r}
+iv$add_rule("count", ~ if (. < 0) "Negative values are not allowed")
+```
+
+Validation formulas should test the `.` variable, and return either `NULL` if the value is acceptable, or else a single-element character vector describing why the value is problematic.
+
+(If you're wondering why the formula in this example doesn't end with `else NULL`, note that in R, `if` expressions automatically return `invisible(NULL)` when false and no `else` is present.)
+
+### Rules as functions
+
+Finally, you can provide validation logic as a function.
+
+``` {.r}
+iv$add_rule("count", function(value) {
+  if (value < 0) {
+    "Negative values are not allowed"
+  }
+})
+```
+
+Functions receive the value to test as an argument (named `value` by convention), and should return `NULL` if that value is valid, and a single-element character vector with a descriptive message if the value is invalid.
+
+Note that you can use named functions, not just anonymous ones; and that if the function takes additional arguments, these can be provided via `…`, similar to how `lapply` works. This example demonstrates both:
+
+``` {.r}
+not_greater_than <- function(value, limit, message = "Value is too high") {
+  if (value > limit) message
+}
+
+iv$add_rule("samples", not_greater_than, limit = nrow(df),
+  message = "Sample count cannot exceed number of rows"
+)
+```
+
+(TODO: make examples reproducible)
+
+## Displaying realtime feedback
+
+Once you've created an `InputValidator` object and populated it with rules, shinyvalidate has the information it needs to check input values and report any problems it detects.
+
+However, it doesn't do so by default. Instead, you must call `iv$enable()` at least once to get validation errors to appear.
+
+The reason for this design is because many forms have an explicit "Submit" or "Continue" button, and in those cases, you may want to suppress the display of validation errors until the user actually attempts to submit the form. This is considered a better user experience than overwhelming the user with error messages before they've even started filling out the form.
+
+TODO: Left off here
+
+## Guarding calculations and actions
 
 ### What about `shiny::validate()`?
 

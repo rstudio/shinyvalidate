@@ -143,7 +143,7 @@
   }
 })</pre></body></html></div>
 <p>Functions receive the value to test as an argument (named <code>value</code> by convention), and should return <code>NULL</code> if that value is valid, and a single-element character vector with a descriptive message if the value is invalid.</p>
-<p>Note that you can use named functions, not just anonymous ones; and that if the function takes additional arguments, these can be provided via <code>…</code>, similar to how <code>lapply</code> works. This example demonstrates both:</p>
+<p>Note that you can use named functions, not just anonymous ones; and that if the function takes additional arguments, these can be provided by passing <code>...</code> arguments to <code>iv$add_rule()</code>, similar to how <code>lapply</code> works. This example demonstrates both:</p>
 <div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">not_greater_than</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">value</span>, <span class="no">limit</span>, <span class="no">message</span> <span class="kw">=</span> <span class="st">"Value is too high"</span>) {
   <span class="kw">if</span> (<span class="no">value</span> <span class="kw">&gt;</span> <span class="no">limit</span>) <span class="no">message</span>
 }

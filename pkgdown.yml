@@ -3,7 +3,7 @@ pkgdown: 1.5.1
 pkgdown_sha: ~
 articles:
   shinyvalidate: shinyvalidate.html
-last_built: 2020-08-13T20:24Z
+last_built: 2020-08-13T20:40Z
 urls:
   reference: https://jcheng5.github.io/shinyvalidate//reference
   article: https://jcheng5.github.io/shinyvalidate//articles

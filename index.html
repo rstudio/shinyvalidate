@@ -46,6 +46,9 @@
   </a>
 </li>
 <li>
+  <a href="articles/shinyvalidate.html">Get started</a>
+</li>
+<li>
   <a href="reference/index.html">Reference</a>
 </li>
       </ul>
@@ -71,14 +74,6 @@
 <h2 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h2>
 <p>shinyvalidate adds input validation capabilities to <a href="https://shiny.rstudio.com">Shiny</a>.</p>
-</div>
-<div id="prior-art" class="section level2">
-<h2 class="hasAnchor">
-<a href="#prior-art" class="anchor"></a>Prior art</h2>
-<ul>
-<li>
-<a href="https://github.com/merlinoa/shinyFeedback">shinyFeedback</a> by <a href="https://github.com/merlinoa">@merlinoa</a>, who graciously provided feedback on the design of shinyvalidate.</li>
-</ul>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
@@ -121,12 +116,20 @@
 }
 
 <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/shinyApp.html">shinyApp</a></span>(<span class="no">ui</span>, <span class="no">server</span>)</pre></div>
-<p>To learn about other features of shinyvalidate, including deferred validation, programmatically accessing validation results, and validating Shiny modules, see the full usage guide (TODO).</p>
+<p>To learn about other features of shinyvalidate, including deferred validation, programmatically accessing validation results, and validating Shiny modules, see the Getting Started guide.</p>
 </div>
-<div id="compatibility" class="section level2">
+<div id="input-widget-compatibility" class="section level2">
 <h2 class="hasAnchor">
-<a href="#compatibility" class="anchor"></a>Compatibility</h2>
-<p>TODO</p>
+<a href="#input-widget-compatibility" class="anchor"></a>Input widget compatibility</h2>
+<p>shinyvalidate should work with all of the inputs that are included in Shiny. It will also work with most custom inputs that follow Bootstrap 3 conventions. Other types of custom inputs can include their own logic for displaying shinyvalidate error messages; see the (TODO) article to learn more.</p>
+</div>
+<div id="prior-art" class="section level2">
+<h2 class="hasAnchor">
+<a href="#prior-art" class="anchor"></a>Prior art</h2>
+<ul>
+<li><p><a href="https://shiny.rstudio.com/articles/validation.html">Shiny’s built-in validation</a>. The <code><a href="https://shiny.rstudio.com/reference/shiny/latest/validate.html">shiny::validate()</a></code> function fits naturally with Shiny’s reactive programming model, but has limited usefulness because it only shows validation feedback in downstream reactive outputs, instead of providing the feedback next to the incorrect input, where users expect it.</p></li>
+<li><p><a href="https://github.com/merlinoa/shinyFeedback">shinyFeedback</a> by <a href="https://github.com/merlinoa">@merlinoa</a>, who graciously provided feedback on the design of shinyvalidate. Compared to shinyFeedback, shinyvalidate aims to have a more concise but less flexible R API; and on the UI side, shinyFeedback displays richer feedback on a hardcoded set of components, while shinyvalidate feedback is minimalistic but aims to support a larger set of components and is extensible for custom inputs.</p></li>
+</ul>
 </div>
 </div>
   </div>

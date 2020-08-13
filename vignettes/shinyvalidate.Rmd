@@ -110,7 +110,7 @@ iv$add_rule("count", function(value) {
 
 Functions receive the value to test as an argument (named `value` by convention), and should return `NULL` if that value is valid, and a single-element character vector with a descriptive message if the value is invalid.
 
-Note that you can use named functions, not just anonymous ones; and that if the function takes additional arguments, these can be provided via `…`, similar to how `lapply` works. This example demonstrates both:
+Note that you can use named functions, not just anonymous ones; and that if the function takes additional arguments, these can be provided by passing `...` arguments to `iv$add_rule()`, similar to how `lapply` works. This example demonstrates both:
 
 ``` {.r}
 not_greater_than <- function(value, limit, message = "Value is too high") {

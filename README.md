@@ -11,10 +11,6 @@
 
 shinyvalidate adds input validation capabilities to [Shiny](https://shiny.rstudio.com).
 
-## Prior art
-
-* [shinyFeedback](https://github.com/merlinoa/shinyFeedback) by [@merlinoa](https://github.com/merlinoa), who graciously provided feedback on the design of shinyvalidate.
-
 ## Installation
 
 shinyvalidate is not yet available on CRAN. In the meantime, you can install it from GitHub using the remotes package.
@@ -58,8 +54,14 @@ is_valid_email <- function(x) {
 shinyApp(ui, server)
 ```
 
-To learn about other features of shinyvalidate, including deferred validation, programmatically accessing validation results, and validating Shiny modules, see the full usage guide (TODO).
+To learn about other features of shinyvalidate, including deferred validation, programmatically accessing validation results, and validating Shiny modules, see the Getting Started guide.
 
-## Compatibility
+## Input widget compatibility
 
-TODO
+shinyvalidate should work with all of the inputs that are included in Shiny. It will also work with most custom inputs that follow Bootstrap 3 conventions. Other types of custom inputs can include their own logic for displaying shinyvalidate error messages; see the (TODO) article to learn more.
+
+## Prior art
+
+* [Shiny's built-in validation](https://shiny.rstudio.com/articles/validation.html). The `shiny::validate()` function fits naturally with Shiny's reactive programming model, but has limited usefulness because it only shows validation feedback in downstream reactive outputs, instead of providing the feedback next to the incorrect input, where users expect it.
+
+* [shinyFeedback](https://github.com/merlinoa/shinyFeedback) by [@merlinoa](https://github.com/merlinoa), who graciously provided feedback on the design of shinyvalidate. Compared to shinyFeedback, shinyvalidate aims to have a more concise but less flexible R API; and on the UI side, shinyFeedback displays richer feedback on a hardcoded set of components, while shinyvalidate feedback is minimalistic but aims to support a larger set of components and is extensible for custom inputs.

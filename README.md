@@ -29,6 +29,8 @@ To add validation to your Shiny app, you need to:
 
 That's all you need to do to get validation messages to show up. Here is a simple example:
 
+<img src="man/figures/demo.gif" width="316" alt="Screencast of empty 'Name' and 'Email' fields showing error messages beneath them, and the user providing valid input that clears the errors"/>
+
 ```r
 library(shiny)
 library(shinyvalidate)
@@ -40,8 +42,8 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   iv <- InputValidator$new()
-  iv$add_rule("name", need, label = "Name")
-  iv$add_rule("email", need, label = "Email")
+  iv$add_rule("name", sv_required())
+  iv$add_rule("email", sv_required())
   iv$add_rule("email", ~ if (!is_valid_email(.)) "Please provide a valid email")
   iv$enable()
 }

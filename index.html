@@ -94,7 +94,7 @@
 </li>
 </ol>
 <p>That’s all you need to do to get validation messages to show up. Here is a simple example:</p>
-<p><img src="reference/figures/demo.gif" width="316"></p>
+<p><img src="reference/figures/demo.gif" width="316" alt="Screencast of empty 'Name' and 'Email' fields showing error messages beneath them, and the user providing valid input that clears the errors"></p>
 <div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">shiny</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">shinyvalidate</span>)
 
@@ -105,8 +105,8 @@
 
 <span class="no">server</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">input</span>, <span class="no">output</span>, <span class="no">session</span>) {
   <span class="no">iv</span> <span class="kw">&lt;-</span> <span class="no">InputValidator</span>$<span class="fu">new</span>()
-  <span class="no">iv</span>$<span class="fu">add_rule</span>(<span class="st">"name"</span>, <span class="no">need</span>, <span class="kw">label</span> <span class="kw">=</span> <span class="st">"Name"</span>)
-  <span class="no">iv</span>$<span class="fu">add_rule</span>(<span class="st">"email"</span>, <span class="no">need</span>, <span class="kw">label</span> <span class="kw">=</span> <span class="st">"Email"</span>)
+  <span class="no">iv</span>$<span class="fu">add_rule</span>(<span class="st">"name"</span>, <span class="fu"><a href="reference/sv_required.html">sv_required</a></span>())
+  <span class="no">iv</span>$<span class="fu">add_rule</span>(<span class="st">"email"</span>, <span class="fu"><a href="reference/sv_required.html">sv_required</a></span>())
   <span class="no">iv</span>$<span class="fu">add_rule</span>(<span class="st">"email"</span>, ~ <span class="kw">if</span> (!<span class="fu">is_valid_email</span>(<span class="no">.</span>)) <span class="st">"Please provide a valid email"</span>)
   <span class="no">iv</span>$<span class="fu">enable</span>()
 }

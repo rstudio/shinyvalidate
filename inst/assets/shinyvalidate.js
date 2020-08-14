@@ -67,7 +67,7 @@ strategies.push(bindingStrategy);
 const bs3Strategy = {
   findInputContainer: function(el) {
     el = $(el);
-    const inputContainer = el.is(".shiny-input-container") ? el : el.parents(".shiny-input-container");
+    const inputContainer = el.is(".form-group") ? el : el.parents(".form-group");
     return inputContainer.length === 0 ? null : inputContainer;
   },
   setInvalid: function(el, binding, id, message) {

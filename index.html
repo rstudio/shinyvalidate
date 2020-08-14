@@ -51,6 +51,18 @@
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="articles/displaying.html">Displaying validation errors</a>
+    </li>
+  </ul>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
 </div>
@@ -79,7 +91,7 @@
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>shinyvalidate is not yet available on CRAN. In the meantime, you can install it from GitHub using the remotes package.</p>
-<div class="sourceCode" id="cb1"><pre class="r"><span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"rstudio/shinyvalidate"</span>)</pre></div>
+<pre class="{.r}"><code><a href="https://remotes.r-lib.org/reference/install_github.html">remotes::install_github("rstudio/shinyvalidate")</a></code></pre>
 </div>
 <div id="basic-usage" class="section level2">
 <h2 class="hasAnchor">
@@ -94,29 +106,29 @@
 </li>
 </ol>
 <p>That’s all you need to do to get validation messages to show up. Here is a simple example:</p>
-<p><img src="reference/figures/demo.gif" width="316" alt="Screencast of empty 'Name' and 'Email' fields showing error messages beneath them, and the user providing valid input that clears the errors"></p>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">shiny</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">shinyvalidate</span>)
+<p><img src="reference/figures/demo.gif" alt="Screencast of empty ‘Name’ and ‘Email’ fields showing error messages beneath them, and the user providing valid input that clears the errors">{width=“316”}</p>
+<pre class="{.r}"><code><a href="https://shiny.rstudio.com/reference/shiny/latest">library(shiny)
+library(shinyvalidate)
 
-<span class="no">ui</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/fluidPage.html">fluidPage</a></span>(
-  <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/textInput.html">textInput</a></span>(<span class="st">"name"</span>, <span class="st">"Name"</span>),
-  <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/textInput.html">textInput</a></span>(<span class="st">"email"</span>, <span class="st">"Email"</span>)
+ui &lt;- fluidPage(
+  textInput("name", "Name"),
+  textInput("email", "Email")
 )
 
-<span class="no">server</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">input</span>, <span class="no">output</span>, <span class="no">session</span>) {
-  <span class="no">iv</span> <span class="kw">&lt;-</span> <span class="no">InputValidator</span>$<span class="fu">new</span>()
-  <span class="no">iv</span>$<span class="fu">add_rule</span>(<span class="st">"name"</span>, <span class="fu"><a href="reference/sv_required.html">sv_required</a></span>())
-  <span class="no">iv</span>$<span class="fu">add_rule</span>(<span class="st">"email"</span>, <span class="fu"><a href="reference/sv_required.html">sv_required</a></span>())
-  <span class="no">iv</span>$<span class="fu">add_rule</span>(<span class="st">"email"</span>, ~ <span class="kw">if</span> (!<span class="fu">is_valid_email</span>(<span class="no">.</span>)) <span class="st">"Please provide a valid email"</span>)
-  <span class="no">iv</span>$<span class="fu">enable</span>()
+server &lt;- function(input, output, session) {
+  iv &lt;- InputValidator$new()
+  iv$add_rule("name", sv_required())
+  iv$add_rule("email", sv_required())
+  iv$add_rule("email", ~ if (!is_valid_email(.)) "Please provide a valid email")
+  iv$enable()
 }
 
-<span class="co"># From https://www.nicebread.de/validating-email-adresses-in-r/</span>
-<span class="no">is_valid_email</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) {
-  <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="st">"^\\s*[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\s*$"</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="no">x</span>), <span class="kw">ignore.case</span><span class="kw">=</span><span class="fl">TRUE</span>)
+# From https://www.nicebread.de/validating-email-adresses-in-r/
+is_valid_email &lt;- function(x) {
+  grepl("^\\s*[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\s*$", as.character(x), ignore.case=TRUE)
 }
 
-<span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/shinyApp.html">shinyApp</a></span>(<span class="no">ui</span>, <span class="no">server</span>)</pre></div>
+shinyApp(ui, server)</a></code></pre>
 <p>To learn about other features of shinyvalidate, including deferred validation, programmatically accessing validation results, and validating Shiny modules, see the Getting Started guide.</p>
 </div>
 <div id="input-widget-compatibility" class="section level2">
@@ -129,7 +141,7 @@
 <a href="#prior-art" class="anchor"></a>Prior art</h2>
 <ul>
 <li><p><a href="https://shiny.rstudio.com/articles/validation.html">Shiny’s built-in validation</a>. The <code><a href="https://shiny.rstudio.com/reference/shiny/latest/validate.html">shiny::validate()</a></code> function fits naturally with Shiny’s reactive programming model, but has limited usefulness because it only shows validation feedback in downstream reactive outputs, instead of providing the feedback next to the incorrect input, where users expect it.</p></li>
-<li><p><a href="https://github.com/merlinoa/shinyFeedback">shinyFeedback</a> by <a href="https://github.com/merlinoa">@merlinoa</a>, who graciously provided feedback on the design of shinyvalidate. Compared to shinyFeedback, shinyvalidate aims to have a more concise but less flexible R API; and on the UI side, shinyFeedback displays richer feedback on a hardcoded set of components, while shinyvalidate feedback is minimalistic but aims to support a larger set of components and is extensible for custom inputs.</p></li>
+<li><p><a href="https://github.com/merlinoa/shinyFeedback">shinyFeedback</a> by <a href="https://github.com/merlinoa">@merlinoa</a>, who graciously provided feedback on the design of shinyvalidate. Compared to shinyFeedback, shinyvalidate aims to have a more concise but less flexible R API; and on the UI side, shinyFeedback displays richer feedback on a hard-coded set of components, while shinyvalidate feedback is minimalist but aims to support a larger set of components and is extensible for custom inputs.</p></li>
 </ul>
 </div>
 </div>

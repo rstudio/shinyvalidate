@@ -1,5 +1,6 @@
 library(shiny)
 library(shinyvalidate)
+library(markdown)
 
 ui <- fluidPage(
   includeMarkdown("README.md"),
@@ -10,6 +11,7 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
+
   # Create an InputValidator object
   iv <- InputValidator$new()
   

@@ -1,9 +1,8 @@
 # shinyvalidate
 
 <!-- badges: start -->
-[![R build status](https://github.com/jcheng5/shinyvalidate/workflows/R-CMD-check/badge.svg)](https://github.com/jcheng5/shinyvalidate/actions)
-<!-- badges: end -->
 
+[![R build status](https://github.com/jcheng5/shinyvalidate/workflows/R-CMD-check/badge.svg)](https://github.com/jcheng5/shinyvalidate/actions) <!-- badges: end -->
 
 **WARNING: Highly experimental, API still in flux**
 
@@ -15,7 +14,7 @@ shinyvalidate adds input validation capabilities to [Shiny](https://shiny.rstudi
 
 shinyvalidate is not yet available on CRAN. In the meantime, you can install it from GitHub using the remotes package.
 
-```r
+``` {.r}
 remotes::install_github("rstudio/shinyvalidate")
 ```
 
@@ -23,15 +22,15 @@ remotes::install_github("rstudio/shinyvalidate")
 
 To add validation to your Shiny app, you need to:
 
-1. Create an InputValidator object: `iv <- InputValidator$new()`
-2. Add one or more validation rules to the InputValidator: `iv$add_rule("title", need, message = "A title is required")`
-3. Turn the validator on: `iv$enable()`
+1.  Create an InputValidator object: `iv <- InputValidator$new()`
+2.  Add one or more validation rules to the InputValidator: `iv$add_rule("title", need, message = "A title is required")`
+3.  Turn the validator on: `iv$enable()`
 
 That's all you need to do to get validation messages to show up. Here is a simple example:
 
-<img src="man/figures/demo.gif" width="316" alt="Screencast of empty 'Name' and 'Email' fields showing error messages beneath them, and the user providing valid input that clears the errors"/>
+![Screencast of empty 'Name' and 'Email' fields showing error messages beneath them, and the user providing valid input that clears the errors](man/figures/demo.gif){width="316"}
 
-```r
+``` {.r}
 library(shiny)
 library(shinyvalidate)
 
@@ -64,6 +63,6 @@ shinyvalidate should work with all of the inputs that are included in Shiny. It 
 
 ## Prior art
 
-* [Shiny's built-in validation](https://shiny.rstudio.com/articles/validation.html). The `shiny::validate()` function fits naturally with Shiny's reactive programming model, but has limited usefulness because it only shows validation feedback in downstream reactive outputs, instead of providing the feedback next to the incorrect input, where users expect it.
+-   [Shiny's built-in validation](https://shiny.rstudio.com/articles/validation.html). The `shiny::validate()` function fits naturally with Shiny's reactive programming model, but has limited usefulness because it only shows validation feedback in downstream reactive outputs, instead of providing the feedback next to the incorrect input, where users expect it.
 
-* [shinyFeedback](https://github.com/merlinoa/shinyFeedback) by [@merlinoa](https://github.com/merlinoa), who graciously provided feedback on the design of shinyvalidate. Compared to shinyFeedback, shinyvalidate aims to have a more concise but less flexible R API; and on the UI side, shinyFeedback displays richer feedback on a hardcoded set of components, while shinyvalidate feedback is minimalistic but aims to support a larger set of components and is extensible for custom inputs.
+-   [shinyFeedback](https://github.com/merlinoa/shinyFeedback) by [@merlinoa](<https://github.com/merlinoa>), who graciously provided feedback on the design of shinyvalidate. Compared to shinyFeedback, shinyvalidate aims to have a more concise but less flexible R API; and on the UI side, shinyFeedback displays richer feedback on a hard-coded set of components, while shinyvalidate feedback is minimalist but aims to support a larger set of components and is extensible for custom inputs.

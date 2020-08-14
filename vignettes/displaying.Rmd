@@ -1,0 +1,84 @@
+---
+title: "Displaying validation errors"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Displaying validation errors}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  prompt = TRUE,
+  comment = NULL
+)
+library(shiny)
+```
+
+```{css echo=FALSE}
+span.delta {
+  font-weight: bold;
+  background-color: #FFC;
+}
+```
+
+This article is intended for developers of custom Shiny input widgets, or anyone familiar with HTML/JavaScript/CSS who wants to customize the display of validation errors raised by shinyvalidate.
+
+When it comes to error display, shinyvalidate provides three levels of support:
+
+1.  **It just works:** The most common widgets are supported right out of the box. Certainly this includes the input controls that are included with the shiny package.
+2.  **Widget-level support:** Authors of custom input widgets have total control over the display of validation errors for their widgets, if they choose to provide an implementation.
+3.  **App-level overrides:** App authors may find themselves using custom input widgets that are not shinyvalidate-compatible, or are unhappy with the default behavior of shinyvalidate or the customizations made by a widget author. These app authors should have some recourse that doesn't require making changes to shinyvalidate or the widget package--though they will be required to know some JavaScript.
+
+These are implemented in JavaScript as three distinct "strategies". When shinyvalidate's display logic is invoked to show a specific error for a specific Shiny input, these strategies are tried in turn until one succeeds. The order that they are tried is the *reverse* of how they're listed above (and below), though: app-level overrides take the highest priority, then widget-level support, then the default "it just works".
+
+## It Just Works: Built-in support for Bootstrap 3
+
+At the time of this writing, Shiny's built-in user interface components are written using the Bootstrap CSS framework, version 3. Bootstrap 3 defines certain markup and CSS patterns to follow for creating input controls, and Shiny's built-in components follow those patterns. Bootstrap also defines patterns for displaying validation errors, and if the input in question follows Bootstrap 3 conventions, then shinyvalidate will automatically use those patterns.
+
+Here, for example, is the HTML used to generate a simple text input in Shiny:
+
+```{r eval=FALSE}
+cat(as.character(shiny::textInput("email", "Email address")))
+```
+
+```{=html}
+<pre><code>&lt;div class="form-group shiny-input-container"&gt;
+  &lt;label class="control-label" for="email"&gt;Email address&lt;/label&gt;
+  &lt;input id="email" type="text" class="form-control" value=""/&gt;
+&lt;/div&gt;</code></pre>
+```
+shinyvalidate will take the input element and look at the element itself, then its containing elements, for the `form-group` CSS class. If this class is found, then a validation message will be displayed by 1) adding the `has-error` CSS class to the `form-group`, and 2) adding a new `<span class="help-block shiny-validation-message">` element as the last child of the `form-group`.
+
+The following code snippet is the same as the above, except for these two changes, which are highlighted:
+
+```{=html}
+<pre><code>&lt;div class="form-group shiny-input-container <span class="delta">has-error</span>"&gt;
+  &lt;label class="control-label" for="email"&gt;Email address&lt;/label&gt;
+  &lt;input id="email" type="text" class="form-control" value=""/&gt;
+  <span class="delta">&lt;span class="help-block shiny-validation-message"&gt;Required&lt;/span&gt;</span>
+&lt;/div&gt;</code></pre>
+```
+Note that this strategy covers, *but is not limited to*, the built-in Shiny input widgets. Any third-party Shiny input widget that uses a containing element with `.form-group` will be assumed to be compatible with this treatment.
+
+#### A note about Bootstrap v4
+
+At the time of this writing, the Shiny team is in the midst of a large project to bring support for Bootstrap v4 to Shiny. As this effort gets closer to release, we plan to bring Bootstrap v4 compatibility to shinyvalidate as well; and in general, we hope to achieve "It Just Works" integration with whatever CSS frameworks are most commonly used with Shiny.
+
+## Widget-level support: Input binding customization
+
+Custom input widgets that don't depend on Bootstrap can define their own behavior for displaying validation errors, by implementing two new methods on their JavaScript [`InputBinding` objects](https://shiny.rstudio.com/articles/building-inputs.html#write-an-input-binding).
+
+-   `binding.setInvalid(el, message)` will be called when a validation error should be displayed. The `message` will be a non-empty string. Besides the message being displayed, other CSS adjustments should be made to make it clear that the input is invalid (having the control label and border colors turn red, or background color turning pink, for example).
+
+-   `binding.clearInvalid(el)` will be called when a validation error is no longer appropriate to be displayed. Any previously added validation message should be removed, and any CSS adjustments (like the aforementioned red labels and borders) should be reversed.
+
+Note that shinyvalidate will invoke `setInvalid` and `clearInvalid` in seemingly random order. It may repeatedly call `clearInvalid` on an input without intervening `setInvalid` calls. It may call `setInvalid` multiple times in a row with the same `message`. Therefore, both `setInvalid` and `clearInvalid` must be prepared to deal with inputs in "normal" or "error" states.
+
+Example 03_custom_inputs [[source](https://github.com/jcheng5/shinyvalidate/tree/master/inst/examples/03_custom_inputs), live demo TODO] uses a custom input widget to implement a webcam capture input, and uses `setInvalid`/`clearInvalid` methods to overlay the validation message on top of the image preview:
+
+![](custom_input.png){alt="Screenshot of app, with error message displayed over a webcam image" width="282"}
+
+## App-level overrides: Event handlers
+
+The final option

@@ -34,6 +34,7 @@ that are completely unrelated to each other; each form would have its own
 \itemize{
 \item \href{#method-new}{\code{InputValidator$new()}}
 \item \href{#method-parent}{\code{InputValidator$parent()}}
+\item \href{#method-condition}{\code{InputValidator$condition()}}
 \item \href{#method-add_validator}{\code{InputValidator$add_validator()}}
 \item \href{#method-add_rule}{\code{InputValidator$add_rule()}}
 \item \href{#method-enable}{\code{InputValidator$enable()}}
@@ -88,6 +89,36 @@ For internal use only.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-condition"></a>}}
+\if{latex}{\out{\hypertarget{method-condition}{}}}
+\subsection{Method \code{condition()}}{
+Gets or sets a condition that overrides all of the rules in
+this validator. Before performing validation, this validator will
+execute the \code{cond} function. If \code{cond} returns \code{TRUE}, then
+validation continues as normal; if \code{FALSE}, then the validation rules
+will be skipped and treated as if they are all passing.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{InputValidator$condition(cond)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{cond}}{If this argument is missing, then the method returns the
+currently set condition function. If not missing, then \code{cond} must
+be either a zero-argument function that returns \code{TRUE} or \code{FALSE}; a
+single-sided formula that results in \code{TRUE} or \code{FALSE}; or \code{NULL}
+(which is equivalent to \code{~ TRUE}).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+If \code{cond} is missing, then either \code{NULL} or a zero-argument
+function; if \code{cond} is provided, then nothing of consequence is
+returned.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add_validator"></a>}}
 \if{latex}{\out{\hypertarget{method-add_validator}{}}}
 \subsection{Method \code{add_validator()}}{
@@ -100,21 +131,14 @@ its child validators are enabled (or disabled) as well.
 This is intended to help with validating Shiny modules. Each module can
 create its own \code{InputValidator} object and populate it with rules, then
 return that object to the caller.
-
-You can also use child validators to group fields/rules together and
-turn them on and off as a whole based on the \code{when} parameter.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{InputValidator$add_validator(validator, when = ~TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{InputValidator$add_validator(validator)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{validator}}{An \code{InputValidator} object.}
-
-\item{\code{when}}{Either a no-argument function, or a single-sided formula,
-that returns \code{TRUE} when the child validator's rules should be invoked
-and \code{FALSE} when the rules should be skipped.}
 }
 \if{html}{\out{</div>}}
 }

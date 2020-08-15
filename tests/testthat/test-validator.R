@@ -109,3 +109,42 @@ test_that("Empty InputValidator works as expected", {
     })
   })
 })
+
+test_that("InputValidator$fields recurses over child validators", {
+  session <- shiny::MockShinySession$new()
+  shiny::withReactiveDomain(session, {
+    child_session <- session$makeScope(session$ns("child"))
+    shiny::withReactiveDomain(child_session, {
+      child_iv <- InputValidator$new()
+      child_iv$add_rule("one", sv_required())
+      child_iv$add_rule("one", sv_regex(".", "Must have a character"))
+    })
+    
+    iv <- InputValidator$new()
+    iv$add_validator(child_iv)
+    # Same name but different namespace
+    iv$add_rule("one", sv_required())
+
+    shiny::isolate({
+      expect_setequal(iv$fields(), names(iv$validate()))
+      expect_length(iv$fields(), 2)
+      
+      expect_false(child_iv$is_valid())
+      expect_false(iv$is_valid())
+      
+      # Let's also test conditionals while we're set up for it
+      
+      child_iv$condition(~ FALSE)
+      expect_true(child_iv$is_valid())
+      expect_false(iv$is_valid())
+      
+      iv$condition(~ FALSE)
+      expect_true(child_iv$is_valid())
+      expect_true(iv$is_valid())
+      
+      child_iv$condition(~ TRUE)
+      expect_false(child_iv$is_valid())
+      expect_true(iv$is_valid())
+    })
+  })
+})

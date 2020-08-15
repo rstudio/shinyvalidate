@@ -56,6 +56,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     enabled = FALSE,
     observer_handle = NULL,
     priority = numeric(0),
+    condition_ = NULL,
     rules = NULL,
     validators = NULL,
     is_child = FALSE
@@ -77,6 +78,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       }
       private$session <- session
       private$priority <- priority
+      private$condition_ <- shiny::reactiveVal(NULL, label = "validator_condition")
       private$rules <- shiny::reactiveVal(list(), label = "validation_rules")
       private$validators <- shiny::reactiveVal(list(), label = "child_validators")
       
@@ -95,6 +97,32 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       self$disable()
       private$is_child <- TRUE
     },
+    #' @description Gets or sets a condition that overrides all of the rules in
+    #'   this validator. Before performing validation, this validator will
+    #'   execute the `cond` function. If `cond` returns `TRUE`, then
+    #'   validation continues as normal; if `FALSE`, then the validation rules
+    #'   will be skipped and treated as if they are all passing.
+    #' @param cond If this argument is missing, then the method returns the
+    #'   currently set condition function. If not missing, then `cond` must
+    #'   be either a zero-argument function that returns `TRUE` or `FALSE`; a
+    #'   single-sided formula that results in `TRUE` or `FALSE`; or `NULL`
+    #'   (which is equivalent to `~ TRUE`).
+    #' @return If `cond` is missing, then either `NULL` or a zero-argument
+    #'   function; if `cond` is provided, then nothing of consequence is
+    #'   returned.
+    condition = function(cond) {
+      if (missing(cond)) {
+        private$condition_()
+      } else {
+        if (inherits(cond, "formula")) {
+          cond <- rlang::as_function(cond)
+        }
+        if (!is.function(cond) && !is.null(cond)) {
+          stop("`cond` argument must be NULL, function, or formula")
+        }
+        private$condition_(cond)
+      }
+    },
     #' @description Add another `InputValidator` object to this one, as a
     #'   "child". Any time this validator object is asked for its validity, it
     #'   will only return `TRUE` if all of its child validators are also valid;
@@ -105,26 +133,14 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   create its own `InputValidator` object and populate it with rules, then
     #'   return that object to the caller.
     #'
-    #'   You can also use child validators to group fields/rules together and
-    #'   turn them on and off as a whole based on the `when` parameter.
-    #'
     #' @param validator An `InputValidator` object.
-    #' @param when Either a no-argument function, or a single-sided formula,
-    #'   that returns `TRUE` when the child validator's rules should be invoked
-    #'   and `FALSE` when the rules should be skipped.
-    add_validator = function(validator, when = ~ TRUE) {
+    add_validator = function(validator) {
       if (!inherits(validator, "InputValidator")) {
         stop("add_validator was called with an invalid `validator` argument; InputValidator object expected")
       }
       
-      if (inherits(when, "formula")) {
-        when <- rlang::as_function(when)
-      }
-      
       validator$parent(self)
-      private$validators(c(shiny::isolate(private$validators()), list(
-        list(validator = validator, when = when)
-      )))
+      private$validators(c(shiny::isolate(private$validators()), list(validator)))
       invisible(self)
     },
     #' @description Add an input validation rule. Each input validation rule
@@ -205,10 +221,15 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #' @description Returns `TRUE` if all input validation rules currently pass,
     #'   `FALSE` if not.
     fields = function() {
-      fieldslist <- unlist(lapply(private$validators(), function(validator_info) {
-        validator_info$validator$fields()
+      fieldslist <- unlist(lapply(private$validators(), function(validator) {
+        validator$fields()
       }))
-      unique(c(fieldslist, names(private$rules())))
+      
+      fullnames <- mapply(names(private$rules()), private$rules(), FUN = function(name, rule) {
+        rule$session$ns(name)
+      })
+      
+      unique(c(fieldslist, fullnames))
     },
     #' @description Returns `TRUE` if all input validation rules currently pass,
     #'   `FALSE` if not.
@@ -223,14 +244,16 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   either `NULL` (if the input value is passing) or a single-element
     #'   character vector describing a validation problem.
     validate = function() {
+      condition <- private$condition_()
+      skip_all <- is.function(condition) && !condition()
+      if (skip_all) {
+        fields <- self$fields()
+        return(setNames(rep_len(list(), length(fields)), fields))
+      }
+      
       dependency_results <- list()
-      for (validator_info in private$validators()) {
-        if (validator_info$when()) {
-          child_results <- validator_info$validator$validate()
-        } else {
-          fields <- validator_info$validator$fields()
-          child_results <- stats::setNames(rep_len(list(), length(fields)), fields)
-        }
+      for (validator in private$validators()) {
+        child_results <- validator$validate()
         dependency_results <- merge_results(dependency_results, child_results)
       }
 

@@ -177,6 +177,7 @@ that are completely unrelated to each other; each form would have its own
 <ul>
 <li><p><a href='#method-new'><code>InputValidator$new()</code></a></p></li>
 <li><p><a href='#method-parent'><code>InputValidator$parent()</code></a></p></li>
+<li><p><a href='#method-condition'><code>InputValidator$condition()</code></a></p></li>
 <li><p><a href='#method-add_validator'><code>InputValidator$add_validator()</code></a></p></li>
 <li><p><a href='#method-add_rule'><code>InputValidator$add_rule()</code></a></p></li>
 <li><p><a href='#method-enable'><code>InputValidator$enable()</code></a></p></li>
@@ -216,6 +217,28 @@ the default.)</p></dd>
 
 </dl><p></div></p>
 <p><hr>
+<a id="method-condition"></a></p><h3>Method <code><a href='https://rdrr.io/r/base/conditions.html'>condition()</a></code></h3>
+<p>Gets or sets a condition that overrides all of the rules in
+this validator. Before performing validation, this validator will
+execute the <code>cond</code> function. If <code>cond</code> returns <code>TRUE</code>, then
+validation continues as normal; if <code>FALSE</code>, then the validation rules
+will be skipped and treated as if they are all passing.</p><h3>Usage</h3>
+<p><div class="r"></p><pre><span class='no'>InputValidator</span>$<span class='fu'><a href='https://rdrr.io/r/base/conditions.html'>condition</a></span>(<span class='no'>cond</span>)</pre><p></div></p>
+
+<h3>Arguments</h3>
+<p><div class="arguments"></p><dl'>
+<dt><code>cond</code></dt><dd><p>If this argument is missing, then the method returns the
+currently set condition function. If not missing, then <code>cond</code> must
+be either a zero-argument function that returns <code>TRUE</code> or <code>FALSE</code>; a
+single-sided formula that results in <code>TRUE</code> or <code>FALSE</code>; or <code>NULL</code>
+(which is equivalent to <code>~ TRUE</code>).</p></dd>
+
+</dl><p></div></p>
+<h3>Returns</h3>
+<p>If <code>cond</code> is missing, then either <code>NULL</code> or a zero-argument
+function; if <code>cond</code> is provided, then nothing of consequence is
+returned.</p>
+<p><hr>
 <a id="method-add_validator"></a></p><h3>Method <code>add_validator()</code></h3>
 <p>Add another <code>InputValidator</code> object to this one, as a
 "child". Any time this validator object is asked for its validity, it
@@ -224,18 +247,12 @@ and when this validator object is enabled (or disabled), then all of
 its child validators are enabled (or disabled) as well.</p>
 <p>This is intended to help with validating Shiny modules. Each module can
 create its own <code>InputValidator</code> object and populate it with rules, then
-return that object to the caller.</p>
-<p>You can also use child validators to group fields/rules together and
-turn them on and off as a whole based on the <code>when</code> parameter.</p><h3>Usage</h3>
-<p><div class="r"></p><pre><span class='no'>InputValidator</span>$<span class='fu'>add_validator</span>(<span class='no'>validator</span>, <span class='kw'>when</span> <span class='kw'>=</span> ~<span class='fl'>TRUE</span>)</pre><p></div></p>
+return that object to the caller.</p><h3>Usage</h3>
+<p><div class="r"></p><pre><span class='no'>InputValidator</span>$<span class='fu'>add_validator</span>(<span class='no'>validator</span>)</pre><p></div></p>
 
 <h3>Arguments</h3>
 <p><div class="arguments"></p><dl'>
 <dt><code>validator</code></dt><dd><p>An <code>InputValidator</code> object.</p></dd>
-
-<dt><code>when</code></dt><dd><p>Either a no-argument function, or a single-sided formula,
-that returns <code>TRUE</code> when the child validator's rules should be invoked
-and <code>FALSE</code> when the rules should be skipped.</p></dd>
 
 </dl><p></div></p>
 <p><hr>

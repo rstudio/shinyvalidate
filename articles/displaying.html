@@ -135,7 +135,7 @@ span.delta {
 <li><p><code>binding.clearInvalid(el)</code> will be called when a validation error is no longer appropriate to be displayed. Any previously added validation message should be removed, and any CSS adjustments (like the aforementioned red labels and borders) should be reversed.</p></li>
 </ul>
 <p>Note that shinyvalidate will invoke <code>setInvalid</code> and <code>clearInvalid</code> in seemingly random order. It may repeatedly call <code>clearInvalid</code> on an input without intervening <code>setInvalid</code> calls. It may call <code>setInvalid</code> multiple times in a row with the same <code>message</code>. Therefore, both <code>setInvalid</code> and <code>clearInvalid</code> must be prepared to deal with inputs in “normal” or “error” states.</p>
-<p>Example 03_custom_inputs [<a href="https://github.com/jcheng5/shinyvalidate/tree/master/inst/examples/03_custom_inputs">source</a>, live demo TODO] uses a custom input widget to implement a webcam capture input, and uses <code>setInvalid</code>/<code>clearInvalid</code> methods to overlay the validation message on top of the image preview:</p>
+<p>Example 03_custom_inputs [<a href="https://github.com/rstudio/shinyvalidate/tree/master/inst/examples/03_custom_inputs">source</a>, live demo TODO] uses a custom input widget to implement a webcam capture input, and uses <code>setInvalid</code>/<code>clearInvalid</code> methods to overlay the validation message on top of the image preview:</p>
 <p><img src="custom_input.png" alt="Screenshot of app, with error message displayed over a webcam image" width="282"></p>
 </div>
 <div id="app-level-overrides-event-handlers" class="section level2">

@@ -93,13 +93,13 @@
 <a href="#basic-usage" class="anchor"></a>Basic usage</h2>
 <p>To add input validation to your app:</p>
 <ol style="list-style-type: decimal">
-<li><p>Create an <a href="https://jcheng5.github.io/shinyvalidate/reference/InputValidator.html"><code>InputValidator</code></a> object (in this doc, we will usually name the variable <code>iv</code>).</p></li>
+<li><p>Create an <a href="https://rstudio.github.io/shinyvalidate/reference/InputValidator.html"><code>InputValidator</code></a> object (in this doc, we will usually name the variable <code>iv</code>).</p></li>
 <li><p>Add one or more validation rules to <code>iv</code>.</p></li>
-<li><p>Start displaying realtime feedback in the UI by calling <a href="https://jcheng5.github.io/shinyvalidate/reference/InputValidator.html#method-enable-"><code>iv$enable()</code></a>.</p></li>
+<li><p>Start displaying realtime feedback in the UI by calling <a href="https://rstudio.github.io/shinyvalidate/reference/InputValidator.html#method-enable-"><code>iv$enable()</code></a>.</p></li>
 <li><p>Guard calculations and operations that rely on valid inputs, by checking that <code>iv$is_valid()</code> returns <code>TRUE</code>.</p></li>
 </ol>
 <p>Note that all of these steps must be performed in your Shiny app’s <code>server</code> function.</p>
-<p>To see this in action, let’s look at the server function from the <code>01_simple</code> example app [<a href="https://github.com/jcheng5/shinyvalidate/blob/master/inst/examples/01_simple/app.R">source</a>, <a href="https://jcheng.shinyapps.io/01_simple/">live demo</a>].</p>
+<p>To see this in action, let’s look at the server function from the <code>01_simple</code> example app [<a href="https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/01_simple/app.R">source</a>, <a href="https://jcheng.shinyapps.io/01_simple/">live demo</a>].</p>
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="no">server</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">input</span>, <span class="no">output</span>, <span class="no">session</span>) {
 
   <span class="co"># 1. Create an InputValidator object</span>
@@ -132,10 +132,10 @@
 <div id="rules-from-helper-functions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#rules-from-helper-functions" class="anchor"></a>Rules from helper functions</h3>
-<p>For maximum convenience, shinyvalidate comes with a few helper functions that implement common validation rules. The <a href="https://jcheng5.github.io/shinyvalidate/reference/sv_required.html"><code>sv_required</code></a> helper is likely to be the one you reach for most often:</p>
+<p>For maximum convenience, shinyvalidate comes with a few helper functions that implement common validation rules. The <a href="https://rstudio.github.io/shinyvalidate/reference/sv_required.html"><code>sv_required</code></a> helper is likely to be the one you reach for most often:</p>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">iv</span>$<span class="fu">add_rule</span>(<span class="st">"title"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span>(<span class="kw">message</span> <span class="kw">=</span> <span class="st">"Title must be provided"</span>))</pre></body></html></div>
 <p>The <code>message</code> argument is optional; if you omit it, the default message is simply “Required”. Keep in mind that validation error messages will be displayed next to the erroneous input, so it’s generally not strictly necessary for the error message to spell out which input it refers to.</p>
-<p>Currently, shinyvalidate provides only a handful of validation helper functions. Besides <code>sv_required</code>, there’s also <a href="https://jcheng5.github.io/shinyvalidate/reference/sv_numeric.html"><code>sv_numeric</code></a>, <a href="https://jcheng5.github.io/shinyvalidate/reference/sv_numeric.html"><code>sv_integer</code></a>, and <a href="https://jcheng5.github.io/shinyvalidate/reference/sv_regex.html"><code>sv_regex</code></a>; see their help topics for more information.</p>
+<p>Currently, shinyvalidate provides only a handful of validation helper functions. Besides <code>sv_required</code>, there’s also <a href="https://rstudio.github.io/shinyvalidate/reference/sv_numeric.html"><code>sv_numeric</code></a>, <a href="https://rstudio.github.io/shinyvalidate/reference/sv_numeric.html"><code>sv_integer</code></a>, and <a href="https://rstudio.github.io/shinyvalidate/reference/sv_regex.html"><code>sv_regex</code></a>; see their help topics for more information.</p>
 </div>
 <div id="rules-as-formulas" class="section level3">
 <h3 class="hasAnchor">
@@ -172,7 +172,7 @@
 <p>Once you’ve created an <code>InputValidator</code> object and populated it with rules, shinyvalidate has the information it needs to check input values and report any problems it detects.</p>
 <p>However, it doesn’t do so by default. Instead, you must call <code>iv$enable()</code> at least once to get validation errors to appear. Once <code>iv$enable()</code> has been called, though, validation messages will appear, update, and disappear reactively; there’s no need to call <code>enable()</code> as input values change.</p>
 <p>The reason for this design is because many forms have an explicit “Submit” or “Continue” button, and in those cases, you may want to suppress the display of validation errors until the user actually attempts to submit the form. This is considered a better user experience than overwhelming the user with error messages before they’ve even started filling out the form.</p>
-<p>To defer validation until “Submit” or “Continue” time, simply call <code>iv$enable()</code> from within whatever <code>observeEvent</code> or <code>eventReactive</code> is triggered by the submit/continue button. You can see this in the 02_deferred example [<a href="https://github.com/jcheng5/shinyvalidate/blob/master/inst/examples/02_deferred/app.R">source</a>, <a href="https://jcheng.shinyapps.io/02_deferred/">live demo</a>].</p>
+<p>To defer validation until “Submit” or “Continue” time, simply call <code>iv$enable()</code> from within whatever <code>observeEvent</code> or <code>eventReactive</code> is triggered by the submit/continue button. You can see this in the 02_deferred example [<a href="https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/02_deferred/app.R">source</a>, <a href="https://jcheng.shinyapps.io/02_deferred/">live demo</a>].</p>
 <p>If, on the other hand, your app doesn’t have a notion of “Submit” or “Continue”, then just go ahead and call <code>iv$enable()</code> as soon as your <code>InputValidator</code> object is populated with rules.</p>
 </div>
 <div id="guarding-calculations-and-actions" class="section level2">

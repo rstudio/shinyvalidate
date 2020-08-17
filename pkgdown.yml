@@ -4,8 +4,8 @@ pkgdown_sha: ~
 articles:
   displaying: displaying.html
   shinyvalidate: shinyvalidate.html
-last_built: 2020-08-15T00:50Z
+last_built: 2020-08-17T22:33Z
 urls:
-  reference: https://jcheng5.github.io/shinyvalidate//reference
-  article: https://jcheng5.github.io/shinyvalidate//articles
+  reference: https://rstudio.github.io/shinyvalidate//reference
+  article: https://rstudio.github.io/shinyvalidate//articles
 

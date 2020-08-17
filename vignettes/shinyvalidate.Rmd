@@ -24,17 +24,17 @@ In these cases, we want to provide feedback to the user that they've made a mist
 
 To add input validation to your app:
 
-1.  Create an [`InputValidator`](https://jcheng5.github.io/shinyvalidate/reference/InputValidator.html) object (in this doc, we will usually name the variable `iv`).
+1.  Create an [`InputValidator`](https://rstudio.github.io/shinyvalidate/reference/InputValidator.html) object (in this doc, we will usually name the variable `iv`).
 
 2.  Add one or more validation rules to `iv`.
 
-3.  Start displaying realtime feedback in the UI by calling [`iv$enable()`](https://jcheng5.github.io/shinyvalidate/reference/InputValidator.html#method-enable-).
+3.  Start displaying realtime feedback in the UI by calling [`iv$enable()`](https://rstudio.github.io/shinyvalidate/reference/InputValidator.html#method-enable-).
 
 4.  Guard calculations and operations that rely on valid inputs, by checking that `iv$is_valid()` returns `TRUE`.
 
 Note that all of these steps must be performed in your Shiny app's `server` function.
 
-To see this in action, let's look at the server function from the `01_simple` example app [[source](https://github.com/jcheng5/shinyvalidate/blob/master/inst/examples/01_simple/app.R), [live demo](https://jcheng.shinyapps.io/01_simple/)].
+To see this in action, let's look at the server function from the `01_simple` example app [[source](https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/01_simple/app.R), [live demo](https://jcheng.shinyapps.io/01_simple/)].
 
 ``` {.r}
 server <- function(input, output, session) {
@@ -73,7 +73,7 @@ The `rule` argument can take various forms:
 
 ### Rules from helper functions
 
-For maximum convenience, shinyvalidate comes with a few helper functions that implement common validation rules. The [`sv_required`](https://jcheng5.github.io/shinyvalidate/reference/sv_required.html) helper is likely to be the one you reach for most often:
+For maximum convenience, shinyvalidate comes with a few helper functions that implement common validation rules. The [`sv_required`](https://rstudio.github.io/shinyvalidate/reference/sv_required.html) helper is likely to be the one you reach for most often:
 
 ``` {.r}
 iv$add_rule("title", sv_required(message = "Title must be provided"))
@@ -81,7 +81,7 @@ iv$add_rule("title", sv_required(message = "Title must be provided"))
 
 The `message` argument is optional; if you omit it, the default message is simply "Required". Keep in mind that validation error messages will be displayed next to the erroneous input, so it's generally not strictly necessary for the error message to spell out which input it refers to.
 
-Currently, shinyvalidate provides only a handful of validation helper functions. Besides `sv_required`, there's also [`sv_numeric`](https://jcheng5.github.io/shinyvalidate/reference/sv_numeric.html), [`sv_integer`](https://jcheng5.github.io/shinyvalidate/reference/sv_numeric.html), and [`sv_regex`](https://jcheng5.github.io/shinyvalidate/reference/sv_regex.html); see their help topics for more information.
+Currently, shinyvalidate provides only a handful of validation helper functions. Besides `sv_required`, there's also [`sv_numeric`](https://rstudio.github.io/shinyvalidate/reference/sv_numeric.html), [`sv_integer`](https://rstudio.github.io/shinyvalidate/reference/sv_numeric.html), and [`sv_regex`](https://rstudio.github.io/shinyvalidate/reference/sv_regex.html); see their help topics for more information.
 
 ### Rules as formulas
 
@@ -131,7 +131,7 @@ However, it doesn't do so by default. Instead, you must call `iv$enable()` at le
 
 The reason for this design is because many forms have an explicit "Submit" or "Continue" button, and in those cases, you may want to suppress the display of validation errors until the user actually attempts to submit the form. This is considered a better user experience than overwhelming the user with error messages before they've even started filling out the form.
 
-To defer validation until "Submit" or "Continue" time, simply call `iv$enable()` from within whatever `observeEvent` or `eventReactive` is triggered by the submit/continue button. You can see this in the 02_deferred example [[source](https://github.com/jcheng5/shinyvalidate/blob/master/inst/examples/02_deferred/app.R), [live demo](https://jcheng.shinyapps.io/02_deferred/)].
+To defer validation until "Submit" or "Continue" time, simply call `iv$enable()` from within whatever `observeEvent` or `eventReactive` is triggered by the submit/continue button. You can see this in the 02_deferred example [[source](https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/02_deferred/app.R), [live demo](https://jcheng.shinyapps.io/02_deferred/)].
 
 If, on the other hand, your app doesn't have a notion of "Submit" or "Continue", then just go ahead and call `iv$enable()` as soon as your `InputValidator` object is populated with rules.
 

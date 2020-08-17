@@ -2,7 +2,7 @@
 
 <!-- badges: start -->
 
-[![R build status](https://github.com/jcheng5/shinyvalidate/workflows/R-CMD-check/badge.svg)](https://github.com/jcheng5/shinyvalidate/actions) <!-- badges: end -->
+[![R build status](https://github.com/rstudio/shinyvalidate/workflows/R-CMD-check/badge.svg)](https://github.com/rstudio/shinyvalidate/actions) <!-- badges: end -->
 
 **WARNING: Highly experimental, API still in flux**
 

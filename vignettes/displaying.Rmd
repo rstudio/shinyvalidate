@@ -75,7 +75,7 @@ Custom input widgets that don't depend on Bootstrap can define their own behavio
 
 Note that shinyvalidate will invoke `setInvalid` and `clearInvalid` in seemingly random order. It may repeatedly call `clearInvalid` on an input without intervening `setInvalid` calls. It may call `setInvalid` multiple times in a row with the same `message`. Therefore, both `setInvalid` and `clearInvalid` must be prepared to deal with inputs in "normal" or "error" states.
 
-Example 03_custom_inputs [[source](https://github.com/jcheng5/shinyvalidate/tree/master/inst/examples/03_custom_inputs), live demo TODO] uses a custom input widget to implement a webcam capture input, and uses `setInvalid`/`clearInvalid` methods to overlay the validation message on top of the image preview:
+Example 03_custom_inputs [[source](https://github.com/rstudio/shinyvalidate/tree/master/inst/examples/03_custom_inputs), live demo TODO] uses a custom input widget to implement a webcam capture input, and uses `setInvalid`/`clearInvalid` methods to overlay the validation message on top of the image preview:
 
 ![](custom_input.png){alt="Screenshot of app, with error message displayed over a webcam image" width="282"}
 

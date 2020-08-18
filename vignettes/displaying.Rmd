@@ -81,4 +81,41 @@ Example 03_custom_inputs [[source](https://github.com/rstudio/shinyvalidate/tree
 
 ## App-level overrides: Event handlers
 
-The final option
+Since it's always possible that something about your application causes the above strategies to not make sense, you can choose to override those strategies using jQuery event handlers.
+
+Here's what the JavaScript code for this might look like:
+
+``` {.javascript}
+$(document).on("shinyvalidate:show", function(event) {
+  let el = event.el;
+  let binding = event.binding;
+  let id = event.id;
+  let message = event.message;
+  event.preventDefault();
+  
+  // Add logic to show (or replace) error message on element `el`
+});
+
+$(document).on("shinyvalidate:clear", function(event) {
+  let el = event.el;
+  let binding = event.binding;
+  let id = event.id;
+  event.preventDefault();
+  
+  // Add logic to clear error (if one exists) from element `el`
+});
+```
+
+The following properties are available on the `event` object:
+
+-   `el` - The HTML element for the relevant input. This is a regular HTML element object, not a jQuery object--you'll need to call `$(el)` yourself if you need jQuery functionality.
+
+-   `binding` - The Shiny `InputBinding` object.
+
+-   `id` - A string indicating the input ID.
+
+-   `message` - A textual string (not HTML) indicating the message to be displayed.
+
+**Important:** The `event` object's `preventDefault()` method must be called to prevent the two other strategies (input binding and Bootstrap) from being attempted. (This allows event handlers to decide to handle error display for only a subset of inputs, for example.)
+
+If you haven't needed to include custom JavaScript for your Shiny app before, see [this article](https://shiny.rstudio.com/articles/packaging-javascript.html) to learn about the various options you have for doing so.

@@ -28,7 +28,7 @@ To add validation to your Shiny app, you need to:
 
 That's all you need to do to get validation messages to show up. Here is a simple example:
 
-![Screencast of empty 'Name' and 'Email' fields showing error messages beneath them, and the user providing valid input that clears the errors](man/figures/demo.gif){width="316"}
+<img src="man/figures/demo.gif" alt="Screencast of empty 'Name' and 'Email' fields showing error messages beneath them, and the user providing valid input that clears the errors" width="316"/>
 
 ``` {.r}
 library(shiny)

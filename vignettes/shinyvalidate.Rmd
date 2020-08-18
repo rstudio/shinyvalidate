@@ -18,7 +18,7 @@ When we present users of our apps with opportunities to input data, there's ofte
 
 In these cases, we want to provide feedback to the user that they've made a mistake.
 
-[screenshot]
+<img src="../man/figures/demo.gif" alt="Screencast of empty 'Name' and 'Email' fields showing error messages beneath them, and the user providing valid input that clears the errors" width="316"/>
 
 ## Basic usage
 

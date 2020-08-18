@@ -141,7 +141,35 @@ span.delta {
 <div id="app-level-overrides-event-handlers" class="section level2">
 <h2 class="hasAnchor">
 <a href="#app-level-overrides-event-handlers" class="anchor"></a>App-level overrides: Event handlers</h2>
-<p>The final option</p>
+<p>Since it’s always possible that something about your application causes the above strategies to not make sense, you can choose to override those strategies using jQuery event handlers.</p>
+<p>Here’s what the JavaScript code for this might look like:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">"shinyvalidate:show"</span><span class="op">,</span> <span class="kw">function</span>(event) <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>  <span class="kw">let</span> el <span class="op">=</span> <span class="va">event</span>.<span class="at">el</span><span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a>  <span class="kw">let</span> binding <span class="op">=</span> <span class="va">event</span>.<span class="at">binding</span><span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>  <span class="kw">let</span> id <span class="op">=</span> <span class="va">event</span>.<span class="at">id</span><span class="op">;</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>  <span class="kw">let</span> message <span class="op">=</span> <span class="va">event</span>.<span class="at">message</span><span class="op">;</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>  <span class="va">event</span>.<span class="at">preventDefault</span>()<span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>  </span>
+<span id="cb2-8"><a href="#cb2-8"></a>  <span class="co">// Add logic to show (or replace) error message on element `el`</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">"shinyvalidate:clear"</span><span class="op">,</span> <span class="kw">function</span>(event) <span class="op">{</span></span>
+<span id="cb2-12"><a href="#cb2-12"></a>  <span class="kw">let</span> el <span class="op">=</span> <span class="va">event</span>.<span class="at">el</span><span class="op">;</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a>  <span class="kw">let</span> binding <span class="op">=</span> <span class="va">event</span>.<span class="at">binding</span><span class="op">;</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a>  <span class="kw">let</span> id <span class="op">=</span> <span class="va">event</span>.<span class="at">id</span><span class="op">;</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a>  <span class="va">event</span>.<span class="at">preventDefault</span>()<span class="op">;</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a>  </span>
+<span id="cb2-17"><a href="#cb2-17"></a>  <span class="co">// Add logic to clear error (if one exists) from element `el`</span></span>
+<span id="cb2-18"><a href="#cb2-18"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<p>The following properties are available on the <code>event</code> object:</p>
+<ul>
+<li><p><code>el</code> - The HTML element for the relevant input. This is a regular HTML element object, not a jQuery object–you’ll need to call <code>$(el)</code> yourself if you need jQuery functionality.</p></li>
+<li><p><code>binding</code> - The Shiny <code>InputBinding</code> object.</p></li>
+<li><p><code>id</code> - A string indicating the input ID.</p></li>
+<li><p><code>message</code> - A textual string (not HTML) indicating the message to be displayed.</p></li>
+</ul>
+<p><strong>Important:</strong> The <code>event</code> object’s <code>preventDefault()</code> method must be called to prevent the two other strategies (input binding and Bootstrap) from being attempted. (This allows event handlers to decide to handle error display for only a subset of inputs, for example.)</p>
+<p>If you haven’t needed to include custom JavaScript for your Shiny app before, see <a href="https://shiny.rstudio.com/articles/packaging-javascript.html">this article</a> to learn about the various options you have for doing so.</p>
 </div>
   </div>
 

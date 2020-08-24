@@ -1,0 +1,164 @@
+---
+title: "Advanced validation"
+author: "Joe Cheng"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Advanced validation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  prompt = TRUE,
+  comment = NULL
+)
+```
+
+The [Introduction to shinyvalidate](shinyvalidate.html) only talks about creating a single `InputValidator` object per app[^1]. That may suffice for simpler apps, but more complex apps have multiple reasons for wanting to create multiple input validators.
+
+[^1]: To be precise, it's actually one `InputValidator` object per session, not per app.
+
+This article discusses some of those more advanced use cases. But first, we need to introduce a couple of `InputValidator` features that support these advanced uses.
+
+## Advanced InputValidator features
+
+### Child validators
+
+Hopefully you know by now that you can add rules to `InputValidator` objects, via the `add_rule()` method. What you may not know is that you can also add entire `InputValidator` objects to each other.
+
+``` {.r}
+parent_iv$add_validator(child_iv)
+```
+
+Each `InputValidator` object can have any number of child `InputValidator` objects. It's also fine for a child `InputValidator` object to have children of its own.
+
+If `child_iv$is_valid()` returns `FALSE`, then `parent_iv$is_valid()` will also return `FALSE`---in other words, an input validator is only valid if all of its child validators are valid. And when `parent_iv$enable()` is called, real-time validation feedback is enabled not only for its own rules, but for the rules of the child validators, and their children, and so on.
+
+I'm not sure, however, it makes sense for one `InputValidator` object to be added as a child to two different parents. Currently, {shinyvalidate} doesn't stop you from doing this, but I can't be sure there aren't strange edge cases that might emerge from doing so.
+
+### Conditional validation
+
+Another feature we'll need is the ability to temporarily turn validation rules on and off, depending on some reactive input or state. We'll see below where this comes in handy; for right now I'll just describe how the feature works.
+
+The `InputValidator` object has a `condition` method for this purpose: pass it either a formula or a zero-argument function that returns `TRUE` when the validation rules should be observed, and `FALSE` when they should be suspended.
+
+Here are three equivalent ways to apply the `isTRUE(input$filter_by_date)` condition to `iv`:
+
+``` {.r}
+# As formula
+iv$condition(~ isTRUE(input$filter_by_date))
+
+# As anonymous function
+iv$condition(function() { isTRUE(input$filter_by_date) })
+
+# As named function--or in this case, named reactive expression
+filtering_by_date <- reactive({
+  isTRUE(input$filter_by_date)
+})
+iv$condition(filtering_by_date)
+```
+
+The effect of all three variants is the same: if `input$filter_by_date` is `TRUE`, then `iv` will function as normal. But if `input$filter_by_date` is not `TRUE`, then `iv` acts as if all of its rules are passing.
+
+Note that I said "as if all of its rules are passing", not "as if it has no rules" or "as if `iv` doesn't even exist". If a validator is enabled and has failing rules, there will be validation errors displayed to the user. If the `condition` then becomes `FALSE`, *these errors will be dismissed*. This is why "as if all of its rules are passing" matters; the validator doesn't just stop validating, it dismisses existing errors for inputs that it has rules for.
+
+To be clear, it's *not* the case that you call the `condition()` method when you want to start or stop bypassing the validator's rules. Rather, you call the `condition()` method just once per `InputValidator`, passing it *the logic that determines* whether the rules should be in effect or not, and trust that Shiny and {shinyvalidate} will invoke that logic as often as is necessary.
+
+## Advanced validation scenarios
+
+Now that we've covered these two new features, we can start discussing some more advanced use cases where multiple `InputValidator` objects are needed.
+
+### Multiple independent forms {#multiple-independent-forms}
+
+Some Shiny apps may have more than one totally independent form, that just happen to be rendered within the same app. In these cases, you don't want to let validation errors in Form A prevent you from being able to submit Form B.
+
+The solution to this is straightforward: create a separate `InputValidator` for each set of related inputs, making sure to use a different variable name for each. By convention, these variables should be suffixed with `_iv`.
+
+``` {.r}
+signup_iv <- InputValidator$new()
+signup_iv$add_rule("email", sv_required())
+
+recalculate_iv <- InputValidator$new()
+recalculate_iv$add_rule("sample_count", sv_integer())
+recalculate_iv$add_rule("sample_count", ~ if (. <= 0) "Must be positive")
+```
+
+[source, live demo] TODO
+
+Now, reactives relating to signup can use `signup_iv`, and reactives relating to recalculation can use `recalculate_iv`. These two validator objects have no parent/child relationship; they're just two independent objects that have nothing in common besides existing in the same environment.
+
+Note that two independent validators may not have any overlap in the sets of inputs that they validate. In other words, since `signup_iv$add_rule("email", ...)` has been called, you cannot then do `recalculate_iv$add_rule("email", ...)`, since that could leave the validators with conflicting opinions about whether the `email` input is valid.
+
+### Conditional subforms
+
+Some apps need different subsets of their validation rules to be active at different times, depending on actions that the user takes. Consider this UI, that asks the user to choose between several ways of providing a profile picture: taking a webcam picture, uploading an image file, or looking up a [Gravatar](https://gravatar.com) by email address.
+
+[screencast]
+
+[source, live demo] TODO
+
+The Gravatar email address input is `sv_required()`, because we don't want to let users submit the Gravatar option without it. But if the user has "Take selfie" currently selected, then the Gravatar email address is not relevant, and the validation rule should be ignored.
+
+We can achieve this by breaking our validation rules into groups using child validators, and then attaching the appropriate conditional to each child validator.
+
+``` {.r}
+gravatar_iv <- InputValidator$new()
+gravatar_iv$condition(~ input$mode == "gravatar")
+gravatar_iv$add_rule("email", sv_required());
+```
+
+Unlike the scenario described above in [Multiple independent forms](#multiple-independent-forms), the individual validator objects associated with each mode--`selfie_iv`, `upload_iv`, and `gravatar_iv`--do not represent independent forms; rather, they all are tied to the same Submit button. We handle this by introducing one more `InputValidator` object, this time representing the overall form, and adding our three validator objects to it as children.
+
+``` {.r}
+iv <- InputValidator$new()
+iv$add_validator(selfie_iv)
+iv$add_validator(upload_iv)
+iv$add_validator(gravatar_iv)
+```
+
+### Validating Shiny modules
+
+{shinyvalidate} is designed to work with [Shiny modules](https://shiny.rstudio.com/articles/modules.html).
+
+Shiny modules provide a way to break up the logic of a Shiny app into smaller, more modular pieces that can each be reasoned about independently. That is the same job of regular R functions, but Shiny modules distinguish themselves versus regular R functions by providing namespacing for Shiny input and output IDs.
+
+For example, in a module server function executing with an `id` (i.e., namespace) of `"one"`, the expression `input$x` is actually equivalent to an outside-the-module expression of `` input$`one-x` ``.
+
+Similarly, when `iv$add_rule("x", ...)` is called, the environment is checked to see if we're currently in a Shiny module server function; if so, then the ID `"x"` is treated as being in the current namespace (`"one-x"`). In other words, `iv$add_rule()` is namespace-aware.
+
+Note that this namespace resolution is *not* performed when the input validator object itself is created, but rather, whenever a rule is added. This allows a single input validator object to collect rules across multiple modules.
+
+This gives us a lot of flexibility as we try to figure out how to combine input validators with modules---so much so, in fact, that it's too early at the time of this writing to clearly identify "best practices". Consider the following to be merely guidelines, and please file [GitHub issues](https://github.com/rstudio/shinyvalidate/issues) as you encounter limitations of the various approaches.
+
+#### Self-contained validation
+
+Imagine a Shiny module that contains an entire form, submission button and all. The module's inputs need to be validated and display feedback, and the module's reactives and outputs need to check `is_valid()`. Code *outside* the module, however, doesn't need to influence the validation in any way, nor query `is_valid()`.
+
+In this case, the module server function can create its own local `InputValidator` object and use it internally.
+
+[TODO: example?]
+
+#### Module as sub-form
+
+Other Shiny modules may have a more transparent relationship with a surrounding form. Consider a Shiny module representing a single input, that returns the value of that input to the caller. It's reasonable to expect the Shiny module to know how to determine whether the user's input is valid, but the module shouldn't need to know anything about the *context* in which that validation happens. Should validation errors be shown right away, or deferred until a Submit button is pressed---and if so, what button is that? Are there downstream reactive expressions and observers that need to guard against invalid data? These kinds of questions need to be concerns of the caller of the module, not the caller itself.
+
+What this means, concretely, is that a Shiny module that contains an input (or multiple inputs) that need to be consumed by the caller, should call `iv$add_rule()` for its own inputs but generally leave `iv$enable()` or `iv$condition()` to the caller.
+
+As for the actual creation of the `InputValidator` object, there are two possibilities: either the module server function takes `iv` as a parameter, making it the module caller's responsibility to create it; or the module server function can create a new `InputValidator` and include it in its return value to the caller.
+
+[TODO: examples]
+
+These two approaches are equivalent in power, and I can't currently think of a compelling reason to recommend one over the other; so feel free to select one or the other based on whichever feels more intuitive to you.
+
+#### Caller-provided validation rules for module inputs
+
+In the previous section, we assumed that a Shiny module knows everything there is to know about its own inputs' validation rules. What if the module wants the caller to help decide if an input is valid? (TODO: come up with an example scenario)
+
+One bad but obvious way to do it would be for the caller to add its own rules directly to the `InputValidator` object:
+
+[TODO: example]
+
+The reason this is bad is because it requires the caller to know the input IDs used within the module. This violates a module boundary that we should try hard to keep sacred.
+
+Instead, the module should take a validation rule---i.e., the second argument to `add_rule`---as a parameter. If multiple inputs need to be validated, then one such parameter should be created for each input.

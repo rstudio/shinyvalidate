@@ -1,5 +1,6 @@
 ---
 title: "Displaying validation errors"
+author: "Joe Cheng"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Displaying validation errors}

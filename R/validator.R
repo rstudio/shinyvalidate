@@ -245,7 +245,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   character vector describing a validation problem.
     validate = function() {
       condition <- private$condition_()
-      skip_all <- is.function(condition) && !condition()
+      skip_all <- is.function(condition) && !isTRUE(condition())
       if (skip_all) {
         fields <- self$fields()
         return(setNames(rep_len(list(), length(fields)), fields))

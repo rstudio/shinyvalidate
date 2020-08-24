@@ -1,5 +1,6 @@
 ---
 title: "Introduction to shinyvalidate"
+author: "Joe Cheng"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to shinyvalidate}
@@ -9,8 +10,8 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+  prompt = TRUE,
+  comment = NULL
 )
 ```
 

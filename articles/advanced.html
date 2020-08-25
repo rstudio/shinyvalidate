@@ -182,18 +182,96 @@
 <a href="#module-as-sub-form" class="anchor"></a>Module as sub-form</h4>
 <p>Other Shiny modules may have a more transparent relationship with a surrounding form. Consider a Shiny module representing a single input, that returns the value of that input to the caller. It’s reasonable to expect the Shiny module to know how to determine whether the user’s input is valid, but the module shouldn’t need to know anything about the <em>context</em> in which that validation happens. Should validation errors be shown right away, or deferred until a Submit button is pressed—and if so, what button is that? Are there downstream reactive expressions and observers that need to guard against invalid data? These kinds of questions need to be concerns of the caller of the module, not the caller itself.</p>
 <p>What this means, concretely, is that a Shiny module that contains an input (or multiple inputs) that need to be consumed by the caller, should call <code>iv$add_rule()</code> for its own inputs but generally leave <code>iv$enable()</code> or <code>iv$condition()</code> to the caller.</p>
-<p>As for the actual creation of the <code>InputValidator</code> object, there are two possibilities: either the module server function takes <code>iv</code> as a parameter, making it the module caller’s responsibility to create it; or the module server function can create a new <code>InputValidator</code> and include it in its return value to the caller.</p>
-<p>[TODO: examples]</p>
-<p>These two approaches are equivalent in power, and I can’t currently think of a compelling reason to recommend one over the other; so feel free to select one or the other based on whichever feels more intuitive to you.</p>
+<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="co"># Module UI</span>
+<span class="no">email_ui</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">id</span>, <span class="no">label</span> <span class="kw">=</span> <span class="st">"Email"</span>, <span class="no">value</span> <span class="kw">=</span> <span class="kw">NULL</span>) {
+  <span class="no">ns</span> <span class="kw">&lt;-</span> <span class="fu">NS</span>(<span class="no">id</span>)
+  <span class="fu">textInput</span>(<span class="fu">ns</span>(<span class="st">"email_address"</span>), <span class="kw">label</span> <span class="kw">=</span> <span class="no">label</span>, <span class="kw">value</span> <span class="kw">=</span> <span class="no">value</span>)
+}
+
+<span class="co"># Module server</span>
+<span class="no">email</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">id</span>, <span class="no">required</span> <span class="kw">=</span> <span class="fl">TRUE</span>) {
+  <span class="fu">moduleServer</span>(<span class="no">id</span>, <span class="kw">function</span>(<span class="no">input</span>, <span class="no">output</span>, <span class="no">session</span>) {
+
+    <span class="co"># Create and populate InputValidator object</span>
+    <span class="no">iv</span> <span class="kw">&lt;-</span> <span class="no">InputValidator</span>$<span class="fu">new</span>()
+    <span class="kw">if</span> (<span class="no">required</span>) {
+      <span class="no">iv</span>$<span class="fu">add_rule</span>(<span class="st">"email_address"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span>())
+    }
+    <span class="no">iv</span>$<span class="fu">add_rule</span>(<span class="st">"email_address"</span>, ~ <span class="kw">if</span> (!<span class="fu">is_valid_email</span>(<span class="no">.</span>)) <span class="st">"Invalid email address"</span>)
+
+    <span class="co"># Allow caller to reset the input</span>
+    <span class="no">reset</span> <span class="kw">&lt;-</span> <span class="kw">function</span>() {
+      <span class="fu">updateTextInput</span>(<span class="no">session</span>, <span class="st">"email_address"</span>, <span class="kw">value</span> <span class="kw">=</span> <span class="st">""</span>)
+    }
+
+    <span class="co"># Return value accessor, InputValidator, and reset function to the caller</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+      <span class="kw">value</span> <span class="kw">=</span> <span class="fu">reactive</span>(<span class="no">input</span>$<span class="no">email_address</span>),
+      <span class="kw">iv</span> <span class="kw">=</span> <span class="no">iv</span>,
+      <span class="kw">reset</span> <span class="kw">=</span> <span class="no">reset</span>
+    )
+  })
+}
+
+<span class="co"># App UI</span>
+<span class="no">ui</span> <span class="kw">&lt;-</span> <span class="fu">fluidPage</span>(
+  <span class="fu">email_ui</span>(<span class="st">"email"</span>, <span class="st">"Email address"</span>)
+)
+
+<span class="co"># App server</span>
+<span class="no">server</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">input</span>, <span class="no">output</span>, <span class="no">session</span>) {
+  <span class="no">email_result</span> <span class="kw">&lt;-</span> <span class="fu">email</span>(<span class="st">"email"</span>)
+  <span class="no">email_result</span>$<span class="no">iv</span>$<span class="fu">enable</span>()
+}</pre></body></html></div>
+<p>[TODO: source code, live demo - 04_module_1]</p>
 </div>
 <div id="caller-provided-validation-rules-for-module-inputs" class="section level4">
 <h4 class="hasAnchor">
 <a href="#caller-provided-validation-rules-for-module-inputs" class="anchor"></a>Caller-provided validation rules for module inputs</h4>
-<p>In the previous section, we assumed that a Shiny module knows everything there is to know about its own inputs’ validation rules. What if the module wants the caller to help decide if an input is valid? (TODO: come up with an example scenario)</p>
-<p>One bad but obvious way to do it would be for the caller to add its own rules directly to the <code>InputValidator</code> object:</p>
-<p>[TODO: example]</p>
-<p>The reason this is bad is because it requires the caller to know the input IDs used within the module. This violates a module boundary that we should try hard to keep sacred.</p>
-<p>Instead, the module should take a validation rule—i.e., the second argument to <code>add_rule</code>—as a parameter. If multiple inputs need to be validated, then one such parameter should be created for each input.</p>
+<p>In the previous section, we assumed that a Shiny module knows everything there is to know about its own inputs’ validation rules. What if the module wants the caller to help decide if an input is valid?</p>
+<p>Let’s consider a <code>password_input</code> Shiny module that provides the UI and logic for this kind of subform, the kind you’ve filled out a hundred times online:</p>
+<p>[screenshot: two password fields]</p>
+<p>This Shiny module can and should include validation rules to ensure that the “Password” and “Password (confirm)” fields always match. But there are other possible validation rules that might or might not be important for any particular app: Is there a minimum/maximum password length? Are passwords required to contain at least one number, uppercase letter, and/or special character? What special characters are allowed? These all feel like the responsibility of the module <em>caller</em> to decide, not the module <em>implementation</em>.</p>
+<p>One bad but obvious way to do it would be for the caller to add its own rules directly to the <code>InputValidator</code> object returned by <code>password_input</code>:</p>
+<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="no">server</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">input</span>, <span class="no">output</span>, <span class="no">session</span>) {
+  <span class="no">password_result</span> <span class="kw">&lt;-</span> <span class="fu">password_input</span>(<span class="st">"password"</span>)
+
+  <span class="co"># Adding a rule for one of password_input's inputs, from outside</span>
+  <span class="co"># of password_input. DON'T DO THIS!</span>
+  <span class="no">password_result</span>$<span class="no">iv</span>$<span class="fu">add_rule</span>(<span class="fu">NS</span>(<span class="st">"password"</span>, <span class="st">"pw1"</span>), ~ {
+    <span class="co"># Custom validation logic</span>
+    <span class="kw">if</span> (!<span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="st">"[0-9]"</span>, <span class="no">pw</span>) <span class="kw">||</span> !<span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="st">"[A-Z]"</span>, <span class="no">pw</span>)) {
+      <span class="st">"Must include a number and an upper-case character"</span>
+    } <span class="kw">else</span> <span class="kw">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/nchar.html">nchar</a></span>(<span class="no">pw</span>) <span class="kw">&lt;</span> <span class="fl">8</span>) {
+      <span class="st">"Must be at least 8 characters"</span>
+    }
+  })
+}</pre></body></html></div>
+<p>The reason this is bad is because it requires the caller to know the input IDs used within the module (<code>NS("password", "pw1")</code> in this case). This violates a module boundary that we should try hard to keep sacred!</p>
+<p>Instead, the module should take a validation rule—i.e., the second argument to <code>add_rule</code>—as a parameter. (If multiple inputs need to be validated, then one such parameter should be created for each input.)</p>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">password_input</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">id</span>, <span class="no">password_rule</span> <span class="kw">=</span> <span class="kw">NULL</span>) {
+  <span class="fu">moduleServer</span>(<span class="no">id</span>, <span class="kw">function</span>(<span class="no">input</span>, <span class="no">output</span>, <span class="no">session</span>) {
+    <span class="no">iv</span> <span class="kw">&lt;-</span> <span class="no">InputValidator</span>$<span class="fu">new</span>()
+    <span class="no">iv</span>$<span class="fu">add_rule</span>(<span class="st">"pw2"</span>, ~ <span class="kw">if</span> (!<span class="fu"><a href="https://rdrr.io/r/base/identical.html">identical</a></span>(<span class="no">.</span>, <span class="no">input</span>$<span class="no">pw1</span>)) <span class="st">"Passwords do not match"</span>)
+
+    <span class="co"># Add custom rule passed in by caller</span>
+    <span class="kw">if</span> (!<span class="fu"><a href="https://rdrr.io/r/base/NULL.html">is.null</a></span>(<span class="no">password_rule</span>)) {
+      <span class="no">iv</span>$<span class="fu">add_rule</span>(<span class="st">"pw1"</span>, <span class="no">password_rule</span>)
+    }
+  })
+}
+
+<span class="no">server</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">input</span>, <span class="no">output</span>, <span class="no">session</span>) {
+  <span class="co"># Initialize the module, passing custom validation logic via password_rule</span>
+  <span class="no">password_result</span> <span class="kw">&lt;-</span> <span class="fu">password_input</span>(<span class="st">"password"</span>, <span class="kw">password_rule</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">pw</span>) {
+    <span class="kw">if</span> (!<span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="st">"[0-9]"</span>, <span class="no">pw</span>) <span class="kw">||</span> !<span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="st">"[A-Z]"</span>, <span class="no">pw</span>)) {
+      <span class="st">"Must include a number and an upper-case character"</span>
+    } <span class="kw">else</span> <span class="kw">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/nchar.html">nchar</a></span>(<span class="no">pw</span>) <span class="kw">&lt;</span> <span class="fl">8</span>) {
+      <span class="st">"Must be at least 8 characters"</span>
+    }
+  })
+}</pre></body></html></div>
+<p>[TODO: source link, live demo - 05_module_2]</p>
 </div>
 </div>
 </div>

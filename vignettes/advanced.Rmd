@@ -145,20 +145,108 @@ Other Shiny modules may have a more transparent relationship with a surrounding 
 
 What this means, concretely, is that a Shiny module that contains an input (or multiple inputs) that need to be consumed by the caller, should call `iv$add_rule()` for its own inputs but generally leave `iv$enable()` or `iv$condition()` to the caller.
 
-As for the actual creation of the `InputValidator` object, there are two possibilities: either the module server function takes `iv` as a parameter, making it the module caller's responsibility to create it; or the module server function can create a new `InputValidator` and include it in its return value to the caller.
+``` {.r}
+# Module UI
+email_ui <- function(id, label = "Email", value = NULL) {
+  ns <- NS(id)
+  textInput(ns("email_address"), label = label, value = value)
+}
 
-[TODO: examples]
+# Module server
+email <- function(id, required = TRUE) {
+  moduleServer(id, function(input, output, session) {
+    
+    # Create and populate InputValidator object
+    iv <- InputValidator$new()
+    if (required) {
+      iv$add_rule("email_address", sv_required())
+    }
+    iv$add_rule("email_address", ~ if (!is_valid_email(.)) "Invalid email address")
 
-These two approaches are equivalent in power, and I can't currently think of a compelling reason to recommend one over the other; so feel free to select one or the other based on whichever feels more intuitive to you.
+    # Allow caller to reset the input
+    reset <- function() {
+      updateTextInput(session, "email_address", value = "")
+    }
+
+    # Return value accessor, InputValidator, and reset function to the caller
+    list(
+      value = reactive(input$email_address),
+      iv = iv,
+      reset = reset
+    )
+  })
+}
+
+# App UI
+ui <- fluidPage(
+  email_ui("email", "Email address")
+)
+
+# App server
+server <- function(input, output, session) {
+  email_result <- email("email")
+  email_result$iv$enable()
+}
+```
+
+[TODO: source code, live demo - 04_module_1]
 
 #### Caller-provided validation rules for module inputs
 
-In the previous section, we assumed that a Shiny module knows everything there is to know about its own inputs' validation rules. What if the module wants the caller to help decide if an input is valid? (TODO: come up with an example scenario)
+In the previous section, we assumed that a Shiny module knows everything there is to know about its own inputs' validation rules. What if the module wants the caller to help decide if an input is valid?
 
-One bad but obvious way to do it would be for the caller to add its own rules directly to the `InputValidator` object:
+Let's consider a `password_input` Shiny module that provides the UI and logic for this kind of subform, the kind you've filled out a hundred times online:
 
-[TODO: example]
+[screenshot: two password fields]
 
-The reason this is bad is because it requires the caller to know the input IDs used within the module. This violates a module boundary that we should try hard to keep sacred.
+This Shiny module can and should include validation rules to ensure that the "Password" and "Password (confirm)" fields always match. But there are other possible validation rules that might or might not be important for any particular app: Is there a minimum/maximum password length? Are passwords required to contain at least one number, uppercase letter, and/or special character? What special characters are allowed? These all feel like the responsibility of the module *caller* to decide, not the module *implementation*.
 
-Instead, the module should take a validation rule---i.e., the second argument to `add_rule`---as a parameter. If multiple inputs need to be validated, then one such parameter should be created for each input.
+One bad but obvious way to do it would be for the caller to add its own rules directly to the `InputValidator` object returned by `password_input`:
+
+``` {.r}
+server <- function(input, output, session) {
+  password_result <- password_input("password")
+
+  # Adding a rule for one of password_input's inputs, from outside
+  # of password_input. DON'T DO THIS!
+  password_result$iv$add_rule(NS("password", "pw1"), ~ {
+    # Custom validation logic
+    if (!grepl("[0-9]", pw) || !grepl("[A-Z]", pw)) {
+      "Must include a number and an upper-case character"
+    } else if (nchar(pw) < 8) {
+      "Must be at least 8 characters"
+    }
+  })
+}
+```
+
+The reason this is bad is because it requires the caller to know the input IDs used within the module (`NS("password", "pw1")` in this case). This violates a module boundary that we should try hard to keep sacred!
+
+Instead, the module should take a validation rule---i.e., the second argument to `add_rule`---as a parameter. (If multiple inputs need to be validated, then one such parameter should be created for each input.)
+
+``` {.r}
+password_input <- function(id, password_rule = NULL) {
+  moduleServer(id, function(input, output, session) {
+    iv <- InputValidator$new()
+    iv$add_rule("pw2", ~ if (!identical(., input$pw1)) "Passwords do not match")
+    
+    # Add custom rule passed in by caller
+    if (!is.null(password_rule)) {
+      iv$add_rule("pw1", password_rule)
+    }
+  })
+}
+
+server <- function(input, output, session) {
+  # Initialize the module, passing custom validation logic via password_rule
+  password_result <- password_input("password", password_rule = function(pw) {
+    if (!grepl("[0-9]", pw) || !grepl("[A-Z]", pw)) {
+      "Must include a number and an upper-case character"
+    } else if (nchar(pw) < 8) {
+      "Must be at least 8 characters"
+    }
+  })
+}
+```
+
+[TODO: source link, live demo - 05_module_2]

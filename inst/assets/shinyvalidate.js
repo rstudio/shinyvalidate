@@ -95,9 +95,49 @@ const bs3Strategy = {
     return true;
   }
 };
-strategies.push(bs3Strategy);
 
-// TODO: Support Bootstrap 4 too
+// https://getbootstrap.com/docs/4.4/components/forms/#server-side
+const bs4Strategy = {
+  findInputControl: function(el) {
+    el = $(el);
+    const inputControl = el.is(".form-control") ? el : el.find(".form-control");
+    return inputControl.length === 0 ? null : inputControl;
+  },
+  setInvalid: function(el, binding, id, message) {
+    const inputControl = this.findInputControl(el);
+    if (!inputControl) {
+      return false;
+    }
+    inputControl.addClass("is-invalid");
+    inputControl.siblings(".shiny-validation-message").remove();
+    if (message) {
+      const msgDiv = $(document.createElement("span")).
+        addClass(["invalid-feedback", "shiny-validation-message"]).
+        text(message);
+      inputControl.after(msgDiv);
+    }
+    return true;
+  },
+  clearInvalid: function(el, binding, id) {
+    const inputControl = this.findInputControl(el);
+    if (!inputControl) {
+      return false;
+    }
+    inputControl.removeClass("is-invalid");
+    inputControl.siblings(".shiny-validation-message").remove();
+    return true;
+  }
+};
+
+if (window.jQuery) {
+  const bsVersion = window.jQuery.fn.tab.Constructor.VERSION;
+  if (bsVersion.match(/^3\./)) {
+    strategies.push(bs3Strategy);
+  } else {
+    // Assuming this strategy will work for BS5 and beyond
+    strategies.push(bs4Strategy);
+  }
+}
 
 function setInvalid(el, binding, id, message = null) {
   for (var i = 0; i < strategies.length; i++) {

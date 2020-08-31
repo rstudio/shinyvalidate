@@ -2,8 +2,6 @@ library(shiny)
 library(shinyvalidate)
 
 ui <- fluidPage(
-  includeMarkdown("README.md"),
-  hr(),
   div(id = "form",
     radioButtons("type", "Profile image type", choices = c(
       "Take selfie" = "selfie",

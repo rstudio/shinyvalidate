@@ -3,8 +3,6 @@ library(shinyvalidate)
 library(markdown)
 
 ui <- fluidPage(
-  includeMarkdown("README.md"),
-  hr(),
   textInput("name", "Name: *"),
   textInput("email", "Email:"),
   checkboxGroupInput("topics", "Topics (choose two or more): *", choices = c(

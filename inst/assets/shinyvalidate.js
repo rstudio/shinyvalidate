@@ -61,43 +61,16 @@ const bindingStrategy = {
 strategies.push(bindingStrategy);
 
 /**
- * This strategy detects .shiny-input-container at or above the el, and uses
- * Bootstrap 3 classes to display validation messages.
+ * This strategy detects a .form-control within the input el, then:
+ * (1) toggles .is-invalid on the control (BS4+) or .has-error to the container (BS3) 
+ * (2) adds/removes .invalid-feedback (BS4+) or .help-block (BS3)
+ * 
+ * https://getbootstrap.com/docs/4.4/components/forms/#server-side
  */
-const bs3Strategy = {
-  findInputContainer: function(el) {
-    el = $(el);
-    const inputContainer = el.is(".form-group") ? el : el.parents(".form-group");
-    return inputContainer.length === 0 ? null : inputContainer;
+const bootstrapStrategy = {
+  isBS3: function() {
+    return window.jQuery ? window.jQuery.fn.tab.Constructor.VERSION.match(/^3\./) : false;
   },
-  setInvalid: function(el, binding, id, message) {
-    const inputContainer = this.findInputContainer(el);
-    if (!inputContainer) {
-      return false;
-    }
-    inputContainer.addClass("has-error");
-    inputContainer.children(".shiny-validation-message").remove();
-    if (message) {
-      const msgDiv = $(document.createElement("span")).
-        addClass(["help-block", "shiny-validation-message"]).
-        text(message);
-      inputContainer.append(msgDiv);
-    }
-    return true;
-  },
-  clearInvalid: function(el, binding, id) {
-    const inputContainer = this.findInputContainer(el);
-    if (!inputContainer) {
-      return false;
-    }
-    inputContainer.removeClass("has-error");
-    inputContainer.children(".shiny-validation-message").remove();
-    return true;
-  }
-};
-
-// https://getbootstrap.com/docs/4.4/components/forms/#server-side
-const bs4Strategy = {
   findInputControl: function(el) {
     el = $(el);
     const inputControl = el.is(".form-control") ? el : el.find(".form-control");
@@ -108,11 +81,14 @@ const bs4Strategy = {
     if (!inputControl) {
       return false;
     }
-    inputControl.addClass("is-invalid");
+    this.isBS3() ?
+      inputControl.parent(".form-group").addClass("has-error") :
+      inputControl.addClass("is-invalid");
     inputControl.siblings(".shiny-validation-message").remove();
     if (message) {
+      const feedbackClass = this.isBS3() ? "help-block" : "invalid-feedback";
       const msgDiv = $(document.createElement("span")).
-        addClass(["invalid-feedback", "shiny-validation-message"]).
+        addClass([feedbackClass, "shiny-validation-message"]).
         text(message);
       inputControl.after(msgDiv);
     }
@@ -123,21 +99,15 @@ const bs4Strategy = {
     if (!inputControl) {
       return false;
     }
-    inputControl.removeClass("is-invalid");
     inputControl.siblings(".shiny-validation-message").remove();
+    this.isBS3() ? 
+      inputControl.parent(".form-group").removeClass("has-error") : 
+      inputControl.removeClass("is-invalid");
     return true;
   }
 };
+strategies.push(bootstrapStrategy);
 
-if (window.jQuery) {
-  const bsVersion = window.jQuery.fn.tab.Constructor.VERSION;
-  if (bsVersion.match(/^3\./)) {
-    strategies.push(bs3Strategy);
-  } else {
-    // Assuming this strategy will work for BS5 and beyond
-    strategies.push(bs4Strategy);
-  }
-}
 
 function setInvalid(el, binding, id, message = null) {
   for (var i = 0; i < strategies.length; i++) {

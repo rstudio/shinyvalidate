@@ -92,10 +92,10 @@ const bsStrategy = {
       // we fallback to putting is-invalid on the container, which should be compatible 
       // with Selectize + BS4 https://github.com/rstudio/shiny/blob/2bd158a4/inst/www/shared/selectize/scss/selectize.bootstrap4.scss#L131-L140
       const control = inputContainer.find(".form-control");
-      if (!control.length) {
-        inputContainer.addClass("is-invalid");
-      } else {
+      if (control.length) {
         control.addClass("is-invalid");
+      } else {
+        inputContainer.addClass("is-invalid");
       }
     }
     
@@ -121,10 +121,10 @@ const bsStrategy = {
       inputContainer.removeClass("has-error");
     } else {
       const control = inputContainer.find(".form-control");
-      if (!control.length) {
-        inputContainer.removeClass("is-invalid");
-      } else {
+      if (control.length) {
         control.removeClass("is-invalid");
+      } else {
+        inputContainer.removeClass("is-invalid");
       }
     }
     

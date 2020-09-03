@@ -61,53 +61,78 @@ const bindingStrategy = {
 strategies.push(bindingStrategy);
 
 /**
- * This strategy detects a .form-control within the input el, then:
- * (1) toggles .is-invalid on the control (BS4+) or .has-error to the container (BS3) 
- * (2) adds/removes .invalid-feedback (BS4+) or .help-block (BS3)
- * 
- * https://getbootstrap.com/docs/4.4/components/forms/#server-side
+ * This strategy detects .shiny-input-container at or above the el, and uses
+ * Bootstrap 3 & 4 classes to display validation messages.
  */
-const bootstrapStrategy = {
+const bsStrategy = {
   isBS3: function() {
-    return window.jQuery ? window.jQuery.fn.tab.Constructor.VERSION.match(/^3\./) : false;
-  },
-  findInputControl: function(el) {
-    el = $(el);
-    const inputControl = el.is(".form-control") ? el : el.find(".form-control");
-    return inputControl.length === 0 ? null : inputControl;
-  },
-  setInvalid: function(el, binding, id, message) {
-    const inputControl = this.findInputControl(el);
-    if (!inputControl) {
+    if (!$.fn.tooltip) {
       return false;
     }
-    this.isBS3() ?
-      inputControl.parent(".form-group").addClass("has-error") :
-      inputControl.addClass("is-invalid");
-    inputControl.siblings(".shiny-validation-message").remove();
+    return $.fn.tooltip.Constructor.VERSION.match(/^3\./);
+  },
+  findInputContainer: function(el) {
+    el = $(el);
+    const inputContainer = el.is(".shiny-input-container") ? el : el.parents(".shiny-input-container");
+    return inputContainer.length === 0 ? null : inputContainer;
+  },
+  setInvalid: function(el, binding, id, message) {
+    const inputContainer = this.findInputContainer(el);
+    if (!inputContainer) {
+      return false;
+    }
+    if (this.isBS3()) {
+      inputContainer.addClass("has-error");
+    } else {
+      // BS4 wants .is-invalid on a .form-control (e.g., <input class="form-control">)
+      // *and* wants it to be a _sibling_ of .invalid-message in order to be displayed. 
+      //
+      // Unfortunately, we can't always assume that .form-control exists 
+      // (it conflicts with selectize CSS), so in the event that it's missing , 
+      // we fallback to putting is-invalid on the container, which should be compatible 
+      // with Selectize + BS4 https://github.com/rstudio/shiny/blob/2bd158a4/inst/www/shared/selectize/scss/selectize.bootstrap4.scss#L131-L140
+      const control = inputContainer.find(".form-control").first();
+      if (!control.length) {
+        inputContainer.addClass("is-invalid");
+      } else {
+        control.addClass("is-invalid");
+      }
+    }
+    
+    inputContainer.children(".shiny-validation-message").remove();
     if (message) {
       const feedbackClass = this.isBS3() ? "help-block" : "invalid-feedback";
-      const msgDiv = $(document.createElement("span")).
+      const msg = $(document.createElement("span")).
         addClass([feedbackClass, "shiny-validation-message"]).
         text(message);
-      inputControl.after(msgDiv);
+      // Yes, this is a terrible hack to get feedback to display when 
+      // there is no .form-control in BS4
+      msg.attr('style', function(i, s) { return (s || '') + 'display: block !important;' });
+      inputContainer.append(msg);
     }
     return true;
   },
   clearInvalid: function(el, binding, id) {
-    const inputControl = this.findInputControl(el);
-    if (!inputControl) {
+    const inputContainer = this.findInputContainer(el);
+    if (!inputContainer) {
       return false;
     }
-    inputControl.siblings(".shiny-validation-message").remove();
-    this.isBS3() ? 
-      inputControl.parent(".form-group").removeClass("has-error") : 
-      inputControl.removeClass("is-invalid");
+    if (this.isBS3()) {
+      inputContainer.removeClass("has-error");
+    } else {
+      const control = inputContainer.find(".form-control").first();
+      if (!control.length) {
+        inputContainer.removeClass("is-invalid");
+      } else {
+        control.removeClass("is-invalid");
+      }
+    }
+    
+    inputContainer.children(".shiny-validation-message").remove();
     return true;
   }
 };
-strategies.push(bootstrapStrategy);
-
+strategies.push(bsStrategy);
 
 function setInvalid(el, binding, id, message = null) {
   for (var i = 0; i < strategies.length; i++) {

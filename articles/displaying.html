@@ -111,7 +111,7 @@ span.delta {
 <a href="#it-just-works-built-in-support-for-bootstrap-3" class="anchor"></a>It Just Works: Built-in support for Bootstrap 3</h2>
 <p>At the time of this writing, Shiny’s built-in user interface components are written using the Bootstrap CSS framework, version 3. Bootstrap 3 defines certain markup and CSS patterns to follow for creating input controls, and Shiny’s built-in components follow those patterns. Bootstrap also defines patterns for displaying validation errors, and if the input in question follows Bootstrap 3 conventions, then shinyvalidate will automatically use those patterns.</p>
 <p>Here, for example, is the HTML used to generate a simple text input in Shiny:</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r">&gt; cat(as.character(shiny::textInput("email", "Email address")))</pre></body></html></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">cat</span>(<span class="kw">as.character</span>(shiny<span class="op">::</span><span class="kw">textInput</span>(<span class="st">"email"</span>, <span class="st">"Email address"</span>)))</span></code></pre></div>
 <pre><code>&lt;div class="form-group shiny-input-container"&gt;
   &lt;label class="control-label" for="email"&gt;Email address&lt;/label&gt;
   &lt;input id="email" type="text" class="form-control" value=""/&gt;
@@ -192,7 +192,7 @@ span.delta {
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

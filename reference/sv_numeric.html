@@ -137,19 +137,19 @@ via arguments.</p>
     </div>
 
     <pre class="usage"><span class='fu'>sv_numeric</span>(
-  <span class='kw'>message</span> <span class='kw'>=</span> <span class='st'>"A number is required"</span>,
-  <span class='kw'>allowMultiple</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>allowNA</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>allowNaN</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>allowInfinite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  message = <span class='st'>"A number is required"</span>,
+  allowMultiple = <span class='fl'>FALSE</span>,
+  allowNA = <span class='fl'>FALSE</span>,
+  allowNaN = <span class='fl'>FALSE</span>,
+  allowInfinite = <span class='fl'>FALSE</span>
 )
 
 <span class='fu'>sv_integer</span>(
-  <span class='kw'>message</span> <span class='kw'>=</span> <span class='st'>"An integer is required"</span>,
-  <span class='kw'>allowMultiple</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>allowNA</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>allowNaN</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>allowInfinite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  message = <span class='st'>"An integer is required"</span>,
+  allowMultiple = <span class='fl'>FALSE</span>,
+  allowNA = <span class='fl'>FALSE</span>,
+  allowNaN = <span class='fl'>FALSE</span>,
+  allowInfinite = <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -192,14 +192,15 @@ element will cause validation to fail.</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Ignore withReactiveDomain(), it's just required to get this example to run</span>
 <span class='co'># outside of Shiny</span>
-<span class='kw pkg'>shiny</span><span class='kw ns'>::</span><span class='fu'><a href='https://shiny.rstudio.com/reference/shiny/latest/domains.html'>withReactiveDomain</a></span>(<span class='kw pkg'>shiny</span><span class='kw ns'>::</span><span class='no'><a href='https://shiny.rstudio.com/reference/shiny/latest/MockShinySession.html'>MockShinySession</a></span>$<span class='fu'>new</span>(), {
+<span class='kw'>shiny</span>::<span class='fu'><a href='https://shiny.rstudio.com/reference/shiny/latest/domains.html'>withReactiveDomain</a></span>(<span class='kw'>shiny</span>::<span class='kw'><a href='https://shiny.rstudio.com/reference/shiny/latest/MockShinySession.html'>MockShinySession</a></span><span class='op'>$</span><span class='fu'>new</span>(), {
 
-  <span class='no'>iv</span> <span class='kw'>&lt;-</span> <span class='no'>InputValidator</span>$<span class='fu'>new</span>()
+  <span class='kw'>iv</span> <span class='op'>&lt;-</span> <span class='kw'>InputValidator</span><span class='op'>$</span><span class='fu'>new</span>()
 
-  <span class='no'>iv</span>$<span class='fu'>add_rule</span>(<span class='st'>"count"</span>, <span class='fu'>sv_integer</span>())
-  <span class='no'>iv</span>$<span class='fu'>add_rule</span>(<span class='st'>"count"</span>, ~<span class='kw'>if</span> (<span class='no'>.</span> <span class='kw'>&lt;=</span> <span class='fl'>0</span>) <span class='st'>"A positive value is required"</span>)
+  <span class='kw'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span>(<span class='st'>"count"</span>, <span class='fu'>sv_integer</span>())
+  <span class='kw'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span>(<span class='st'>"count"</span>, <span class='op'>~</span><span class='co'>if</span> (<span class='kw'>.</span> <span class='op'>&lt;=</span> <span class='fl'>0</span>) <span class='st'>"A positive value is required"</span>)
 
-})</div></pre>
+})
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -215,7 +216,7 @@ element will cause validation to fail.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -62,9 +62,15 @@ strategies.push(bindingStrategy);
 
 /**
  * This strategy detects .shiny-input-container at or above the el, and uses
- * Bootstrap 3 classes to display validation messages.
+ * Bootstrap 3 & 4 classes to display validation messages.
  */
-const bs3Strategy = {
+const bsStrategy = {
+  isBS3: function() {
+    if (!$.fn.tooltip) {
+      return false;
+    }
+    return $.fn.tooltip.Constructor.VERSION.match(/^3\./);
+  },
   findInputContainer: function(el) {
     el = $(el);
     const inputContainer = el.is(".form-group") ? el : el.parents(".form-group");
@@ -75,13 +81,34 @@ const bs3Strategy = {
     if (!inputContainer) {
       return false;
     }
-    inputContainer.addClass("has-error");
+    if (this.isBS3()) {
+      inputContainer.addClass("has-error");
+    } else {
+      // BS4 wants .is-invalid on a .form-control (e.g., <input class="form-control">)
+      // *and* wants it to be a _sibling_ of .invalid-message in order to be displayed. 
+      //
+      // Unfortunately, we can't always assume that .form-control exists 
+      // (it conflicts with selectize CSS), so in the event that it's missing , 
+      // we fallback to putting is-invalid on the container, which should be compatible 
+      // with Selectize + BS4 https://github.com/rstudio/shiny/blob/2bd158a4/inst/www/shared/selectize/scss/selectize.bootstrap4.scss#L131-L140
+      const control = inputContainer.find(".form-control");
+      if (control.length) {
+        control.addClass("is-invalid");
+      } else {
+        inputContainer.addClass("is-invalid");
+      }
+    }
+    
     inputContainer.children(".shiny-validation-message").remove();
     if (message) {
-      const msgDiv = $(document.createElement("span")).
-        addClass(["help-block", "shiny-validation-message"]).
+      const feedbackClass = this.isBS3() ? "help-block" : "invalid-feedback";
+      const msg = $(document.createElement("span")).
+        addClass([feedbackClass, "shiny-validation-message"]).
         text(message);
-      inputContainer.append(msgDiv);
+      // Yes, this is a terrible hack to get feedback to display when 
+      // there is no .form-control in BS4
+      msg.attr('style', function(i, s) { return (s || '') + 'display: block !important;' });
+      inputContainer.append(msg);
     }
     return true;
   },
@@ -90,14 +117,22 @@ const bs3Strategy = {
     if (!inputContainer) {
       return false;
     }
-    inputContainer.removeClass("has-error");
+    if (this.isBS3()) {
+      inputContainer.removeClass("has-error");
+    } else {
+      const control = inputContainer.find(".form-control");
+      if (control.length) {
+        control.removeClass("is-invalid");
+      } else {
+        inputContainer.removeClass("is-invalid");
+      }
+    }
+    
     inputContainer.children(".shiny-validation-message").remove();
     return true;
   }
 };
-strategies.push(bs3Strategy);
-
-// TODO: Support Bootstrap 4 too
+strategies.push(bsStrategy);
 
 function setInvalid(el, binding, id, message = null) {
   for (var i = 0; i < strategies.length; i++) {

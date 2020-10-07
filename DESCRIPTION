@@ -17,7 +17,7 @@ Imports:
     htmltools,
     rlang
 Remotes: 
-    rstudio/shiny#2975
+    rstudio/shiny#3055
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 Suggests: 

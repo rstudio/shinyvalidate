@@ -192,10 +192,10 @@ that are completely unrelated to each other; each form would have its own
 <p><hr>
 <a id="method-new"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>new()</code></h3>
 <p>Create a new validator object.</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='kw'>InputValidator</span><span class='op'>$</span><span class='fu'>new</span>(
-  priority = <span class='fl'>1000</span>,
-  session = <span class='kw'>shiny</span>::<span class='fu'><a href='https://shiny.rstudio.com/reference/shiny/latest/domains.html'>getDefaultReactiveDomain</a></span>()
-)</pre><p></div></p>
+<p><div class="r"></p><pre><span class='va'>InputValidator</span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span>
+  priority <span class='op'>=</span> <span class='fl'>1000</span>,
+  session <span class='op'>=</span> <span class='fu'>shiny</span><span class='fu'>::</span><span class='fu'><a href='https://shiny.rstudio.com/reference/shiny/latest/domains.html'>getDefaultReactiveDomain</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>)</span></pre><p></div></p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
 <p><div class="arguments"></p><dl>
@@ -212,7 +212,7 @@ the default.)</p></dd>
 <p><hr>
 <a id="method-parent"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>parent()</code></h3>
 <p>For internal use only.</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='kw'>InputValidator</span><span class='op'>$</span><span class='fu'>parent</span>(<span class='kw'>validator</span>)</pre><p></div></p>
+<p><div class="r"></p><pre><span class='va'>InputValidator</span><span class='op'>$</span><span class='fu'>parent</span><span class='op'>(</span><span class='va'>validator</span><span class='op'>)</span></pre><p></div></p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
 <p><div class="arguments"></p><dl>
@@ -226,7 +226,7 @@ this validator. Before performing validation, this validator will
 execute the <code>cond</code> function. If <code>cond</code> returns <code>TRUE</code>, then
 validation continues as normal; if <code>FALSE</code>, then the validation rules
 will be skipped and treated as if they are all passing.</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='kw'>InputValidator</span><span class='op'>$</span><span class='fu'><a href='https://rdrr.io/r/base/conditions.html'>condition</a></span>(<span class='kw'>cond</span>)</pre><p></div></p>
+<p><div class="r"></p><pre><span class='va'>InputValidator</span><span class='op'>$</span><span class='fu'>condition</span><span class='op'>(</span><span class='va'>cond</span><span class='op'>)</span></pre><p></div></p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
 <p><div class="arguments"></p><dl>
@@ -251,7 +251,7 @@ its child validators are enabled (or disabled) as well.</p>
 <p>This is intended to help with validating Shiny modules. Each module can
 create its own <code>InputValidator</code> object and populate it with rules, then
 return that object to the caller.</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='kw'>InputValidator</span><span class='op'>$</span><span class='fu'>add_validator</span>(<span class='kw'>validator</span>)</pre><p></div></p>
+<p><div class="r"></p><pre><span class='va'>InputValidator</span><span class='op'>$</span><span class='fu'>add_validator</span><span class='op'>(</span><span class='va'>validator</span><span class='op'>)</span></pre><p></div></p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
 <p><div class="arguments"></p><dl>
@@ -265,12 +265,12 @@ applies to a single input. You can add multiple validation rules for a
 single input, by calling <code>add_rules()</code> multiple times; the first
 validation rule for an input that fails will be used, and will prevent
 subsequent rules for that input from executing.</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='kw'>InputValidator</span><span class='op'>$</span><span class='fu'>add_rule</span>(
-  <span class='kw'>inputId</span>,
-  <span class='kw'>rule</span>,
-  <span class='kw'>...</span>,
-  session. = <span class='kw'>shiny</span>::<span class='fu'><a href='https://shiny.rstudio.com/reference/shiny/latest/domains.html'>getDefaultReactiveDomain</a></span>()
-)</pre><p></div></p>
+<p><div class="r"></p><pre><span class='va'>InputValidator</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span>
+  <span class='va'>inputId</span>,
+  <span class='va'>rule</span>,
+  <span class='va'>...</span>,
+  session. <span class='op'>=</span> <span class='fu'>shiny</span><span class='fu'>::</span><span class='fu'><a href='https://shiny.rstudio.com/reference/shiny/latest/domains.html'>getDefaultReactiveDomain</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>)</span></pre><p></div></p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
 <p><div class="arguments"></p><dl>
@@ -301,7 +301,7 @@ the feedback up-to-date. (It's safe to call the <code>enable()</code> method
 on an already-enabled validator.) If this validator object has been
 added to another validator object using <code>InputValidator$add_validator</code>,
 calls to <code>enable()</code> on this validator will be ignored.</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='kw'>InputValidator</span><span class='op'>$</span><span class='fu'>enable</span>()</pre><p></div></p>
+<p><div class="r"></p><pre><span class='va'>InputValidator</span><span class='op'>$</span><span class='fu'>enable</span><span class='op'>(</span><span class='op'>)</span></pre><p></div></p>
 
 <p><hr>
 <a id="method-disable"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>disable()</code></h3>
@@ -309,19 +309,19 @@ calls to <code>enable()</code> on this validator will be ignored.</p><h4 class='
 interface for all inputs represented in this validator's ruleset, and
 stop providing feedback going forward. Once disabled, <code>enable()</code> can be
 called to resume input validation.</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='kw'>InputValidator</span><span class='op'>$</span><span class='fu'>disable</span>()</pre><p></div></p>
+<p><div class="r"></p><pre><span class='va'>InputValidator</span><span class='op'>$</span><span class='fu'>disable</span><span class='op'>(</span><span class='op'>)</span></pre><p></div></p>
 
 <p><hr>
 <a id="method-fields"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>fields()</code></h3>
 <p>Returns <code>TRUE</code> if all input validation rules currently pass,
 <code>FALSE</code> if not.</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='kw'>InputValidator</span><span class='op'>$</span><span class='fu'>fields</span>()</pre><p></div></p>
+<p><div class="r"></p><pre><span class='va'>InputValidator</span><span class='op'>$</span><span class='fu'>fields</span><span class='op'>(</span><span class='op'>)</span></pre><p></div></p>
 
 <p><hr>
 <a id="method-is_valid"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>is_valid()</code></h3>
 <p>Returns <code>TRUE</code> if all input validation rules currently pass,
 <code>FALSE</code> if not.</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='kw'>InputValidator</span><span class='op'>$</span><span class='fu'>is_valid</span>()</pre><p></div></p>
+<p><div class="r"></p><pre><span class='va'>InputValidator</span><span class='op'>$</span><span class='fu'>is_valid</span><span class='op'>(</span><span class='op'>)</span></pre><p></div></p>
 
 <p><hr>
 <a id="method-validate"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>validate()</code></h3>
@@ -331,7 +331,7 @@ instead. The return value of this method is a named list, where the
 names are (fully namespace qualified) input IDs, and the values are
 either <code>NULL</code> (if the input value is passing) or a single-element
 character vector describing a validation problem.</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='kw'>InputValidator</span><span class='op'>$</span><span class='fu'>validate</span>()</pre><p></div></p>
+<p><div class="r"></p><pre><span class='va'>InputValidator</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='op'>)</span></pre><p></div></p>
 
 
 

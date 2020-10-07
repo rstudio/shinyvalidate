@@ -105,27 +105,26 @@
 <p>Note that all of these steps must be performed in your Shiny app’s <code>server</code> function.</p>
 <p>To see this in action, let’s look at the server function from the <code>01_simple</code> example app [<a href="https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/01_simple/app.R">source</a>, <a href="https://jcheng.shinyapps.io/01_simple/">live demo</a>].</p>
 <div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="kw">server</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">input</span>, <span class="kw">output</span>, <span class="kw">session</span>) {
+<span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
 
   <span class="co"># 1. Create an InputValidator object</span>
-  <span class="kw">iv</span> <span class="op">&lt;-</span> <span class="kw">InputValidator</span><span class="op">$</span><span class="fu">new</span>()
+  <span class="va">iv</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
   
   <span class="co"># 2. Add validation rules</span>
-  <span class="kw">iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"name"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span>())
-  <span class="kw">iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"email"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span>())
-  <span class="kw">iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"email"</span>, <span class="op">~</span> <span class="co">if</span> (<span class="op">!</span><span class="fu">is_valid_email</span>(<span class="kw">.</span>)) <span class="st">"Not a valid email"</span>)
+  <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"name"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email"</span>, <span class="op">~</span> <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu">is_valid_email</span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span> <span class="st">"Not a valid email"</span><span class="op">)</span>
   
   <span class="co"># 3. Start displaying errors in the UI</span>
-  <span class="kw">iv</span><span class="op">$</span><span class="fu">enable</span>()
+  <span class="va">iv</span><span class="op">$</span><span class="fu">enable</span><span class="op">(</span><span class="op">)</span>
   
-  <span class="kw">output</span><span class="op">$</span><span class="kw">greeting</span> <span class="op">&lt;-</span> <span class="fu">renderText</span>({
+  <span class="va">output</span><span class="op">$</span><span class="va">greeting</span> <span class="op">&lt;-</span> <span class="fu">renderText</span><span class="op">(</span><span class="op">{</span>
     <span class="co"># 4. Don't proceed if any input is invalid</span>
-    <span class="fu">req</span>(<span class="kw">iv</span><span class="op">$</span><span class="fu">is_valid</span>())
+    <span class="fu">req</span><span class="op">(</span><span class="va">iv</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
     
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">"Nice to meet you, "</span>, <span class="kw">input</span><span class="op">$</span><span class="kw">name</span>, <span class="st">" &lt;"</span>, <span class="kw">input</span><span class="op">$</span><span class="kw">email</span>, <span class="st">"&gt;!"</span>)
-  })
-}
-</pre></div>
+    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"Nice to meet you, "</span>, <span class="va">input</span><span class="op">$</span><span class="va">name</span>, <span class="st">" &lt;"</span>, <span class="va">input</span><span class="op">$</span><span class="va">email</span>, <span class="st">"&gt;!"</span><span class="op">)</span>
+  <span class="op">}</span><span class="op">)</span>
+<span class="op">}</span></pre></div>
 <p>This validator has rules that check that a value is provided for <code>input$name</code> and <code>input$email</code>, and that the provided email is valid.</p>
 </div>
 <div id="adding-rules" class="section level2">
@@ -140,8 +139,7 @@
 <a href="#rules-from-helper-functions" class="anchor"></a>Rules from helper functions</h3>
 <p>For maximum convenience, shinyvalidate comes with a few helper functions that implement common validation rules. The <a href="https://rstudio.github.io/shinyvalidate/reference/sv_required.html"><code>sv_required</code></a> helper is likely to be the one you reach for most often:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="kw">iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"title"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span>(message = <span class="st">"Title must be provided"</span>))
-</pre></div>
+<span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"title"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span><span class="op">(</span>message <span class="op">=</span> <span class="st">"Title must be provided"</span><span class="op">)</span><span class="op">)</span></pre></div>
 <p>The <code>message</code> argument is optional; if you omit it, the default message is simply “Required”. Keep in mind that validation error messages will be displayed next to the erroneous input, so it’s generally not strictly necessary for the error message to spell out which input it refers to.</p>
 <p>Currently, shinyvalidate provides only a handful of validation helper functions. Besides <code>sv_required</code>, there’s also <a href="https://rstudio.github.io/shinyvalidate/reference/sv_numeric.html"><code>sv_numeric</code></a>, <a href="https://rstudio.github.io/shinyvalidate/reference/sv_numeric.html"><code>sv_integer</code></a>, and <a href="https://rstudio.github.io/shinyvalidate/reference/sv_regex.html"><code>sv_regex</code></a>; see their help topics for more information.</p>
 </div>
@@ -150,8 +148,7 @@
 <a href="#rules-as-formulas" class="anchor"></a>Rules as formulas</h3>
 <p>If your validation logic differs from the helper functions described above, you can use a formula to implement custom rules.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="kw">iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"email"</span>, <span class="op">~</span> <span class="co">if</span> (<span class="op">!</span><span class="fu">is_valid_email</span>(<span class="kw">.</span>)) <span class="st">"Not a valid email"</span>)
-</pre></div>
+<span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email"</span>, <span class="op">~</span> <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu">is_valid_email</span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span> <span class="st">"Not a valid email"</span><span class="op">)</span></pre></div>
 <p>Validation formulas should test the <code>.</code> variable, and return either <code>NULL</code> if the value is acceptable, or else a single-element character vector describing why the value is problematic.</p>
 <p>(If you’re wondering why the formula in this example doesn’t end with <code>else NULL</code>, note that in R, <code>if</code> expressions automatically return <code><a href="https://rdrr.io/r/base/invisible.html">invisible(NULL)</a></code> when false and no <code>else</code> is present.)</p>
 </div>
@@ -160,23 +157,21 @@
 <a href="#rules-as-functions" class="anchor"></a>Rules as functions</h3>
 <p>Finally, you can provide validation logic as a function.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="kw">iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"count"</span>, <span class="fu">function</span>(<span class="kw">value</span>) {
-  <span class="co">if</span> (<span class="kw">value</span> <span class="op">&lt;</span> <span class="fl">0</span>) {
+<span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"count"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">{</span>
+  <span class="kw">if</span> <span class="op">(</span><span class="va">value</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
     <span class="st">"Negative values are not allowed"</span>
-  }
-})
-</pre></div>
+  <span class="op">}</span>
+<span class="op">}</span><span class="op">)</span></pre></div>
 <p>Functions receive the value to test as an argument (named <code>value</code> by convention), and should return <code>NULL</code> if that value is valid, and a single-element character vector with a descriptive message if the value is invalid.</p>
 <p>Note that you can use named functions, not just anonymous ones; and that if the function takes additional arguments, these can be provided by passing <code>...</code> arguments to <code>iv$add_rule()</code>, similar to how <code>lapply</code> works. This example demonstrates both:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="kw">not_greater_than</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">value</span>, <span class="kw">limit</span>, <span class="kw">message</span> = <span class="st">"Value is too high"</span>) {
-  <span class="co">if</span> (<span class="kw">value</span> <span class="op">&gt;</span> <span class="kw">limit</span>) <span class="kw">message</span>
-}
+<span class="va">not_greater_than</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">value</span>, <span class="va">limit</span>, <span class="va">message</span> <span class="op">=</span> <span class="st">"Value is too high"</span><span class="op">)</span> <span class="op">{</span>
+  <span class="kw">if</span> <span class="op">(</span><span class="va">value</span> <span class="op">&gt;</span> <span class="va">limit</span><span class="op">)</span> <span class="va">message</span>
+<span class="op">}</span>
 
-<span class="kw">iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"samples"</span>, <span class="kw">not_greater_than</span>, limit = <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="kw">df</span>),
-  message = <span class="st">"Sample count cannot exceed number of rows"</span>
-)
-</pre></div>
+<span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"samples"</span>, <span class="va">not_greater_than</span>, limit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>,
+  message <span class="op">=</span> <span class="st">"Sample count cannot exceed number of rows"</span>
+<span class="op">)</span></pre></div>
 <p><strong>(TODO: make examples reproducible)</strong></p>
 </div>
 </div>
@@ -195,25 +190,23 @@
 <p>Besides displaying errors to the user, <code>InputValidator</code> can also help your observers and reactive expressions ensure they are only operating on complete and valid input (as defined by the rules you defined on the <code>InputValidator</code> object).</p>
 <p>Currently, <code>InputValidator</code> exposes a single, simple <code>is_valid()</code> method that returns <code>TRUE</code> or <code>FALSE</code>. You can either use it in a simple conditional:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="fu">observeEvent</span>(<span class="kw">input</span><span class="op">$</span><span class="kw">continue</span>, {
-  <span class="co">if</span> (<span class="kw">iv</span><span class="op">$</span><span class="fu">is_valid</span>()) {
+<span class="fu">observeEvent</span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">continue</span>, <span class="op">{</span>
+  <span class="kw">if</span> <span class="op">(</span><span class="va">iv</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
     <span class="co"># use inputs...</span>
-  } <span class="co">else</span> {
-    <span class="fu">showNotification</span>(
+  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
+    <span class="fu">showNotification</span><span class="op">(</span>
       <span class="st">"Please fix the errors in the form before continuing"</span>,
-      type = <span class="st">"warning"</span>
-    )
-  }
-})
-</pre></div>
+      type <span class="op">=</span> <span class="st">"warning"</span>
+    <span class="op">)</span>
+  <span class="op">}</span>
+<span class="op">}</span><span class="op">)</span></pre></div>
 <p>Or, if you don’t want to do anything besides silently abort the calculation/action/output, you can use <code>req(iv$is_valid())</code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="kw">df</span> <span class="op">&lt;-</span> <span class="fu">reactive</span>({
-  <span class="fu">req</span>(<span class="kw">iv</span><span class="op">$</span><span class="fu">is_valid</span>())
+<span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">reactive</span><span class="op">(</span><span class="op">{</span>
+  <span class="fu">req</span><span class="op">(</span><span class="va">iv</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
   
   <span class="co"># use inputs...</span>
-})
-</pre></div>
+<span class="op">}</span><span class="op">)</span></pre></div>
 </div>
   </div>
 

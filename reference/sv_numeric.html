@@ -136,21 +136,21 @@ valid number/integer is allowed, but each of those criteria can be controlled
 via arguments.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sv_numeric</span>(
-  message = <span class='st'>"A number is required"</span>,
-  allowMultiple = <span class='fl'>FALSE</span>,
-  allowNA = <span class='fl'>FALSE</span>,
-  allowNaN = <span class='fl'>FALSE</span>,
-  allowInfinite = <span class='fl'>FALSE</span>
-)
+    <pre class="usage"><span class='fu'>sv_numeric</span><span class='op'>(</span>
+  message <span class='op'>=</span> <span class='st'>"A number is required"</span>,
+  allowMultiple <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  allowNA <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  allowNaN <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  allowInfinite <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span>
 
-<span class='fu'>sv_integer</span>(
-  message = <span class='st'>"An integer is required"</span>,
-  allowMultiple = <span class='fl'>FALSE</span>,
-  allowNA = <span class='fl'>FALSE</span>,
-  allowNaN = <span class='fl'>FALSE</span>,
-  allowInfinite = <span class='fl'>FALSE</span>
-)</pre>
+<span class='fu'>sv_integer</span><span class='op'>(</span>
+  message <span class='op'>=</span> <span class='st'>"An integer is required"</span>,
+  allowMultiple <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  allowNA <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  allowNaN <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  allowInfinite <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -192,14 +192,14 @@ element will cause validation to fail.</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Ignore withReactiveDomain(), it's just required to get this example to run</span>
 <span class='co'># outside of Shiny</span>
-<span class='kw'>shiny</span>::<span class='fu'><a href='https://shiny.rstudio.com/reference/shiny/latest/domains.html'>withReactiveDomain</a></span>(<span class='kw'>shiny</span>::<span class='kw'><a href='https://shiny.rstudio.com/reference/shiny/latest/MockShinySession.html'>MockShinySession</a></span><span class='op'>$</span><span class='fu'>new</span>(), {
+<span class='fu'>shiny</span><span class='fu'>::</span><span class='fu'><a href='https://shiny.rstudio.com/reference/shiny/latest/domains.html'>withReactiveDomain</a></span><span class='op'>(</span><span class='fu'>shiny</span><span class='fu'>::</span><span class='va'><a href='https://shiny.rstudio.com/reference/shiny/latest/MockShinySession.html'>MockShinySession</a></span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='op'>)</span>, <span class='op'>{</span>
 
-  <span class='kw'>iv</span> <span class='op'>&lt;-</span> <span class='kw'>InputValidator</span><span class='op'>$</span><span class='fu'>new</span>()
+  <span class='va'>iv</span> <span class='op'>&lt;-</span> <span class='va'><a href='InputValidator.html'>InputValidator</a></span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='op'>)</span>
 
-  <span class='kw'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span>(<span class='st'>"count"</span>, <span class='fu'>sv_integer</span>())
-  <span class='kw'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span>(<span class='st'>"count"</span>, <span class='op'>~</span><span class='co'>if</span> (<span class='kw'>.</span> <span class='op'>&lt;=</span> <span class='fl'>0</span>) <span class='st'>"A positive value is required"</span>)
+  <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"count"</span>, <span class='fu'>sv_integer</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"count"</span>, <span class='op'>~</span><span class='kw'>if</span> <span class='op'>(</span><span class='va'>.</span> <span class='op'>&lt;=</span> <span class='fl'>0</span><span class='op'>)</span> <span class='st'>"A positive value is required"</span><span class='op'>)</span>
 
-})
+<span class='op'>}</span><span class='op'>)</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

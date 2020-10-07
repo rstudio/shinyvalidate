@@ -99,8 +99,7 @@
 <a href="#child-validators" class="anchor"></a>Child validators</h3>
 <p>Hopefully you know by now that you can add rules to <code>InputValidator</code> objects, via the <code>add_rule()</code> method. What you may not know is that you can also add entire <code>InputValidator</code> objects to each other.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="kw">parent_iv</span><span class="op">$</span><span class="fu">add_validator</span>(<span class="kw">child_iv</span>)
-</pre></div>
+<span class="va">parent_iv</span><span class="op">$</span><span class="fu">add_validator</span><span class="op">(</span><span class="va">child_iv</span><span class="op">)</span></pre></div>
 <p>Each <code>InputValidator</code> object can have any number of child <code>InputValidator</code> objects. It’s also fine for a child <code>InputValidator</code> object to have children of its own.</p>
 <p>If <code>child_iv$is_valid()</code> returns <code>FALSE</code>, then <code>parent_iv$is_valid()</code> will also return <code>FALSE</code>—in other words, an input validator is only valid if all of its child validators are valid. And when <code>parent_iv$enable()</code> is called, real-time validation feedback is enabled not only for its own rules, but for the rules of the child validators, and their children, and so on.</p>
 <p>I’m not sure, however, it makes sense for one <code>InputValidator</code> object to be added as a child to two different parents. Currently, {shinyvalidate} doesn’t stop you from doing this, but I can’t be sure there aren’t strange edge cases that might emerge from doing so.</p>
@@ -113,17 +112,16 @@
 <p>Here are three equivalent ways to apply the <code><a href="https://rdrr.io/r/base/Logic.html">isTRUE(input$filter_by_date)</a></code> condition to <code>iv</code>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit">
 <span class="co"># As formula</span>
-<span class="kw">iv</span><span class="op">$</span><span class="fu"><a href="https://rdrr.io/r/base/conditions.html">condition</a></span>(<span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Logic.html">isTRUE</a></span>(<span class="kw">input</span><span class="op">$</span><span class="kw">filter_by_date</span>))
+<span class="va">iv</span><span class="op">$</span><span class="fu">condition</span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Logic.html">isTRUE</a></span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">filter_by_date</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># As anonymous function</span>
-<span class="kw">iv</span><span class="op">$</span><span class="fu"><a href="https://rdrr.io/r/base/conditions.html">condition</a></span>(<span class="fu">function</span>() { <span class="fu"><a href="https://rdrr.io/r/base/Logic.html">isTRUE</a></span>(<span class="kw">input</span><span class="op">$</span><span class="kw">filter_by_date</span>) })
+<span class="va">iv</span><span class="op">$</span><span class="fu">condition</span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/base/Logic.html">isTRUE</a></span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">filter_by_date</span><span class="op">)</span> <span class="op">}</span><span class="op">)</span>
 
 <span class="co"># As named function--or in this case, named reactive expression</span>
-<span class="kw">filtering_by_date</span> <span class="op">&lt;-</span> <span class="fu">reactive</span>({
-  <span class="fu"><a href="https://rdrr.io/r/base/Logic.html">isTRUE</a></span>(<span class="kw">input</span><span class="op">$</span><span class="kw">filter_by_date</span>)
-})
-<span class="kw">iv</span><span class="op">$</span><span class="fu"><a href="https://rdrr.io/r/base/conditions.html">condition</a></span>(<span class="kw">filtering_by_date</span>)
-</pre></div>
+<span class="va">filtering_by_date</span> <span class="op">&lt;-</span> <span class="fu">reactive</span><span class="op">(</span><span class="op">{</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/Logic.html">isTRUE</a></span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">filter_by_date</span><span class="op">)</span>
+<span class="op">}</span><span class="op">)</span>
+<span class="va">iv</span><span class="op">$</span><span class="fu">condition</span><span class="op">(</span><span class="va">filtering_by_date</span><span class="op">)</span></pre></div>
 <p>The effect of all three variants is the same: if <code>input$filter_by_date</code> is <code>TRUE</code>, then <code>iv</code> will function as normal. But if <code>input$filter_by_date</code> is not <code>TRUE</code>, then <code>iv</code> acts as if all of its rules are passing.</p>
 <p>Note that I said “as if all of its rules are passing”, not “as if it has no rules” or “as if <code>iv</code> doesn’t even exist”. If a validator is enabled and has failing rules, there will be validation errors displayed to the user. If the <code>condition</code> then becomes <code>FALSE</code>, <em>these errors will be dismissed</em>. This is why “as if all of its rules are passing” matters; the validator doesn’t just stop validating, it dismisses existing errors for inputs that it has rules for.</p>
 <p>To be clear, it’s <em>not</em> the case that you call the <code><a href="https://rdrr.io/r/base/conditions.html">condition()</a></code> method when you want to start or stop bypassing the validator’s rules. Rather, you call the <code><a href="https://rdrr.io/r/base/conditions.html">condition()</a></code> method just once per <code>InputValidator</code>, passing it <em>the logic that determines</em> whether the rules should be in effect or not, and trust that Shiny and {shinyvalidate} will invoke that logic as often as is necessary.</p>
@@ -139,13 +137,12 @@
 <p>Some Shiny apps may have more than one totally independent form, that just happen to be rendered within the same app. In these cases, you don’t want to let validation errors in Form A prevent you from being able to submit Form B.</p>
 <p>The solution to this is straightforward: create a separate <code>InputValidator</code> for each set of related inputs, making sure to use a different variable name for each. By convention, these variables should be suffixed with <code>_iv</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="kw">signup_iv</span> <span class="op">&lt;-</span> <span class="kw">InputValidator</span><span class="op">$</span><span class="fu">new</span>()
-<span class="kw">signup_iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"email"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span>())
+<span class="va">signup_iv</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
+<span class="va">signup_iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 
-<span class="kw">recalculate_iv</span> <span class="op">&lt;-</span> <span class="kw">InputValidator</span><span class="op">$</span><span class="fu">new</span>()
-<span class="kw">recalculate_iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"sample_count"</span>, <span class="fu"><a href="../reference/sv_numeric.html">sv_integer</a></span>())
-<span class="kw">recalculate_iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"sample_count"</span>, <span class="op">~</span> <span class="co">if</span> (<span class="kw">.</span> <span class="op">&lt;=</span> <span class="fl">0</span>) <span class="st">"Must be positive"</span>)
-</pre></div>
+<span class="va">recalculate_iv</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
+<span class="va">recalculate_iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"sample_count"</span>, <span class="fu"><a href="../reference/sv_numeric.html">sv_integer</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="va">recalculate_iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"sample_count"</span>, <span class="op">~</span> <span class="kw">if</span> <span class="op">(</span><span class="va">.</span> <span class="op">&lt;=</span> <span class="fl">0</span><span class="op">)</span> <span class="st">"Must be positive"</span><span class="op">)</span></pre></div>
 <p>[source, live demo] TODO</p>
 <p>Now, reactives relating to signup can use <code>signup_iv</code>, and reactives relating to recalculation can use <code>recalculate_iv</code>. These two validator objects have no parent/child relationship; they’re just two independent objects that have nothing in common besides existing in the same environment.</p>
 <p>Note that two independent validators may not have any overlap in the sets of inputs that they validate. In other words, since <code>signup_iv$add_rule("email", ...)</code> has been called, you cannot then do <code>recalculate_iv$add_rule("email", ...)</code>, since that could leave the validators with conflicting opinions about whether the <code>email</code> input is valid.</p>
@@ -159,17 +156,15 @@
 <p>The Gravatar email address input is <code><a href="../reference/sv_required.html">sv_required()</a></code>, because we don’t want to let users submit the Gravatar option without it. But if the user has “Take selfie” currently selected, then the Gravatar email address is not relevant, and the validation rule should be ignored.</p>
 <p>We can achieve this by breaking our validation rules into groups using child validators, and then attaching the appropriate conditional to each child validator.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="kw">gravatar_iv</span> <span class="op">&lt;-</span> <span class="kw">InputValidator</span><span class="op">$</span><span class="fu">new</span>()
-<span class="kw">gravatar_iv</span><span class="op">$</span><span class="fu"><a href="https://rdrr.io/r/base/conditions.html">condition</a></span>(<span class="op">~</span> <span class="kw">input</span><span class="op">$</span><span class="kw">mode</span> <span class="op">==</span> <span class="st">"gravatar"</span>)
-<span class="kw">gravatar_iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"email"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span>());
-</pre></div>
+<span class="va">gravatar_iv</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
+<span class="va">gravatar_iv</span><span class="op">$</span><span class="fu">condition</span><span class="op">(</span><span class="op">~</span> <span class="va">input</span><span class="op">$</span><span class="va">mode</span> <span class="op">==</span> <span class="st">"gravatar"</span><span class="op">)</span>
+<span class="va">gravatar_iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>;</pre></div>
 <p>Unlike the scenario described above in <a href="#multiple-independent-forms">Multiple independent forms</a>, the individual validator objects associated with each mode–<code>selfie_iv</code>, <code>upload_iv</code>, and <code>gravatar_iv</code>–do not represent independent forms; rather, they all are tied to the same Submit button. We handle this by introducing one more <code>InputValidator</code> object, this time representing the overall form, and adding our three validator objects to it as children.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="kw">iv</span> <span class="op">&lt;-</span> <span class="kw">InputValidator</span><span class="op">$</span><span class="fu">new</span>()
-<span class="kw">iv</span><span class="op">$</span><span class="fu">add_validator</span>(<span class="kw">selfie_iv</span>)
-<span class="kw">iv</span><span class="op">$</span><span class="fu">add_validator</span>(<span class="kw">upload_iv</span>)
-<span class="kw">iv</span><span class="op">$</span><span class="fu">add_validator</span>(<span class="kw">gravatar_iv</span>)
-</pre></div>
+<span class="va">iv</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
+<span class="va">iv</span><span class="op">$</span><span class="fu">add_validator</span><span class="op">(</span><span class="va">selfie_iv</span><span class="op">)</span>
+<span class="va">iv</span><span class="op">$</span><span class="fu">add_validator</span><span class="op">(</span><span class="va">upload_iv</span><span class="op">)</span>
+<span class="va">iv</span><span class="op">$</span><span class="fu">add_validator</span><span class="op">(</span><span class="va">gravatar_iv</span><span class="op">)</span></pre></div>
 </div>
 <div id="validating-shiny-modules" class="section level3">
 <h3 class="hasAnchor">
@@ -194,47 +189,46 @@
 <p>What this means, concretely, is that a Shiny module that contains an input (or multiple inputs) that need to be consumed by the caller, should call <code>iv$add_rule()</code> for its own inputs but generally leave <code>iv$enable()</code> or <code>iv$condition()</code> to the caller.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit">
 <span class="co"># Module UI</span>
-<span class="kw">email_ui</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">id</span>, <span class="kw">label</span> = <span class="st">"Email"</span>, <span class="kw">value</span> = <span class="kw">NULL</span>) {
-  <span class="kw">ns</span> <span class="op">&lt;-</span> <span class="fu">NS</span>(<span class="kw">id</span>)
-  <span class="fu">textInput</span>(<span class="fu">ns</span>(<span class="st">"email_address"</span>), label = <span class="kw">label</span>, value = <span class="kw">value</span>)
-}
+<span class="va">email_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">label</span> <span class="op">=</span> <span class="st">"Email"</span>, <span class="va">value</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">ns</span> <span class="op">&lt;-</span> <span class="fu">NS</span><span class="op">(</span><span class="va">id</span><span class="op">)</span>
+  <span class="fu">textInput</span><span class="op">(</span><span class="fu">ns</span><span class="op">(</span><span class="st">"email_address"</span><span class="op">)</span>, label <span class="op">=</span> <span class="va">label</span>, value <span class="op">=</span> <span class="va">value</span><span class="op">)</span>
+<span class="op">}</span>
 
 <span class="co"># Module server</span>
-<span class="kw">email</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">id</span>, <span class="kw">required</span> = <span class="fl">TRUE</span>) {
-  <span class="fu">moduleServer</span>(<span class="kw">id</span>, <span class="fu">function</span>(<span class="kw">input</span>, <span class="kw">output</span>, <span class="kw">session</span>) {
+<span class="va">email</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">required</span> <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu">moduleServer</span><span class="op">(</span><span class="va">id</span>, <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
     
     <span class="co"># Create and populate InputValidator object</span>
-    <span class="kw">iv</span> <span class="op">&lt;-</span> <span class="kw">InputValidator</span><span class="op">$</span><span class="fu">new</span>()
-    <span class="co">if</span> (<span class="kw">required</span>) {
-      <span class="kw">iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"email_address"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span>())
-    }
-    <span class="kw">iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"email_address"</span>, <span class="op">~</span> <span class="co">if</span> (<span class="op">!</span><span class="fu">is_valid_email</span>(<span class="kw">.</span>)) <span class="st">"Invalid email address"</span>)
+    <span class="va">iv</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
+    <span class="kw">if</span> <span class="op">(</span><span class="va">required</span><span class="op">)</span> <span class="op">{</span>
+      <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email_address"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+    <span class="op">}</span>
+    <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email_address"</span>, <span class="op">~</span> <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu">is_valid_email</span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span> <span class="st">"Invalid email address"</span><span class="op">)</span>
 
     <span class="co"># Allow caller to reset the input</span>
-    <span class="kw">reset</span> <span class="op">&lt;-</span> <span class="fu">function</span>() {
-      <span class="fu">updateTextInput</span>(<span class="kw">session</span>, <span class="st">"email_address"</span>, value = <span class="st">""</span>)
-    }
+    <span class="va">reset</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
+      <span class="fu">updateTextInput</span><span class="op">(</span><span class="va">session</span>, <span class="st">"email_address"</span>, value <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
+    <span class="op">}</span>
 
     <span class="co"># Return value accessor, InputValidator, and reset function to the caller</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-      value = <span class="fu">reactive</span>(<span class="kw">input</span><span class="op">$</span><span class="kw">email_address</span>),
-      iv = <span class="kw">iv</span>,
-      reset = <span class="kw">reset</span>
-    )
-  })
-}
+    <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+      value <span class="op">=</span> <span class="fu">reactive</span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">email_address</span><span class="op">)</span>,
+      iv <span class="op">=</span> <span class="va">iv</span>,
+      reset <span class="op">=</span> <span class="va">reset</span>
+    <span class="op">)</span>
+  <span class="op">}</span><span class="op">)</span>
+<span class="op">}</span>
 
 <span class="co"># App UI</span>
-<span class="kw">ui</span> <span class="op">&lt;-</span> <span class="fu">fluidPage</span>(
-  <span class="fu">email_ui</span>(<span class="st">"email"</span>, <span class="st">"Email address"</span>)
-)
+<span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu">fluidPage</span><span class="op">(</span>
+  <span class="fu">email_ui</span><span class="op">(</span><span class="st">"email"</span>, <span class="st">"Email address"</span><span class="op">)</span>
+<span class="op">)</span>
 
 <span class="co"># App server</span>
-<span class="kw">server</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">input</span>, <span class="kw">output</span>, <span class="kw">session</span>) {
-  <span class="kw">email_result</span> <span class="op">&lt;-</span> <span class="fu">email</span>(<span class="st">"email"</span>)
-  <span class="kw">email_result</span><span class="op">$</span><span class="kw">iv</span><span class="op">$</span><span class="fu">enable</span>()
-}
-</pre></div>
+<span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">email_result</span> <span class="op">&lt;-</span> <span class="fu">email</span><span class="op">(</span><span class="st">"email"</span><span class="op">)</span>
+  <span class="va">email_result</span><span class="op">$</span><span class="va">iv</span><span class="op">$</span><span class="fu">enable</span><span class="op">(</span><span class="op">)</span>
+<span class="op">}</span></pre></div>
 <p>[TODO: source code, live demo - 04_module_1]</p>
 </div>
 <div id="caller-provided-validation-rules-for-module-inputs" class="section level4">
@@ -246,47 +240,45 @@
 <p>This Shiny module can and should include validation rules to ensure that the “Password” and “Password (confirm)” fields always match. But there are other possible validation rules that might or might not be important for any particular app: Is there a minimum/maximum password length? Are passwords required to contain at least one number, uppercase letter, and/or special character? What special characters are allowed? These all feel like the responsibility of the module <em>caller</em> to decide, not the module <em>implementation</em>.</p>
 <p>One bad but obvious way to do it would be for the caller to add its own rules directly to the <code>InputValidator</code> object returned by <code>password_input</code>:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="kw">server</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">input</span>, <span class="kw">output</span>, <span class="kw">session</span>) {
-  <span class="kw">password_result</span> <span class="op">&lt;-</span> <span class="fu">password_input</span>(<span class="st">"password"</span>)
+<span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">password_result</span> <span class="op">&lt;-</span> <span class="fu">password_input</span><span class="op">(</span><span class="st">"password"</span><span class="op">)</span>
 
   <span class="co"># Adding a rule for one of password_input's inputs, from outside</span>
   <span class="co"># of password_input. DON'T DO THIS!</span>
-  <span class="kw">password_result</span><span class="op">$</span><span class="kw">iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="fu">NS</span>(<span class="st">"password"</span>, <span class="st">"pw1"</span>), <span class="op">~</span> {
+  <span class="va">password_result</span><span class="op">$</span><span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="fu">NS</span><span class="op">(</span><span class="st">"password"</span>, <span class="st">"pw1"</span><span class="op">)</span>, <span class="op">~</span> <span class="op">{</span>
     <span class="co"># Custom validation logic</span>
-    <span class="co">if</span> (<span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="st">"[0-9]"</span>, <span class="kw">pw</span>) <span class="op">||</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="st">"[A-Z]"</span>, <span class="kw">pw</span>)) {
+    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"[0-9]"</span>, <span class="va">pw</span><span class="op">)</span> <span class="op">||</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"[A-Z]"</span>, <span class="va">pw</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
       <span class="st">"Must include a number and an upper-case character"</span>
-    } <span class="co">else</span> <span class="co">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/nchar.html">nchar</a></span>(<span class="kw">pw</span>) <span class="op">&lt;</span> <span class="fl">8</span>) {
+    <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html">nchar</a></span><span class="op">(</span><span class="va">pw</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">8</span><span class="op">)</span> <span class="op">{</span>
       <span class="st">"Must be at least 8 characters"</span>
-    }
-  })
-}
-</pre></div>
+    <span class="op">}</span>
+  <span class="op">}</span><span class="op">)</span>
+<span class="op">}</span></pre></div>
 <p>The reason this is bad is because it requires the caller to know the input IDs used within the module (<code>NS("password", "pw1")</code> in this case). This violates a module boundary that we should try hard to keep sacred!</p>
 <p>Instead, the module should take a validation rule—i.e., the second argument to <code>add_rule</code>—as a parameter. (If multiple inputs need to be validated, then one such parameter should be created for each input.)</p>
 <div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="kw">password_input</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">id</span>, <span class="kw">password_rule</span> = <span class="kw">NULL</span>) {
-  <span class="fu">moduleServer</span>(<span class="kw">id</span>, <span class="fu">function</span>(<span class="kw">input</span>, <span class="kw">output</span>, <span class="kw">session</span>) {
-    <span class="kw">iv</span> <span class="op">&lt;-</span> <span class="kw">InputValidator</span><span class="op">$</span><span class="fu">new</span>()
-    <span class="kw">iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"pw2"</span>, <span class="op">~</span> <span class="co">if</span> (<span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html">identical</a></span>(<span class="kw">.</span>, <span class="kw">input</span><span class="op">$</span><span class="kw">pw1</span>)) <span class="st">"Passwords do not match"</span>)
+<span class="va">password_input</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">password_rule</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu">moduleServer</span><span class="op">(</span><span class="va">id</span>, <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
+    <span class="va">iv</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
+    <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"pw2"</span>, <span class="op">~</span> <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html">identical</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">input</span><span class="op">$</span><span class="va">pw1</span><span class="op">)</span><span class="op">)</span> <span class="st">"Passwords do not match"</span><span class="op">)</span>
     
     <span class="co"># Add custom rule passed in by caller</span>
-    <span class="co">if</span> (<span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html">is.null</a></span>(<span class="kw">password_rule</span>)) {
-      <span class="kw">iv</span><span class="op">$</span><span class="fu">add_rule</span>(<span class="st">"pw1"</span>, <span class="kw">password_rule</span>)
-    }
-  })
-}
+    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html">is.null</a></span><span class="op">(</span><span class="va">password_rule</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+      <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"pw1"</span>, <span class="va">password_rule</span><span class="op">)</span>
+    <span class="op">}</span>
+  <span class="op">}</span><span class="op">)</span>
+<span class="op">}</span>
 
-<span class="kw">server</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">input</span>, <span class="kw">output</span>, <span class="kw">session</span>) {
+<span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
   <span class="co"># Initialize the module, passing custom validation logic via password_rule</span>
-  <span class="kw">password_result</span> <span class="op">&lt;-</span> <span class="fu">password_input</span>(<span class="st">"password"</span>, password_rule = <span class="fu">function</span>(<span class="kw">pw</span>) {
-    <span class="co">if</span> (<span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="st">"[0-9]"</span>, <span class="kw">pw</span>) <span class="op">||</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="st">"[A-Z]"</span>, <span class="kw">pw</span>)) {
+  <span class="va">password_result</span> <span class="op">&lt;-</span> <span class="fu">password_input</span><span class="op">(</span><span class="st">"password"</span>, password_rule <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">pw</span><span class="op">)</span> <span class="op">{</span>
+    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"[0-9]"</span>, <span class="va">pw</span><span class="op">)</span> <span class="op">||</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"[A-Z]"</span>, <span class="va">pw</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
       <span class="st">"Must include a number and an upper-case character"</span>
-    } <span class="co">else</span> <span class="co">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/nchar.html">nchar</a></span>(<span class="kw">pw</span>) <span class="op">&lt;</span> <span class="fl">8</span>) {
+    <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html">nchar</a></span><span class="op">(</span><span class="va">pw</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">8</span><span class="op">)</span> <span class="op">{</span>
       <span class="st">"Must be at least 8 characters"</span>
-    }
-  })
-}
-</pre></div>
+    <span class="op">}</span>
+  <span class="op">}</span><span class="op">)</span>
+<span class="op">}</span></pre></div>
 <p>[TODO: source link, live demo - 05_module_2]</p>
 </div>
 </div>

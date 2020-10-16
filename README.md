@@ -4,8 +4,6 @@
 
 [![R build status](https://github.com/rstudio/shinyvalidate/workflows/R-CMD-check/badge.svg)](https://github.com/rstudio/shinyvalidate/actions) <!-- badges: end -->
 
-**WARNING: Highly experimental, API still in flux**
-
 ## Overview
 
 shinyvalidate adds input validation capabilities to [Shiny](https://shiny.rstudio.com).

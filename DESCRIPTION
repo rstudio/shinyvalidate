@@ -9,6 +9,8 @@ Description: Improves the user experience of Shiny apps by helping to
     provide realtime feedback when required inputs are missing, or
     input values are not valid.
 License: MIT + file LICENSE
+URL: https://rstudio.github.io/shinyvalidate/
+    https://github.com/rstudio/shinyvalidate
 Encoding: UTF-8
 LazyData: true
 Imports: 

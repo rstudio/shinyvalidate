@@ -210,3 +210,78 @@ sv_integer <- function(message = "An integer is required",
     }
   }
 }
+
+#' Validate that a field is a number bounded by minimum and maximum values
+#'
+#' `sv_numeric` and `sv_integer` validate that a field `is.numeric` and
+#' `is.integer`, respectively. By default, only a single, finite, not-missing,
+#' valid number/integer is allowed, but each of those criteria can be controlled
+#' via arguments.
+#'
+#' @param allowNA If `FALSE` (the default), then any `NA` element will cause
+#'   validation to fail.
+#' @param allowNaN If `FALSE` (the default), then any `NaN` element will cause
+#'   validation to fail.
+#' @param message The validation error message to use if a value fails to match
+#'   the rule. If left as `NULL`, a validation error message will be generated
+#'   according to the chosen language (specified in `lang`).
+#' @param lang The language to use for automatic creation of validation error
+#'   messages. By default, `NULL` will create English (`"en"`) text. Other
+#'   options include French (`"fr"`), German (`"de"`) and Spanish (`"es"`).
+#'
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' 
+#'   iv <- InputValidator$new()
+#' 
+#'   iv$add_rule("count", sv_between(10, 10000))
+#'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
+#'
+#' })
+#' @export
+sv_between <- function(minimum,
+                       maximum,
+                       allowNA = FALSE,
+                       allowNaN = FALSE,
+                       message = NULL,
+                       lang = NULL) {
+  force(allowNA)
+  force(allowNaN)
+  force(message)
+  
+  # TODO: consider adding arg for specifying inclusive bounds
+  
+  # TODO: normalize lang (ensures that NULL -> "en" and other inputs
+  # match supported langs in shinyvalidate)
+  # lang <- normalize_lang(lang)
+  
+  # TODO: The gluestring will be obtained via a function that obtains
+  # a localized string vector and focuses it on the spoken language
+  # TODO: Use a safe version of `glue::glue()`
+  # message <- glue::glue(get_lsv("between")[[lang]])
+  if (is.null(message)) {
+    message <- glue::glue("The field must be between {minimum} and {maximum}")
+  }
+  
+  function(value) {
+    # TODO: use the "noNA" lsv for the message
+    if (!allowNA && any(is.na(value))) {
+      return(message)
+    }
+    # TODO: use the "noNaN" lsv for the message
+    if (!allowNaN && any(is.nan(value))) {
+      return(message)
+    }
+    
+    # TODO: ensure that `value` is coercible to numeric
+    
+    if ((as.numeric(value) < minimum) | (as.numeric(value) > maximum)) {
+      return(message)
+    }
+  }
+}

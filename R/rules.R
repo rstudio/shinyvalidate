@@ -217,7 +217,9 @@ sv_integer <- function(message = "An integer is required",
 #' `is.integer`, respectively. By default, only a single, finite, not-missing,
 #' valid number/integer is allowed, but each of those criteria can be controlled
 #' via arguments.
-#'
+#' 
+#' @param minimum,maximum The minimum and maximum values of the numerical
+#'   bounds, which are both inclusive.
 #' @param allowNA If `FALSE` (the default), then any `NA` element will cause
 #'   validation to fail.
 #' @param allowNaN If `FALSE` (the default), then any `NaN` element will cause

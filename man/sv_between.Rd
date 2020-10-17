@@ -14,6 +14,9 @@ sv_between(
 )
 }
 \arguments{
+\item{minimum, maximum}{The minimum and maximum values of the numerical
+bounds, which are both inclusive.}
+
 \item{allowNA}{If \code{FALSE} (the default), then any \code{NA} element will cause
 validation to fail.}
 

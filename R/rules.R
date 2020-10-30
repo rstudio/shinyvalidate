@@ -210,3 +210,88 @@ sv_integer <- function(message = "An integer is required",
     }
   }
 }
+
+#' Validate that a field is a number bounded by minimum and maximum values
+#'
+#' `sv_numeric` and `sv_integer` validate that a field `is.numeric` and
+#' `is.integer`, respectively. By default, only a single, finite, not-missing,
+#' valid number/integer is allowed, but each of those criteria can be controlled
+#' via arguments.
+#' 
+#' @param left,right The left and right boundary values. Inclusively for each of
+#'   the boundaries is set with the `inclusive` argument; the defaults are set
+#'   for inclusive bounds.
+#' @param inclusive A two-element logical vector that indicates whether the
+#'   `left` and `right` bounds, respectively, should be inclusive. Both bounds
+#'   are by default are inclusive, using `c(TRUE, TRUE)`.
+#' @param allow_na,allow_nan If `FALSE` (the default for both options), then any
+#'   `NA` or `NaN` element will cause validation to fail.
+#' @param message The validation error message to use if a value fails to match
+#'   the rule. If left as `NULL`, a validation error message will be generated
+#'   according to the chosen language (specified in `lang`).
+#'
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' 
+#'   iv <- InputValidator$new()
+#' 
+#'   iv$add_rule("count", sv_between(10, 10000))
+#'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
+#'
+#' })
+#' @export
+sv_between <- function(left,
+                       right,
+                       inclusive = c(TRUE, TRUE),
+                       allow_na = FALSE,
+                       allow_nan = FALSE,
+                       message = NULL) {
+  force(allow_na)
+  force(allow_nan)
+  force(message)
+  
+  # TODO: consider adding arg for specifying inclusive bounds
+  
+  # TODO: When {shiny} has a localization language set, the gluestring
+  # used in the `glue::glue_data_safe()` call will be obtained via a function
+  # that obtains a localized string vector and focuses it on the `lang` setting.
+  # Also we will normalize the `lang` value to ensure that NULL -> "en" and
+  # other locale inputs match supported languages in {shinyvalidate}
+  # lang <- normalize_lang(lang)
+  # message <- glue::glue_data_safe(get_lsv("between")[[lang]])
+  
+  if (is.null(message)) {
+    message <- 
+      glue::glue_data_safe(
+        list(left = left, right = right),
+        "Must be between {left} and {right}."
+      )
+  }
+  
+  function(value) {
+    # TODO: use the "noNA" lsv for the message
+    if (!allow_na && any(is.na(value))) {
+      return(message)
+    }
+    # TODO: use the "noNaN" lsv for the message
+    if (!allow_nan && any(is.nan(value))) {
+      return(message)
+    }
+    
+    # TODO: perhaps check that `value` has a class where
+    # comparison operators successfully eval to a logical value,
+    # or better yet, use a `try()/tryCatch()` scheme here
+    
+    l_of_left <- if (inclusive[1]) value < left else value <= left
+    r_of_right <- if (inclusive[2]) value > right else value >= right
+    
+    if (any(l_of_left, r_of_right)) {
+      return(message)
+    }
+  }
+}

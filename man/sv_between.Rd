@@ -5,31 +5,29 @@
 \title{Validate that a field is a number bounded by minimum and maximum values}
 \usage{
 sv_between(
-  minimum,
-  maximum,
-  allowNA = FALSE,
-  allowNaN = FALSE,
-  message = NULL,
-  lang = NULL
+  left,
+  right,
+  inclusive = c(TRUE, TRUE),
+  allow_na = FALSE,
+  allow_nan = FALSE,
+  message = NULL
 )
 }
 \arguments{
-\item{minimum, maximum}{The minimum and maximum values of the numerical
-bounds, which are both inclusive.}
+\item{left, right}{The left and right boundary values. Inclusively for each of
+the boundaries is set with the \code{inclusive} argument; the defaults are set
+for inclusive bounds.}
 
-\item{allowNA}{If \code{FALSE} (the default), then any \code{NA} element will cause
-validation to fail.}
+\item{inclusive}{A two-element logical vector that indicates whether the
+\code{left} and \code{right} bounds, respectively, should be inclusive. Both bounds
+are by default are inclusive, using \code{c(TRUE, TRUE)}.}
 
-\item{allowNaN}{If \code{FALSE} (the default), then any \code{NaN} element will cause
-validation to fail.}
+\item{allow_na, allow_nan}{If \code{FALSE} (the default for both options), then any
+\code{NA} or \code{NaN} element will cause validation to fail.}
 
 \item{message}{The validation error message to use if a value fails to match
 the rule. If left as \code{NULL}, a validation error message will be generated
 according to the chosen language (specified in \code{lang}).}
-
-\item{lang}{The language to use for automatic creation of validation error
-messages. By default, \code{NULL} will create English (\code{"en"}) text. Other
-options include French (\code{"fr"}), German (\code{"de"}) and Spanish (\code{"es"}).}
 }
 \value{
 A function suitable for using as an

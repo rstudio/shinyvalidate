@@ -1,6 +1,15 @@
 # TODO:
 # sv_lookup - make sure value is in a list of choices
 
+# TODO: When {shiny} has a localization language set, we can finally use preset,
+# localized error messages (as gluestrings). The gluestring used in the
+# `glue::glue_data_safe()` call will be obtained via a function that obtains a
+# localized string vector and focuses it on the `lang` setting.
+# Also we will normalize the `lang` value to ensure that NULL -> "en" and
+# other locale inputs match supported languages in {shinyvalidate}
+# lang <- normalize_lang(lang)
+# message <- glue::glue_data_safe(get_lsv("between")[[lang]])
+
 #' Validate that the field is present
 #'
 #' Call `sv_required()` to generate a validation function that ensures an input
@@ -254,16 +263,6 @@ sv_between <- function(left,
   force(allow_na)
   force(allow_nan)
   force(message)
-  
-  # TODO: consider adding arg for specifying inclusive bounds
-  
-  # TODO: When {shiny} has a localization language set, the gluestring
-  # used in the `glue::glue_data_safe()` call will be obtained via a function
-  # that obtains a localized string vector and focuses it on the `lang` setting.
-  # Also we will normalize the `lang` value to ensure that NULL -> "en" and
-  # other locale inputs match supported languages in {shinyvalidate}
-  # lang <- normalize_lang(lang)
-  # message <- glue::glue_data_safe(get_lsv("between")[[lang]])
   
   if (is.null(message)) {
     message <- 

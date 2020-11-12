@@ -295,3 +295,93 @@ sv_between <- function(left,
     }
   }
 }
+
+#' Validate that a field is part of a defined set
+#'
+#' The `sv_in_set()` function checks whether the field value is part of a
+#' specified set of values.
+#' 
+#' @param set A vector of elements for which the field value must be a part of
+#'   to pass validation. To allow an empty field, `NA` should be included in the
+#'   `set` vector.
+#' @param allow_nan If `FALSE` (the default), then the presence of a `NaN` value
+#'   element will cause validation to fail.
+#' @param message The validation error message to use if a value fails to match
+#'   the rule. By default, this is generic message provided by **shinyvalidate**
+#'   but a custom message can be provided here.
+#' @param msg_limit The limit of `set` values to include in the
+#'   automatically-generated error message (i.e., when `message = NULL`). If the
+#'   number of elements provided in `set` is greater than `msg_limit` then only
+#'   the first `<message_limit>` set elements will be echoed along with text
+#'   that states how many extra elements are part of the `set`.
+#'
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' 
+#'   iv <- InputValidator$new()
+#' 
+#'   iv$add_rule("count", sv_in_set(1:5))
+#'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
+#'
+#' })
+#' @export
+sv_in_set <- function(set,
+                      allow_nan = FALSE,
+                      message = NULL,
+                      msg_limit = 3) {
+  force(allow_nan)
+  force(message)
+  force(msg_limit)
+  
+  if (is.null(message)) {
+    
+    values_text <- prepare_values_text(set, limit = msg_limit)
+    
+    message <- 
+      glue::glue_data_safe(
+        list(values_text = values_text),
+        "Must be in the set of {values_text}."
+      )
+  }
+  
+  function(value) {
+    
+    if (!allow_nan && any(is.nan(value))) {
+      return(message)
+    }
+    
+    if (!(value %in% set)) {
+      return(message)
+    }
+  }
+}
+
+prepare_values_text <- function(set,
+                                limit) {
+  
+  # TODO: consider special handling of `NA`, producing additional
+  # text that states that empty fields are allowed (right now, `NA`
+  # is just echoed in the string if it is in the first `1:limit`
+  # elements of the `set`)
+  
+  if (!is.null(limit) && length(set) > limit) {
+    
+    num_omitted <- length(set) - limit
+    
+    values_str <- paste0(set[seq_len(limit)], collapse = ", ")
+    
+    additional_text <- glue::glue("(and {num_omitted} more)")
+      
+    values_str <- paste0(values_str, " ", additional_text)
+    
+  } else {
+    values_str <- paste0(set, collapse = ", ")
+  }
+  
+  values_str
+}

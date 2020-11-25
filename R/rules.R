@@ -1,5 +1,7 @@
-# TODO:
-# sv_lookup - make sure value is in a list of choices
+# TODO: in function reference and getting started guide we need to explain
+# that inputID suffixed with `?` indicates that the validation only takes
+# effect if the field is not empty (i.e., not `NULL`)
+#   e.g. iv$add_rule("email?", ~ if (!is_valid_email(.)) "Please provide a valid email")
 
 #' Validate that the field is present
 #'
@@ -87,8 +89,13 @@ sv_required <- function(message = "Required", test = shiny::isTruthy) {
 #' })
 #'
 #' @export
-sv_regex <- function(pattern, message, ignore.case = FALSE, perl = FALSE,
-  fixed = FALSE, useBytes = FALSE, invert = FALSE) {
+sv_regex <- function(pattern,
+                     message,
+                     ignore.case = FALSE,
+                     perl = FALSE,
+                     fixed = FALSE,
+                     useBytes = FALSE,
+                     invert = FALSE) {
 
   force(pattern)
   force(message)
@@ -99,6 +106,7 @@ sv_regex <- function(pattern, message, ignore.case = FALSE, perl = FALSE,
   force(invert)
   
   function(value) {
+    
     result <- grepl(pattern, value, ignore.case = ignore.case, perl = perl,
       fixed = fixed, useBytes = useBytes)
     

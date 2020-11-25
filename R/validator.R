@@ -171,7 +171,17 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       if (inherits(rule, "formula")) {
         rule <- rlang::as_function(rule)
       }
+      
+      optional <- FALSE
+      if (grepl("\\?$", inputId)) {
+        optional <- TRUE
+        inputId <- sub("\\?$", "", inputId)
+      }
+      
       applied_rule <- function(value) {
+        if (optional && !shiny::isTruthy(value)) {
+          return(NULL)
+        }
         # Do this instead of purrr::partial because purrr::partial doesn't
         # support leaving a "hole" for the first argument
         do.call(rule, c(list(value), args))

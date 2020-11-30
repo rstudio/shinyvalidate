@@ -4,24 +4,26 @@
 \alias{sv_in_set}
 \title{Validate that a field is part of a defined set}
 \usage{
-sv_in_set(set, allow_nan = FALSE, message = NULL, msg_limit = 3)
+sv_in_set(set, message = NULL, msg_limit = 3)
 }
 \arguments{
-\item{set}{A vector of elements for which the field value must be a part of
-to pass validation.}
-
-\item{allow_nan}{If \code{FALSE} (the default), then the presence of a \code{NaN} value
-element will cause validation to fail.}
+\item{set}{A vector or list of elements for which the field value must be a
+part of to pass validation. To allow an empty field, \code{NA} should be
+included in the \code{set} vector. Optionally, \code{NaN} can be included as well.}
 
 \item{message}{The validation error message to use if a value fails to match
-the rule. By default, this is generic message provided by \strong{shinyvalidate}
-but a custom message can be provided here.}
+the rule. By default, this is \code{NULL} and this prompts \strong{shinyvalidate} to
+prepare a generic message using the the glue string \code{"Must be in the set of {values_text}."}. A custom message can be provided here as a length-1
+character vector to be processed internally by \code{glue::glue()}. We can
+optionally use \code{"{values_text}"} within the message to include a short list
+of values based on \code{set}.}
 
 \item{msg_limit}{The limit of \code{set} values to include in the
-automatically-generated error message (i.e., when \code{message = NULL}). If the
-number of elements provided in \code{set} is greater than \code{msg_limit} then only
-the first \verb{<message_limit>} set elements will be echoed along with text
-that states how many extra elements are part of the \code{set}.}
+automatically-generated error message (i.e., when \code{message = NULL}, the
+default). If the number of elements provided in \code{set} is greater than
+\code{msg_limit} then only the first \verb{<message_limit>} set elements will be
+echoed along with text that states how many extra elements are part of the
+\code{set}.}
 }
 \value{
 A function suitable for using as an

@@ -300,19 +300,22 @@ sv_between <- function(left,
 #' The `sv_in_set()` function checks whether the field value is part of a
 #' specified set of values.
 #' 
-#' @param set A vector of elements for which the field value must be a part of
-#'   to pass validation. To allow an empty field, `NA` should be included in the
-#'   `set` vector.
-#' @param allow_nan If `FALSE` (the default), then the presence of a `NaN` value
-#'   element will cause validation to fail.
+#' @param set A vector or list of elements for which the field value must be a
+#'   part of to pass validation. To allow an empty field, `NA` should be
+#'   included in the `set` vector. Optionally, `NaN` can be included as well.
 #' @param message The validation error message to use if a value fails to match
-#'   the rule. By default, this is generic message provided by **shinyvalidate**
-#'   but a custom message can be provided here.
+#'   the rule. By default, this is `NULL` and this prompts **shinyvalidate** to
+#'   prepare a generic message using the the glue string `"Must be in the set of
+#'   {values_text}."`. A custom message can be provided here as a length-1
+#'   character vector to be processed internally by `glue::glue()`. We can
+#'   optionally use `"{values_text}"` within the message to include a short list
+#'   of values based on `set`.
 #' @param msg_limit The limit of `set` values to include in the
-#'   automatically-generated error message (i.e., when `message = NULL`). If the
-#'   number of elements provided in `set` is greater than `msg_limit` then only
-#'   the first `<message_limit>` set elements will be echoed along with text
-#'   that states how many extra elements are part of the `set`.
+#'   automatically-generated error message (i.e., when `message = NULL`, the
+#'   default). If the number of elements provided in `set` is greater than
+#'   `msg_limit` then only the first `<message_limit>` set elements will be
+#'   echoed along with text that states how many extra elements are part of the
+#'   `set`.
 #'
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
@@ -330,31 +333,31 @@ sv_between <- function(left,
 #' })
 #' @export
 sv_in_set <- function(set,
-                      allow_nan = FALSE,
                       message = NULL,
                       msg_limit = 3) {
-  force(allow_nan)
+  force(set)
   force(message)
   force(msg_limit)
   
-  if (is.null(message)) {
-    
-    values_text <- prepare_values_text(set, limit = msg_limit)
-    
-    message <- 
-      glue::glue_data_safe(
-        list(values_text = values_text),
-        "Must be in the set of {values_text}."
-      )
+  if (length(set) < 1) {
+    stop("The `set` must contain values.", call. = FALSE)
   }
+  
+  if (is.null(message)) {
+    message <- "Must be in the set of {values_text}."
+  }
+  
+  values_text <- prepare_values_text(set, limit = msg_limit)
+  
+  message <- 
+    glue::glue_data_safe(
+      list(values_text = values_text),
+      message
+    )
   
   function(value) {
     
-    if (!allow_nan && any(is.nan(value))) {
-      return(message)
-    }
-    
-    if (!(value %in% set)) {
+    if (!all(value %in% set)) {
       return(message)
     }
   }

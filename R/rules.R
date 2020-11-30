@@ -3,6 +3,15 @@
 # effect if the field is not empty (i.e., not `NULL`)
 #   e.g. iv$add_rule("email?", ~ if (!is_valid_email(.)) "Please provide a valid email")
 
+# TODO: When {shiny} has a localization language set, we can finally use preset,
+# localized error messages (as gluestrings). The gluestring used in the
+# `glue::glue_data_safe()` call will be obtained via a function that obtains a
+# localized string vector and focuses it on the `lang` setting.
+# Also we will normalize the `lang` value to ensure that NULL -> "en" and
+# other locale inputs match supported languages in {shinyvalidate}
+# lang <- normalize_lang(lang)
+# message <- glue::glue_data_safe(get_lsv("between")[[lang]])
+
 #' Validate that the field is present
 #'
 #' Call `sv_required()` to generate a validation function that ensures an input
@@ -240,8 +249,8 @@ sv_integer <- function(message = "An integer is required",
 #' @param allow_na,allow_nan If `FALSE` (the default for both options), then any
 #'   `NA` or `NaN` element will cause validation to fail.
 #' @param message The validation error message to use if a value fails to match
-#'   the rule. If left as `NULL`, a validation error message will be generated
-#'   according to the chosen language (specified in `lang`).
+#'   the rule. By default, this is generic message provided by **shinyvalidate**
+#'   but a custom message can be provided here.
 #'
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
@@ -267,16 +276,6 @@ sv_between <- function(left,
   force(allow_na)
   force(allow_nan)
   force(message)
-  
-  # TODO: consider adding arg for specifying inclusive bounds
-  
-  # TODO: When {shiny} has a localization language set, the gluestring
-  # used in the `glue::glue_data_safe()` call will be obtained via a function
-  # that obtains a localized string vector and focuses it on the `lang` setting.
-  # Also we will normalize the `lang` value to ensure that NULL -> "en" and
-  # other locale inputs match supported languages in {shinyvalidate}
-  # lang <- normalize_lang(lang)
-  # message <- glue::glue_data_safe(get_lsv("between")[[lang]])
   
   if (is.null(message)) {
     message <- 
@@ -307,4 +306,89 @@ sv_between <- function(left,
       return(message)
     }
   }
+}
+
+#' Validate that a field is part of a defined set
+#'
+#' The `sv_in_set()` function checks whether the field value is part of a
+#' specified set of values.
+#' 
+#' @param set A vector or list of elements for which the field value must be a
+#'   part of to pass validation. To allow an empty field, `NA` should be
+#'   included in the `set` vector. Optionally, `NaN` can be included as well.
+#' @param message The validation error message to use if a value fails to match
+#'   the rule. Use `"{values_text}"` within the message to include a short list
+#'   of values based on `set`.
+#' @param msg_limit The limit of `set` values to include in the
+#'   automatically-generated error message (i.e., when `message = NULL`, the
+#'   default). If the number of elements provided in `set` is greater than
+#'   `msg_limit` then only the first `<message_limit>` set elements will be
+#'   echoed along with text that states how many extra elements are part of the
+#'   `set`.
+#'
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' 
+#'   iv <- InputValidator$new()
+#' 
+#'   iv$add_rule("count", sv_in_set(1:5))
+#'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
+#'
+#' })
+#' @export
+sv_in_set <- function(set,
+                      message = "Must be in the set of {values_text}.",
+                      msg_limit = 3) {
+  force(set)
+  force(message)
+  force(msg_limit)
+  
+  if (length(set) < 1) {
+    stop("The `set` must contain values.", call. = FALSE)
+  }
+  
+  values_text <- prepare_values_text(set, limit = msg_limit)
+  
+  message <- 
+    glue::glue_data_safe(
+      list(values_text = values_text),
+      message
+    )
+  
+  function(value) {
+    
+    if (!all(value %in% set)) {
+      return(message)
+    }
+  }
+}
+
+prepare_values_text <- function(set,
+                                limit) {
+  
+  # TODO: consider special handling of `NA`, producing additional
+  # text that states that empty fields are allowed (right now, `NA`
+  # is just echoed in the string if it is in the first `1:limit`
+  # elements of the `set`)
+  
+  if (!is.null(limit) && length(set) > limit) {
+    
+    num_omitted <- length(set) - limit
+    
+    values_str <- paste0(set[seq_len(limit)], collapse = ", ")
+    
+    additional_text <- glue::glue("(and {num_omitted} more)")
+      
+    values_str <- paste0(values_str, " ", additional_text)
+    
+  } else {
+    values_str <- paste0(set, collapse = ", ")
+  }
+  
+  values_str
 }

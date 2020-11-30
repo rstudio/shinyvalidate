@@ -303,7 +303,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
               results <<- c(results, stats::setNames(list(NULL), fullname))
             }
           } else {
-            results[[fullname]] <<- result
+            results[[fullname]] <<- list(type = "error", message = result)
           }
         })
       })

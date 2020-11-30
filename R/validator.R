@@ -150,9 +150,13 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   subsequent rules for that input from executing.
     #'
     #' @param inputId A single-element character vector indicating the ID of the
-    #'   input that this rule applies to. (Note that this name should _not_ be
-    #'   qualified by a module namespace; e.g. pass `"x"` and not
-    #'   `session$ns("x")`.)
+    #'   input that this rule applies to. Using a `"?"` suffix on the `inputId`
+    #'   indicates to **shinyvalidate** that a given validation rule on the
+    #'   field should not be enabled if the value is `NULL`, or, not truthy
+    #'   (checked internally through use of `!shiny::isTruthy(<value>)`. Any
+    #'   `"?"` used as a suffix will internally be stripped off when setting the
+    #'   `inputID`. Please note that the `inputId` should *not* be qualified by
+    #'   a module namespace (e.g., pass `"x"` and not `session$ns("x")`).
     #' @param rule A function that takes (at least) one argument: the input's
     #'   value. The function should return `NULL` if it passes validation, and
     #'   if not, a single-element character vector containing an error message

@@ -26,8 +26,8 @@ are by default are inclusive, using \code{c(TRUE, TRUE)}.}
 \code{NA} or \code{NaN} element will cause validation to fail.}
 
 \item{message}{The validation error message to use if a value fails to match
-the rule. If left as \code{NULL}, a validation error message will be generated
-according to the chosen language (specified in \code{lang}).}
+the rule. By default, this is generic message provided by \strong{shinyvalidate}
+but a custom message can be provided here.}
 }
 \value{
 A function suitable for using as an

@@ -4,7 +4,7 @@
 \alias{sv_in_set}
 \title{Validate that a field is part of a defined set}
 \usage{
-sv_in_set(set, message = NULL, msg_limit = 3)
+sv_in_set(set, message = "Must be in the set of {values_text}.", msg_limit = 3)
 }
 \arguments{
 \item{set}{A vector or list of elements for which the field value must be a
@@ -12,11 +12,10 @@ part of to pass validation. To allow an empty field, \code{NA} should be
 included in the \code{set} vector. Optionally, \code{NaN} can be included as well.}
 
 \item{message}{The validation error message to use if a value fails to match
-the rule. By default, this is \code{NULL} and this prompts \strong{shinyvalidate} to
-prepare a generic message using the the glue string \code{"Must be in the set of {values_text}."}. A custom message can be provided here as a length-1
-character vector to be processed internally by \code{glue::glue()}. We can
-optionally use \code{"{values_text}"} within the message to include a short list
-of values based on \code{set}.}
+the rule. This prepare a message using the the glue string \code{"Must be in the set of {values_text}."}. A different message can be provided here as a
+length-1 character vector to be processed internally by \code{glue::glue()}. We
+can optionally use \code{"{values_text}"} within the message to include a short
+list of values based on \code{set}.}
 
 \item{msg_limit}{The limit of \code{set} values to include in the
 automatically-generated error message (i.e., when \code{message = NULL}, the

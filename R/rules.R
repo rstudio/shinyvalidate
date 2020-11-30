@@ -304,12 +304,11 @@ sv_between <- function(left,
 #'   part of to pass validation. To allow an empty field, `NA` should be
 #'   included in the `set` vector. Optionally, `NaN` can be included as well.
 #' @param message The validation error message to use if a value fails to match
-#'   the rule. By default, this is `NULL` and this prompts **shinyvalidate** to
-#'   prepare a generic message using the the glue string `"Must be in the set of
-#'   {values_text}."`. A custom message can be provided here as a length-1
-#'   character vector to be processed internally by `glue::glue()`. We can
-#'   optionally use `"{values_text}"` within the message to include a short list
-#'   of values based on `set`.
+#'   the rule. This prepare a message using the the glue string `"Must be in the
+#'   set of {values_text}."`. A different message can be provided here as a
+#'   length-1 character vector to be processed internally by `glue::glue()`. We
+#'   can optionally use `"{values_text}"` within the message to include a short
+#'   list of values based on `set`.
 #' @param msg_limit The limit of `set` values to include in the
 #'   automatically-generated error message (i.e., when `message = NULL`, the
 #'   default). If the number of elements provided in `set` is greater than
@@ -333,7 +332,7 @@ sv_between <- function(left,
 #' })
 #' @export
 sv_in_set <- function(set,
-                      message = NULL,
+                      message = "Must be in the set of {values_text}.",
                       msg_limit = 3) {
   force(set)
   force(message)
@@ -341,10 +340,6 @@ sv_in_set <- function(set,
   
   if (length(set) < 1) {
     stop("The `set` must contain values.", call. = FALSE)
-  }
-  
-  if (is.null(message)) {
-    message <- "Must be in the set of {values_text}."
   }
   
   values_text <- prepare_values_text(set, limit = msg_limit)

@@ -41,9 +41,9 @@ if (window.Shiny) {
     
     // The following two methods, setInvalid and clearInvalid, will be called
     // whenever this input fails or passes (respectively) validation.
-    setInvalid: function(el, message) {
+    setInvalid: function(el, data) {
       el.classList.add("invalid");
-      el.querySelector(".feedback-message").innerText = message;
+      el.querySelector(".feedback-message").innerText = data.message;
     },
     clearInvalid: function(el) {
       el.classList.remove("invalid");

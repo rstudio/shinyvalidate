@@ -14,13 +14,12 @@
  * the showing/clearing.
  */
 const eventStrategy = {
-  setInvalid: function(el, binding, id, message) {
-    const e = $.Event("shinyvalidate:show", {
+  setInvalid: function(el, binding, id, data) {
+    const e = $.Event("shinyvalidate:show", $.extend({
       el: el,
       binding: binding,
       id: id,
-      message: message
-    });
+    }, data));
     $(el).trigger(e);
     
     return e.isDefaultPrevented();
@@ -43,11 +42,11 @@ strategies.push(eventStrategy);
  * setInvalid/clearInvalid.
  */
 const bindingStrategy = {
-  setInvalid: function(el, binding, id, message) {
+  setInvalid: function(el, binding, id, data) {
     if (typeof(binding.setInvalid) !== "function") {
       return false;
     }
-    binding.setInvalid(el, message);
+    binding.setInvalid(el, data);
     return true;
   },
   clearInvalid: function(el, binding, id) {
@@ -76,7 +75,10 @@ const bsStrategy = {
     const inputContainer = el.is(".form-group") ? el : el.parents(".form-group");
     return inputContainer.length === 0 ? null : inputContainer;
   },
-  setInvalid: function(el, binding, id, message) {
+  setInvalid: function(el, binding, id, data) {
+    if (data.type !== "error") {
+      return false;
+    }
     const inputContainer = this.findInputContainer(el);
     if (!inputContainer) {
       return false;
@@ -100,11 +102,11 @@ const bsStrategy = {
     }
     
     inputContainer.children(".shiny-validation-message").remove();
-    if (message) {
+    if (data.message) {
       const feedbackClass = this.isBS3() ? "help-block" : "invalid-feedback";
       const msg = $(document.createElement("span")).
         addClass([feedbackClass, "shiny-validation-message"]).
-        text(message);
+        text(data.message);
       // Yes, this is a terrible hack to get feedback to display when 
       // there is no .form-control in BS4
       msg.attr('style', function(i, s) { return (s || '') + 'display: block !important;' });
@@ -134,13 +136,13 @@ const bsStrategy = {
 };
 strategies.push(bsStrategy);
 
-function setInvalid(el, binding, id, message = null) {
+function setInvalid(el, binding, id, data = null) {
   for (var i = 0; i < strategies.length; i++) {
-    if (strategies[i].setInvalid(el, binding, id, message)) {
+    if (strategies[i].setInvalid(el, binding, id, data)) {
       return;
     }
   }
-  console.warn("Don't know how to display input validation feedback for input '" + id + "'. The message was:\n" + message);
+  console.warn("Don't know how to display input validation feedback for input '" + id + "'. The message was:\n" + JSON.stringify(data));
 }
 
 function clearInvalid(el, binding, id) {

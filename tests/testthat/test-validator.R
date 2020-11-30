@@ -41,9 +41,9 @@ test_that("InputValidator add_rule()", {
       expect_false(iv$is_valid())
       
       expect_identical(iv$validate(), rlang::list2(
-        !!session$ns("inputA") := "Input A is required",
-        !!session$ns("inputB") := "Input B is required",
-        !!session$ns("inputC") := "Input C is required"
+        !!session$ns("inputA") := list(type = "error", message = "Input A is required"),
+        !!session$ns("inputB") := list(type = "error", message = "Input B is required"),
+        !!session$ns("inputC") := list(type = "error", message = "Input C is required")
       ))
     })
     
@@ -53,8 +53,8 @@ test_that("InputValidator add_rule()", {
     shiny::isolate({
       expect_false(iv$is_valid())
       expect_identical(iv$validate(), rlang::list2(
-        !!session$ns("inputA") := "Input A is required",
-        !!session$ns("inputC") := "Input C is required",
+        !!session$ns("inputA") := list(type = "error", message = "Input A is required"),
+        !!session$ns("inputC") := list(type = "error", message = "Input C is required"),
         !!session$ns("inputB") := NULL
       ))
     })
@@ -86,14 +86,14 @@ test_that("InputValidator add_rule() stops on first failing rule", {
       for (x in list(NULL, FALSE, "whatever")) {
         session$setInputs(a = x)
         expect_identical(iv$validate(), rlang::list2(
-          !!session$ns("a") := "rule 1"
+          !!session$ns("a") := list(type = "error", message = "rule 1")
         ))
       }
       
       session$setInputs(a = TRUE)
       
       expect_identical(iv$validate(), rlang::list2(
-        !!session$ns("a") := "rule 2"
+        !!session$ns("a") := list(type = "error", message = "rule 2")
       ))
     })
   })

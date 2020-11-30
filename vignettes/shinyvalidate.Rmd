@@ -98,7 +98,7 @@ Validation formulas should test the `.` variable, and return either `NULL` if th
 
 ### Rules as functions
 
-Finally, you can provide validation logic as a function.
+You can provide validation logic as a function.
 
 ``` {.r}
 iv$add_rule("count", function(value) {
@@ -122,7 +122,21 @@ iv$add_rule("samples", not_greater_than, limit = nrow(df),
 )
 ```
 
-**(TODO: make examples reproducible)**
+### Optional rules
+
+<!-- **(TODO: change this if it's decided that ? should be the 'default')** -->
+
+Whenever using the `add_rule()` method with a Validator, the rule can be made optional until input is present in the field. To do this, add a `?` as a suffix on the `inputId` string.
+
+Taking the rule that checks for a valid email (with `is_valid_email()`), the `inputId` can be rewritten so that validation won't occur until the field is no longer empty.
+
+``` {.r}
+iv$add_rule("email?", ~ if (!is_valid_email(.)) "Not a valid email")
+```
+
+While this use of `?` on `inputId` works with any of the supplied `sv_*()` functions (e.g., `sv_regex()`, `sv_between()`, etc.), we should not use this syntax with `sv_required()` since it would directly contradict the notion of a required field.
+
+<!-- **(TODO: make examples reproducible)** -->
 
 ## Displaying real-time feedback
 
@@ -132,7 +146,9 @@ However, it doesn't do so by default. Instead, you must call `iv$enable()` at le
 
 The reason for this design is because many forms have an explicit "Submit" or "Continue" button, and in those cases, you may want to suppress the display of validation errors until the user actually attempts to submit the form. This is considered a better user experience than overwhelming the user with error messages before they've even started filling out the form.
 
-To defer validation until "Submit" or "Continue" time, simply call `iv$enable()` from within whatever `observeEvent` or `eventReactive` is triggered by the submit/continue button. You can see this in the 02_deferred example [[source](https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/02_deferred/app.R), [live demo](https://jcheng.shinyapps.io/02_deferred/)].
+## Deferring Validation
+
+To defer validation until "Submit" or "Continue" time, simply call `iv$enable()` from within whatever `observeEvent` or `eventReactive` is triggered by the submit/continue button. You can see this in the `02_deferred` example app [[source](https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/02_deferred/app.R), [live demo](https://jcheng.shinyapps.io/02_deferred/)].
 
 If, on the other hand, your app doesn't have a notion of "Submit" or "Continue", then just go ahead and call `iv$enable()` as soon as your `InputValidator` object is populated with rules.
 

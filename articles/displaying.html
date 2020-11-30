@@ -143,10 +143,10 @@ span.delta {
 <a href="#widget-level-support-input-binding-customization" class="anchor"></a>Widget-level support: Input binding customization</h2>
 <p>Custom input widgets that don’t depend on Bootstrap can define their own behavior for displaying validation errors, by implementing two new methods on their JavaScript <a href="https://shiny.rstudio.com/articles/building-inputs.html#write-an-input-binding"><code>InputBinding</code> objects</a>.</p>
 <ul>
-<li><p><code>binding.setInvalid(el, message)</code> will be called when a validation error should be displayed. The <code>message</code> will be a non-empty string. Besides the message being displayed, other CSS adjustments should be made to make it clear that the input is invalid (having the control label and border colors turn red, or background color turning pink, for example).</p></li>
+<li><p><code>binding.setInvalid(el, data)</code> will be called when a validation error should be displayed. The <code>data</code> object has two fields: <code>data.type</code> is currently always <code>"error"</code> (in the future we may add <code>"warning"</code> and <code>"info"</code> types), and <code>data.message</code> will be a non-empty string specifying the message to display. Besides displaying the message, other UI changes/CSS adjustments should be made to make it clear that the input is invalid (having the control label and border colors turn red, or background color turning pink, for example).</p></li>
 <li><p><code>binding.clearInvalid(el)</code> will be called when a validation error is no longer appropriate to be displayed. Any previously added validation message should be removed, and any CSS adjustments (like the aforementioned red labels and borders) should be reversed.</p></li>
 </ul>
-<p>Note that shinyvalidate will invoke <code>setInvalid</code> and <code>clearInvalid</code> in seemingly random order. It may repeatedly call <code>clearInvalid</code> on an input without intervening <code>setInvalid</code> calls. It may call <code>setInvalid</code> multiple times in a row with the same <code>message</code>. Therefore, both <code>setInvalid</code> and <code>clearInvalid</code> must be prepared to deal with inputs in “normal” or “error” states.</p>
+<p>Note that shinyvalidate will invoke <code>setInvalid</code> and <code>clearInvalid</code> in seemingly random order. It may repeatedly call <code>clearInvalid</code> on an input without intervening <code>setInvalid</code> calls. It may call <code>setInvalid</code> multiple times in a row with the same <code>data</code>. Therefore, both <code>setInvalid</code> and <code>clearInvalid</code> must be prepared to deal with inputs in “normal” or “error” states.</p>
 <p>Example 03_custom_inputs [<a href="https://github.com/rstudio/shinyvalidate/tree/master/inst/examples/03_custom_inputs">source</a>, live demo TODO] uses a custom input widget to implement a webcam capture input, and uses <code>setInvalid</code>/<code>clearInvalid</code> methods to overlay the validation message on top of the image preview:</p>
 <p><img src="custom_input.png" alt="Screenshot of app, with error message displayed over a webcam image" width="282"></p>
 </div>
@@ -159,25 +159,27 @@ span.delta {
 <span id="cb2-2"><a href="#cb2-2"></a>  <span class="kw">let</span> el <span class="op">=</span> <span class="va">event</span>.<span class="at">el</span><span class="op">;</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a>  <span class="kw">let</span> binding <span class="op">=</span> <span class="va">event</span>.<span class="at">binding</span><span class="op">;</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a>  <span class="kw">let</span> id <span class="op">=</span> <span class="va">event</span>.<span class="at">id</span><span class="op">;</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a>  <span class="kw">let</span> message <span class="op">=</span> <span class="va">event</span>.<span class="at">message</span><span class="op">;</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a>  <span class="va">event</span>.<span class="at">preventDefault</span>()<span class="op">;</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a>  </span>
-<span id="cb2-8"><a href="#cb2-8"></a>  <span class="co">// Add logic to show (or replace) error message on element `el`</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a><span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a></span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">"shinyvalidate:clear"</span><span class="op">,</span> <span class="kw">function</span>(event) <span class="op">{</span></span>
-<span id="cb2-12"><a href="#cb2-12"></a>  <span class="kw">let</span> el <span class="op">=</span> <span class="va">event</span>.<span class="at">el</span><span class="op">;</span></span>
-<span id="cb2-13"><a href="#cb2-13"></a>  <span class="kw">let</span> binding <span class="op">=</span> <span class="va">event</span>.<span class="at">binding</span><span class="op">;</span></span>
-<span id="cb2-14"><a href="#cb2-14"></a>  <span class="kw">let</span> id <span class="op">=</span> <span class="va">event</span>.<span class="at">id</span><span class="op">;</span></span>
-<span id="cb2-15"><a href="#cb2-15"></a>  <span class="va">event</span>.<span class="at">preventDefault</span>()<span class="op">;</span></span>
-<span id="cb2-16"><a href="#cb2-16"></a>  </span>
-<span id="cb2-17"><a href="#cb2-17"></a>  <span class="co">// Add logic to clear error (if one exists) from element `el`</span></span>
-<span id="cb2-18"><a href="#cb2-18"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<span id="cb2-5"><a href="#cb2-5"></a>  <span class="kw">let</span> type <span class="op">=</span> <span class="va">event</span>.<span class="at">type</span><span class="op">;</span> <span class="co">// always "error"</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>  <span class="kw">let</span> message <span class="op">=</span> <span class="va">event</span>.<span class="at">message</span><span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>  <span class="va">event</span>.<span class="at">preventDefault</span>()<span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>  </span>
+<span id="cb2-9"><a href="#cb2-9"></a>  <span class="co">// Add logic to show (or replace) error message on element `el`</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">"shinyvalidate:clear"</span><span class="op">,</span> <span class="kw">function</span>(event) <span class="op">{</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a>  <span class="kw">let</span> el <span class="op">=</span> <span class="va">event</span>.<span class="at">el</span><span class="op">;</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a>  <span class="kw">let</span> binding <span class="op">=</span> <span class="va">event</span>.<span class="at">binding</span><span class="op">;</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a>  <span class="kw">let</span> id <span class="op">=</span> <span class="va">event</span>.<span class="at">id</span><span class="op">;</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a>  <span class="va">event</span>.<span class="at">preventDefault</span>()<span class="op">;</span></span>
+<span id="cb2-17"><a href="#cb2-17"></a>  </span>
+<span id="cb2-18"><a href="#cb2-18"></a>  <span class="co">// Add logic to clear error (if one exists) from element `el`</span></span>
+<span id="cb2-19"><a href="#cb2-19"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 <p>The following properties are available on the <code>event</code> object:</p>
 <ul>
 <li><p><code>el</code> - The HTML element for the relevant input. This is a regular HTML element object, not a jQuery object–you’ll need to call <code>$(el)</code> yourself if you need jQuery functionality.</p></li>
 <li><p><code>binding</code> - The Shiny <code>InputBinding</code> object.</p></li>
 <li><p><code>id</code> - A string indicating the input ID.</p></li>
+<li><p><code>type</code> - Currently hardcoded to <code>"error"</code>. (In the future, we may introduce other types like <code>"warning"</code> and <code>"info"</code>.)</p></li>
 <li><p><code>message</code> - A textual string (not HTML) indicating the message to be displayed.</p></li>
 </ul>
 <p><strong>Important:</strong> The <code>event</code> object’s <code>preventDefault()</code> method must be called to prevent the two other strategies (input binding and Bootstrap) from being attempted. (This allows event handlers to decide to handle error display for only a subset of inputs, for example.)</p>

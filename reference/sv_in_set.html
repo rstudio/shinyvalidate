@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Validate that a field is a number bounded by minimum and maximum values — sv_between • shinyvalidate</title>
+<title>Validate that a field is part of a defined set — sv_in_set • shinyvalidate</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,9 @@
 
 
 
-<meta property="og:title" content="Validate that a field is a number bounded by minimum and maximum values — sv_between" />
-<meta property="og:description" content="sv_numeric and sv_integer validate that a field is.numeric and
-is.integer, respectively. By default, only a single, finite, not-missing,
-valid number/integer is allowed, but each of those criteria can be controlled
-via arguments." />
+<meta property="og:title" content="Validate that a field is part of a defined set — sv_in_set" />
+<meta property="og:description" content="The sv_in_set() function checks whether the field value is part of a
+specified set of values." />
 
 
 
@@ -129,52 +127,41 @@ via arguments." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Validate that a field is a number bounded by minimum and maximum values</h1>
+    <h1>Validate that a field is part of a defined set</h1>
     <small class="dont-index">Source: <a href='https://github.com/rstudio/shinyvalidate/blob/master/R/rules.R'><code>R/rules.R</code></a></small>
-    <div class="hidden name"><code>sv_between.Rd</code></div>
+    <div class="hidden name"><code>sv_in_set.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>sv_numeric</code> and <code>sv_integer</code> validate that a field <code>is.numeric</code> and
-<code>is.integer</code>, respectively. By default, only a single, finite, not-missing,
-valid number/integer is allowed, but each of those criteria can be controlled
-via arguments.</p>
+    <p>The <code>sv_in_set()</code> function checks whether the field value is part of a
+specified set of values.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sv_between</span><span class='op'>(</span>
-  <span class='va'>left</span>,
-  <span class='va'>right</span>,
-  inclusive <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>TRUE</span>, <span class='cn'>TRUE</span><span class='op'>)</span>,
-  allow_na <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  allow_nan <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  message <span class='op'>=</span> <span class='cn'>NULL</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sv_in_set</span><span class='op'>(</span><span class='va'>set</span>, message <span class='op'>=</span> <span class='st'>"Must be in the set of {values_text}."</span>, msg_limit <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>left, right</th>
-      <td><p>The left and right boundary values. Inclusively for each of
-the boundaries is set with the <code>inclusive</code> argument; the defaults are set
-for inclusive bounds.</p></td>
-    </tr>
-    <tr>
-      <th>inclusive</th>
-      <td><p>A two-element logical vector that indicates whether the
-<code>left</code> and <code>right</code> bounds, respectively, should be inclusive. Both bounds
-are by default are inclusive, using <code><a href='https://rdrr.io/r/base/c.html'>c(TRUE, TRUE)</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>allow_na, allow_nan</th>
-      <td><p>If <code>FALSE</code> (the default for both options), then any
-<code>NA</code> or <code>NaN</code> element will cause validation to fail.</p></td>
+      <th>set</th>
+      <td><p>A vector or list of elements for which the field value must be a
+part of to pass validation. To allow an empty field, <code>NA</code> should be
+included in the <code>set</code> vector. Optionally, <code>NaN</code> can be included as well.</p></td>
     </tr>
     <tr>
       <th>message</th>
       <td><p>The validation error message to use if a value fails to match
-the rule. By default, this is generic message provided by <strong>shinyvalidate</strong>
-but a custom message can be provided here.</p></td>
+the rule. Use <code>"{values_text}"</code> within the message to include a short list
+of values based on <code>set</code>.</p></td>
+    </tr>
+    <tr>
+      <th>msg_limit</th>
+      <td><p>The limit of <code>set</code> values to include in the
+automatically-generated error message (i.e., when <code>message = NULL</code>, the
+default). If the number of elements provided in <code>set</code> is greater than
+<code>msg_limit</code> then only the first <code>&lt;message_limit&gt;</code> set elements will be
+echoed along with text that states how many extra elements are part of the
+<code>set</code>.</p></td>
     </tr>
     </table>
 
@@ -190,7 +177,7 @@ but a custom message can be provided here.</p></td>
 
   <span class='va'>iv</span> <span class='op'>&lt;-</span> <span class='va'><a href='InputValidator.html'>InputValidator</a></span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='op'>)</span>
 
-  <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"count"</span>, <span class='fu'>sv_between</span><span class='op'>(</span><span class='fl'>10</span>, <span class='fl'>10000</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"count"</span>, <span class='fu'>sv_in_set</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
   <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"count"</span>, <span class='op'>~</span><span class='kw'>if</span> <span class='op'>(</span><span class='va'>.</span> <span class='op'>&lt;=</span> <span class='fl'>0</span><span class='op'>)</span> <span class='st'>"A positive value is required"</span><span class='op'>)</span>
 
 <span class='op'>}</span><span class='op'>)</span>

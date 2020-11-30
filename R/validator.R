@@ -180,6 +180,19 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       if (grepl("\\?$", inputId)) {
         optional <- TRUE
         inputId <- sub("\\?$", "", inputId)
+        
+        if (!is.null(attr(rule, "sv_required", exact = TRUE))) {
+          
+          rule_name <- attr(rule, "sv_required", exact = TRUE)
+
+          warning(
+            "The `", rule_name, "()` rule was used with `", inputId,
+            "?`. This is contradictory, as the `?` indicates that the value ",
+            "is optional but the rule implies that a value is required. ",
+            "Consider using `", inputId, "` instead.",
+            call. = FALSE
+          )
+        }
       }
       
       applied_rule <- function(value) {

@@ -150,13 +150,9 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   subsequent rules for that input from executing.
     #'
     #' @param inputId A single-element character vector indicating the ID of the
-    #'   input that this rule applies to. Using a `"?"` suffix on the `inputId`
-    #'   indicates to **shinyvalidate** that a given validation rule on the
-    #'   field should not be enabled if the value is `NULL`, or, not truthy
-    #'   (checked internally through use of `!shiny::isTruthy(<value>)`. Any
-    #'   `"?"` used as a suffix will internally be stripped off when setting the
-    #'   `inputID`. Please note that the `inputId` should *not* be qualified by
-    #'   a module namespace (e.g., pass `"x"` and not `session$ns("x")`).
+    #'   input that this rule applies to. Please note that the `inputId` should
+    #'   *not* be qualified by a module namespace (e.g., pass `"x"` and not
+    #'   `session$ns("x")`).
     #' @param rule A function that takes (at least) one argument: the input's
     #'   value. The function should return `NULL` if it passes validation, and
     #'   if not, a single-element character vector containing an error message
@@ -165,9 +161,18 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   name for the input value being validated.
     #' @param ... Optional: Additional arguments to pass to the `rule` function
     #'   whenever it is invoked.
+    #' @param skip_missing_value Determines whether the provided `rule` checks
+    #'   for the existence of missing values. By default,
+    #'   `!is_existence_check(rule)` is invoked.
     #' @param session. The session object to which the input belongs. (There's
     #'   almost never a reason to change this from the default.)
-    add_rule = function(inputId, rule, ..., session. = shiny::getDefaultReactiveDomain()) {
+    add_rule = function(inputId,
+                        rule,
+                        ...,
+                        skip_missing_value = !is_existence_check(rule),
+                        session. = shiny::getDefaultReactiveDomain()) {
+      force(skip_missing_value)
+      
       args <- rlang::list2(...)
       if (is.null(rule)) {
         rule <- function(value, ...) NULL
@@ -176,27 +181,8 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         rule <- rlang::as_function(rule)
       }
       
-      optional <- FALSE
-      if (grepl("\\?$", inputId)) {
-        optional <- TRUE
-        inputId <- sub("\\?$", "", inputId)
-        
-        if (!is.null(attr(rule, "sv_required", exact = TRUE))) {
-          
-          rule_name <- attr(rule, "sv_required", exact = TRUE)
-
-          warning(
-            "The `", rule_name, "()` rule was used with `", inputId,
-            "?`. This is contradictory, as the `?` indicates that the value ",
-            "is optional but the rule implies that a value is required. ",
-            "Consider using `", inputId, "` instead.",
-            call. = FALSE
-          )
-        }
-      }
-      
       applied_rule <- function(value) {
-        if (optional && !shiny::isTruthy(value)) {
+        if (skip_missing_value && !shiny::isTruthy(value)) {
           return(NULL)
         }
         # Do this instead of purrr::partial because purrr::partial doesn't
@@ -290,23 +276,28 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         # Short-circuit if already errored
         if (!is.null(results[[fullname]])) return()
         
-        try({
-          result <- rule$rule(rule$session$input[[name]])
-          if (!is.null(result) && (!is.character(result) || length(result) != 1)) {
-            stop("Result of '", name, "' validation was not a single-character vector")
+
+        result <- tryCatch(
+          shiny::withLogErrors(rule$rule(rule$session$input[[name]])),
+          error = function(e) {
+            "An error has occurred"
           }
-          # Note that if there's an error in rule(), we won't get to the next
-          # line
-          if (is.null(result)) {
-            if (!fullname %in% names(results)) {
-              # Can't do results[[fullname]] <<- NULL, that just removes the element
-              results <<- c(results, stats::setNames(list(NULL), fullname))
-            }
-          } else {
-            results[[fullname]] <<- list(type = "error", message = result)
+        )
+        if (!is.null(result) && (!is.character(result) || length(result) != 1)) {
+          stop("Result of '", name, "' validation was not a single-character vector")
+        }
+        # Note that if there's an error in rule(), we won't get to the next
+        # line
+        if (is.null(result)) {
+          if (!fullname %in% names(results)) {
+            # Can't do results[[fullname]] <<- NULL, that just removes the element
+            results <<- c(results, stats::setNames(list(NULL), fullname))
           }
-        })
+        } else {
+          results[[fullname]] <<- list(type = "error", message = result)
+        }
       })
+      
       
       merge_results(dependency_results, results)
     }
@@ -324,4 +315,29 @@ merge_results <- function(resultsA, resultsB) {
   results <- results[c(which(has_error), which(!has_error))]
   results <- results[!duplicated(names(results))]
   results
+}
+
+is_existence_check <- function(rule) {
+  if (is.null(rule)) {
+    FALSE
+  } else {
+    isTRUE(attr(rule, "sv_existence_check", exact = TRUE))
+  }
+}
+
+#' @export
+sv_make_validator <- function(name, func, ..., checks_existence = FALSE) {
+  stopifnot(is.function(func) || inherits(func, "formula"))
+  stopifnot(is.character(name) && length(name) == 1)
+  stopifnot(is.logical(checks_existence) && length(checks_existence) == 1)
+  if (length(list(...)) != 0) {
+    stop("Unknown argument(s) were provided to sv_make_validator")
+  }
+  
+  attr(func, "sv_validator_name") <- name
+  attr(func, "sv_existence_check") <- checks_existence
+  if (!inherits(func, "sv_validator_rule")) {
+    class(func) <- c("sv_validator_rule", class(func))
+  }
+  func
 }

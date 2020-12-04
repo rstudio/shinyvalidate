@@ -157,6 +157,7 @@ subsequent rules for that input from executing.
   inputId,
   rule,
   ...,
+  skip_missing_value = !is_existence_check(rule),
   session. = shiny::getDefaultReactiveDomain()
 )}\if{html}{\out{</div>}}
 }
@@ -165,13 +166,9 @@ subsequent rules for that input from executing.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{inputId}}{A single-element character vector indicating the ID of the
-input that this rule applies to. Using a \code{"?"} suffix on the \code{inputId}
-indicates to \strong{shinyvalidate} that a given validation rule on the
-field should not be enabled if the value is \code{NULL}, or, not truthy
-(checked internally through use of \verb{!shiny::isTruthy(<value>)}. Any
-\code{"?"} used as a suffix will internally be stripped off when setting the
-\code{inputID}. Please note that the \code{inputId} should \emph{not} be qualified by
-a module namespace (e.g., pass \code{"x"} and not \code{session$ns("x")}).}
+input that this rule applies to. Please note that the \code{inputId} should
+\emph{not} be qualified by a module namespace (e.g., pass \code{"x"} and not
+\code{session$ns("x")}).}
 
 \item{\code{rule}}{A function that takes (at least) one argument: the input's
 value. The function should return \code{NULL} if it passes validation, and
@@ -182,6 +179,10 @@ name for the input value being validated.}
 
 \item{\code{...}}{Optional: Additional arguments to pass to the \code{rule} function
 whenever it is invoked.}
+
+\item{\code{skip_missing_value}}{Determines whether the provided \code{rule} checks
+for the existence of missing values. By default,
+\code{!is_existence_check(rule)} is invoked.}
 
 \item{\code{session.}}{The session object to which the input belongs. (There's
 almost never a reason to change this from the default.)}

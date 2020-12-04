@@ -55,16 +55,14 @@ sv_required <- function(message = "Required", test = shiny::isTruthy) {
     test <- rlang::as_function(test)
   }
   
-  func <- 
+  sv_make_validator(
+    "sv_required", checks_existence = TRUE,
     function(value) {
       if (!test(value)) {
         message
       }
     }
-  
-  attr(func, "sv_required") <- "sv_required"
-  
-  func
+  )
 }
 
 #' Validate that a field matches a regular expression

@@ -18,7 +18,8 @@ Imports:
     utils,
     htmltools,
     rlang,
-    glue (>= 1.4.2)
+    glue (>= 1.4.2),
+    magrittr
 Remotes: 
     rstudio/shiny,
     rstudio/htmltools

@@ -39,6 +39,6 @@ shiny::withReactiveDomain(shiny::MockShinySession$new(), {
 
   iv$add_rule("count", sv_in_set(1:5))
   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
-
 })
+
 }

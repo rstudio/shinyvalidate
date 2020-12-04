@@ -42,10 +42,11 @@
 #'   # Provide a `test` argument to change the definition of "is present";
 #'   # in this example, any non-NULL value will be accepted.
 #'   iv$add_rule("choices", sv_required(test = is.null))
-#'
 #' })
+#' 
 #' @export
-sv_required <- function(message = "Required", test = shiny::isTruthy) {
+sv_required <- function(message = "Required",
+                        test = shiny::isTruthy) {
   force(message)
   force(test)
   
@@ -70,7 +71,8 @@ sv_required <- function(message = "Required", test = shiny::isTruthy) {
 #'   length 2 or more is supplied, the first element is used with a warning.
 #' @param message The validation error message to use if a value fails to match
 #'   the pattern.
-#' @param ignore.case,perl,fixed,useBytes,invert Passed through to [base::grepl()].
+#' @param ignore.case,perl,fixed,useBytes,invert Passed through to
+#'   [base::grepl()].
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
@@ -92,13 +94,16 @@ sv_required <- function(message = "Required", test = shiny::isTruthy) {
 #'       ignore.case = TRUE
 #'     )
 #'   )
-#'
 #' })
 #'
 #' @export
-sv_regex <- function(pattern, message, ignore.case = FALSE, perl = FALSE,
-  fixed = FALSE, useBytes = FALSE, invert = FALSE) {
-
+sv_regex <- function(pattern,
+                     message,
+                     ignore.case = FALSE,
+                     perl = FALSE,
+                     fixed = FALSE,
+                     useBytes = FALSE,
+                     invert = FALSE) {
   force(pattern)
   force(message)
   force(ignore.case)
@@ -106,6 +111,8 @@ sv_regex <- function(pattern, message, ignore.case = FALSE, perl = FALSE,
   force(fixed)
   force(useBytes)
   force(invert)
+  
+  # TODO: include a `message` value in the signature
   
   function(value) {
     result <- grepl(pattern, value, ignore.case = ignore.case, perl = perl,
@@ -123,23 +130,20 @@ sv_regex <- function(pattern, message, ignore.case = FALSE, perl = FALSE,
 
 #' Validate that a field is a number
 #'
-#' `sv_numeric` and `sv_integer` validate that a field `is.numeric` and
-#' `is.integer`, respectively. By default, only a single, finite, not-missing,
-#' valid number/integer is allowed, but each of those criteria can be controlled
-#' via arguments.
+#' The `sv_numeric()` function validates that a field is numeric with the
+#' [base::is.numeric()] function. By default, only a single, finite,
+#' not-missing, valid number is allowed, but each of those criteria can be
+#' controlled via arguments.
 #'
-#' @param message The validation error message to use if a value fails to match
-#'   the rule.
-#' @param allowMultiple If `FALSE` (the default), then the length of the input
+#' @param message The validation error message to use if a value is not numeric.
+#' @param allow_multiple If `FALSE` (the default), then the length of the input
 #'   vector must be exactly one; if `TRUE`, then any length is allowed
 #'   (including a length of zero; use [sv_required()] if one or more values
 #'   should be required).
-#' @param allowNA If `FALSE` (the default), then any `NA` element will cause
-#'   validation to fail.
-#' @param allowNaN If `FALSE` (the default), then any `NaN` element will cause
-#'   validation to fail.
-#' @param allowInfinite If `FALSE` (the default), then any `Inf` or `-Inf`
-#'   element will cause validation to fail.
+#' @param allow_na,allow_nan If `FALSE` (the default for both options), then any
+#'   `NA` or `NaN` element will cause validation to fail.
+#' @param allow_inf If `FALSE` (the default), then any `Inf` or `-Inf` element
+#'   will cause validation to fail.
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
@@ -150,19 +154,22 @@ sv_regex <- function(pattern, message, ignore.case = FALSE, perl = FALSE,
 #' 
 #'   iv <- InputValidator$new()
 #' 
-#'   iv$add_rule("count", sv_integer())
+#'   iv$add_rule("count", sv_numeric())
 #'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
-#'
 #' })
+#' 
 #' @export
-sv_numeric <- function(message = "A number is required", allowMultiple = FALSE,
-  allowNA = FALSE, allowNaN = FALSE, allowInfinite = FALSE) {
+sv_numeric <- function(message = "A number is required",
+                       allow_multiple = FALSE,
+                       allow_na = FALSE, 
+                       allow_nan = FALSE, 
+                       allow_inf = FALSE) {
 
   force(message)
-  force(allowMultiple)
-  force(allowNA)
-  force(allowNaN)
-  force(allowInfinite)
+  force(allow_multiple)
+  force(allow_na)
+  force(allow_nan)
+  force(allow_inf)
 
   function(value) {
     if (!is.numeric(value)) {
@@ -171,32 +178,55 @@ sv_numeric <- function(message = "A number is required", allowMultiple = FALSE,
     if (length(value) == 0) {
       return(message)
     }
-    if (!allowMultiple && length(value) != 1) {
+    if (!allow_multiple && length(value) != 1) {
       return(message)
     }
-    if (!allowNA && any(is.na(value))) {
+    if (!allow_na && any(is.na(value))) {
       return(message)
     }
-    if (!allowNaN && any(is.nan(value))) {
+    if (!allow_nan && any(is.nan(value))) {
       return(message)
     }
-    if (!allowInfinite && any(!is.finite(value))) {
+    if (!allow_inf && any(!is.finite(value))) {
       return(message)
     }
   }
 }
 
-#' @rdname sv_numeric
+#' Validate that a field is an integer
+#'
+#' The `sv_integer()` function validates that a field is an integer with the
+#' [base::is.integer()] function. By default, only a single, finite,
+#' not-missing, valid integer is allowed, but each of those criteria can be
+#' controlled via arguments.
+#' 
+#' @param message The validation error message to use if a value is not an
+#'   integer.
+#' @inheritParams sv_numeric
+#' 
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' 
+#'   iv <- InputValidator$new()
+#' 
+#'   iv$add_rule("count", sv_integer())
+#'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
+#' })
+#' 
 #' @export
 sv_integer <- function(message = "An integer is required",
-  allowMultiple = FALSE, allowNA = FALSE, allowNaN = FALSE,
-  allowInfinite = FALSE) {
+                       allow_multiple = FALSE,
+                       allow_na = FALSE,
+                       allow_nan = FALSE,
+                       allow_inf = FALSE) {
   
   force(message)
-  force(allowMultiple)
-  force(allowNA)
-  force(allowNaN)
-  force(allowInfinite)
+  force(allow_multiple)
+  force(allow_na)
+  force(allow_nan)
+  force(allow_inf)
   
   function(value) {
     if (!is.integer(value)) {
@@ -205,16 +235,16 @@ sv_integer <- function(message = "An integer is required",
     if (length(value) == 0) {
       return(message)
     }
-    if (!allowMultiple && length(value) != 1) {
+    if (!allow_multiple && length(value) != 1) {
       return(message)
     }
-    if (!allowNA && any(is.na(value))) {
+    if (!allow_na && any(is.na(value))) {
       return(message)
     }
-    if (!allowNaN && any(is.nan(value))) {
+    if (!allow_nan && any(is.nan(value))) {
       return(message)
     }
-    if (!allowInfinite && any(!is.finite(value))) {
+    if (!allow_inf && any(!is.finite(value))) {
       return(message)
     }
   }
@@ -222,10 +252,11 @@ sv_integer <- function(message = "An integer is required",
 
 #' Validate that a field is a number bounded by minimum and maximum values
 #'
-#' `sv_numeric` and `sv_integer` validate that a field `is.numeric` and
-#' `is.integer`, respectively. By default, only a single, finite, not-missing,
-#' valid number/integer is allowed, but each of those criteria can be controlled
-#' via arguments.
+#' The `sv_between()` function validates that a field has values between left
+#' and right boundary values. Both bounds are inclusive by default, but both can
+#' be set as either inclusive or exclusive with the `inclusive` argument. In its
+#' default mode, the validation check will effectively be of the form `<left> <=
+#' <field> <= <right>`.
 #' 
 #' @param left,right The left and right boundary values. Inclusively for each of
 #'   the boundaries is set with the `inclusive` argument; the defaults are set
@@ -233,11 +264,10 @@ sv_integer <- function(message = "An integer is required",
 #' @param inclusive A two-element logical vector that indicates whether the
 #'   `left` and `right` bounds, respectively, should be inclusive. Both bounds
 #'   are by default are inclusive, using `c(TRUE, TRUE)`.
-#' @param allow_na,allow_nan If `FALSE` (the default for both options), then any
-#'   `NA` or `NaN` element will cause validation to fail.
 #' @param message The validation error message to use if a value fails to match
 #'   the rule. By default, this is generic message provided by **shinyvalidate**
 #'   but a custom message can be provided here.
+#' @inheritParams sv_numeric
 #'
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
@@ -251,18 +281,24 @@ sv_integer <- function(message = "An integer is required",
 #' 
 #'   iv$add_rule("count", sv_between(10, 10000))
 #'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
-#'
 #' })
+#' 
 #' @export
 sv_between <- function(left,
                        right,
                        inclusive = c(TRUE, TRUE),
+                       message = NULL,
                        allow_na = FALSE,
-                       allow_nan = FALSE,
-                       message = NULL) {
+                       allow_nan = FALSE) {
+  force(left)
+  force(right)
+  force(inclusive)
+  force(message)
   force(allow_na)
   force(allow_nan)
-  force(message)
+  
+  # TODO: allow for check of multiple values with `allow_multiple`
+  # TODO: `message` should have the message string 
   
   if (is.null(message)) {
     message <- 
@@ -325,8 +361,8 @@ sv_between <- function(left,
 #' 
 #'   iv$add_rule("count", sv_in_set(1:5))
 #'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
-#'
 #' })
+#' 
 #' @export
 sv_in_set <- function(set,
                       message = "Must be in the set of {values_text}.",
@@ -378,4 +414,299 @@ prepare_values_text <- function(set,
   }
   
   values_str
+}
+
+#' Validate that a field is greater than a specified value
+#'
+#' The `sv_gt()` function compares the field value to a specified value with the
+#' `>` operator.
+#' 
+#' @param rhs The right hand side (RHS) value is to be used for the comparison
+#'   with the field value. The validation check will effectively be of the form
+#'   `<field> > <rhs>`.
+#' @param message The validation error message to use if the field fails the
+#'   validation test. Use `"{rhs}"` within the message to include what was set
+#'   in `rhs`.
+#' @param allow_multiple If `FALSE` (the default), then the length of the input
+#'   vector must be exactly one; if `TRUE`, then any length is allowed
+#'   (including a length of zero; use [sv_required()] if one or more values
+#'   should be required).
+#' @inheritParams sv_numeric
+#'
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @export
+sv_gt <- function(rhs,
+                  message = "Must be greater than {rhs}.",
+                  allow_multiple = FALSE,
+                  allow_na = FALSE,
+                  allow_nan = FALSE,
+                  allow_inf = FALSE) {
+    
+  force(rhs)
+  force(message)
+  force(allow_multiple)
+  force(allow_na)
+  force(allow_nan)
+  force(allow_inf)
+  
+  # Preparation of the message and the validation test
+  sv_comparison(
+    rhs = rhs,
+    message = message,
+    allow_multiple = allow_multiple,
+    allow_na = allow_na,
+    allow_nan = allow_nan,
+    allow_inf = allow_inf,
+    operator = ">"
+  )
+}
+
+
+#' Validate that a field is greater than or equal to a specified value
+#'
+#' The `sv_gte()` function compares the field value to a specified value with
+#' the `>=` operator.
+#' 
+#' @param rhs The right hand side (RHS) value is to be used for the comparison
+#'   with the field value. The validation check will effectively be of the form
+#'   `<field> >= <rhs>`.
+#' @inheritParams sv_gt
+#' 
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#' 
+#' @export
+sv_gte <- function(rhs,
+                   message = "Must be greater than or equal to {rhs}.",
+                   allow_multiple = FALSE,
+                   allow_na = FALSE,
+                   allow_nan = FALSE,
+                   allow_inf = FALSE) {
+  
+  force(rhs)
+  force(message)
+  force(allow_multiple)
+  force(allow_na)
+  force(allow_nan)
+  force(allow_inf)
+  
+  # Preparation of the message and the validation test
+  sv_comparison(
+    rhs = rhs,
+    message = message,
+    allow_multiple = allow_multiple,
+    allow_na = allow_na,
+    allow_nan = allow_nan,
+    allow_inf = allow_inf,
+    operator = ">="
+  )
+}
+
+#' Validate that a field is less than a specified value
+#'
+#' The `sv_lt()` function compares the field value to a specified value with the
+#' `<` operator.
+#' 
+#' @param rhs The right hand side (RHS) value is to be used for the comparison
+#'   with the field value. The validation check will effectively be of the form
+#'   `<field> < <rhs>`.
+#' @inheritParams sv_gt
+#'
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @export
+sv_lt <- function(rhs,
+                  message = "Must be less than {rhs}.",
+                  allow_multiple = FALSE,
+                  allow_na = FALSE,
+                  allow_nan = FALSE,
+                  allow_inf = FALSE) {
+  
+  force(rhs)
+  force(message)
+  force(allow_multiple)
+  force(allow_na)
+  force(allow_nan)
+  force(allow_inf)
+  
+  # Preparation of the message and the validation test
+  sv_comparison(
+    rhs = rhs,
+    message = message,
+    allow_multiple = allow_multiple,
+    allow_na = allow_na,
+    allow_nan = allow_nan,
+    allow_inf = allow_inf,
+    operator = "<"
+  )
+}
+
+#' Validate that a field is less than or equal to a specified value
+#'
+#' The `sv_lte()` function compares the field value to a specified value with
+#' the `<=` operator.
+#' 
+#' @param rhs The right hand side (RHS) value is to be used for the comparison
+#'   with the field value. The validation check will effectively be of the form
+#'   `<field> <= <rhs>`.
+#' @inheritParams sv_gt
+#' 
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @export
+sv_lte <- function(rhs,
+                   message = "Must be less than or equal to {rhs}.",
+                   allow_multiple = FALSE,
+                   allow_na = FALSE,
+                   allow_nan = FALSE,
+                   allow_inf = FALSE) {
+  
+  force(rhs)
+  force(message)
+  force(allow_multiple)
+  force(allow_na)
+  force(allow_nan)
+  force(allow_inf)
+  
+  # Preparation of the message and the validation test
+  sv_comparison(
+    rhs = rhs,
+    message = message,
+    allow_multiple = allow_multiple,
+    allow_na = allow_na,
+    allow_nan = allow_nan,
+    allow_inf = allow_inf,
+    operator = "<="
+  )
+}
+
+#' Validate that a field is equal to a specified value
+#'
+#' The `sv_equal()` function compares the field value to a specified value with
+#' the `==` operator.
+#' 
+#' @param rhs The right hand side (RHS) value is to be used for the comparison
+#'   with the field value. The validation check will effectively be of the form
+#'   `<field> == <rhs>`.
+#' @inheritParams sv_gt
+#'
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @export
+sv_equal <- function(rhs,
+                     message = "Must be equal to {rhs}.",
+                     allow_multiple = FALSE,
+                     allow_na = FALSE,
+                     allow_nan = FALSE,
+                     allow_inf = FALSE) {
+  
+  force(rhs)
+  force(message)
+  force(allow_multiple)
+  force(allow_na)
+  force(allow_nan)
+  force(allow_inf)
+  
+  # Preparation of the message and the validation test
+  sv_comparison(
+    rhs = rhs,
+    message = message,
+    allow_multiple = allow_multiple,
+    allow_na = allow_na,
+    allow_nan = allow_nan,
+    allow_inf = allow_inf,
+    operator = "=="
+  )
+}
+
+#' Validate that a field is not equal to a specified value
+#'
+#' The `sv_not_equal()` function compares the field value to a specified value
+#' with the `!=` operator.
+#' 
+#' @param rhs The right hand side (RHS) value is to be used for the comparison
+#'   with the field value. The validation check will effectively be of the form
+#'   `<field> != <rhs>`.
+#' @inheritParams sv_gt
+#'
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @export
+sv_not_equal <- function(rhs,
+                         message = "Must not be equal to {rhs}.",
+                         allow_multiple = FALSE,
+                         allow_na = FALSE,
+                         allow_nan = FALSE,
+                         allow_inf = FALSE) {
+  
+  force(rhs)
+  force(message)
+  force(allow_multiple)
+  force(allow_na)
+  force(allow_nan)
+  force(allow_inf)
+  
+  # Preparation of the message and the validation test
+  sv_comparison(
+    rhs = rhs,
+    message = message,
+    allow_multiple = allow_multiple,
+    allow_na = allow_na,
+    allow_nan = allow_nan,
+    allow_inf = allow_inf,
+    operator = "!="
+  )
+}
+
+sv_comparison <- function(rhs,
+                          message,
+                          allow_multiple,
+                          allow_na,
+                          allow_nan,
+                          allow_inf,
+                          operator) {
+  
+  # Preparation of the message
+  message <- 
+    glue::glue_data_safe(
+      list(rhs = rhs),
+      message
+    )
+  
+  # Testing of `value` and validation
+  function(value) {
+    
+    # Validity testing of `value` within set constraints
+    if (!is.numeric(value)) {
+      return(message)
+    }
+    if (length(value) == 0) {
+      return(message)
+    }
+    if (!allow_multiple && length(value) != 1) {
+      return(message)
+    }
+    if (!allow_na && any(is.na(value))) {
+      return(message)
+    }
+    if (!allow_nan && any(is.nan(value))) {
+      return(message)
+    }
+    if (!allow_inf && any(!is.finite(value))) {
+      return(message)
+    }
+    
+    # Validation test
+    res <- rlang::eval_tidy(rlang::parse_expr(paste("value", operator, "rhs")))
+    
+    if (!all(res)) {
+      return(message)
+    }
+  }
 }

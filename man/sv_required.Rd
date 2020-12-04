@@ -41,6 +41,6 @@ shiny::withReactiveDomain(shiny::MockShinySession$new(), {
   # Provide a `test` argument to change the definition of "is present";
   # in this example, any non-NULL value will be accepted.
   iv$add_rule("choices", sv_required(test = is.null))
-
 })
+
 }

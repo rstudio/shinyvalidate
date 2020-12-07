@@ -279,8 +279,16 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
 
         result <- tryCatch(
           shiny::withLogErrors(rule$rule(rule$session$input[[name]])),
+          shiny.silent.error = function(e) {
+            "An unexpected error occurred during input validation"
+          },
           error = function(e) {
-            "An error has occurred"
+            if (inherits(e, "shiny.custom.error") || !isTRUE(getOption("shiny.sanitize.errors", FALSE))) {
+              paste0("An unexpected error occurred during input validation: ",
+                     conditionMessage(e))
+            } else {
+              "An unexpected error occurred during input validation"
+            }
           }
         )
         if (!is.null(result) && (!is.character(result) || length(result) != 1)) {

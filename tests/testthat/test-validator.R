@@ -27,13 +27,9 @@ test_that("InputValidator add_rule()", {
   shiny::withReactiveDomain(session, {
     iv <- InputValidator$new()
     
-    iv$add_rule("inputA", shiny::need, message = "Input A is required")
-    iv$add_rule("inputB", function(value) {
-      if (is.null(value)) {
-        "Input B is required"
-      }
-    })
-    iv$add_rule("inputC", ~ if (is.null(.)) "Input C is required")
+    iv$add_rule("inputA", sv_required(message = "Input A is required"))
+    iv$add_rule("inputB", sv_required(message = "Input B is required"))
+    iv$add_rule("inputC", sv_required(message = "Input C is required"))
     
     expect_error(iv$is_valid(), "reactive context")
     

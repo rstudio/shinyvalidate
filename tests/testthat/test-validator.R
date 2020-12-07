@@ -79,7 +79,7 @@ test_that("InputValidator add_rule() stops on first failing rule", {
     iv$add_rule("a", ~ if (!identical(., FALSE)) "rule 2")
     
     shiny::isolate({
-      for (x in list(NULL, FALSE, "whatever")) {
+      for (x in list(FALSE, "whatever")) {
         session$setInputs(a = x)
         expect_identical(iv$validate(), rlang::list2(
           !!session$ns("a") := list(type = "error", message = "rule 1")

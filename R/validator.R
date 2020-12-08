@@ -181,8 +181,11 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         rule <- rlang::as_function(rule)
       }
       
+      # TODO: Determine whether this change from `shiny::isTruthy()`
+      # to the in-package variant `sv_has_value()` is a good change
+      # (i.e., review the conditionals in that exported function)
       applied_rule <- function(value) {
-        if (skip_missing_value && !shiny::isTruthy(value)) {
+        if (skip_missing_value && !sv_has_value(value)) {
           return(NULL)
         }
         # Do this instead of purrr::partial because purrr::partial doesn't
@@ -333,7 +336,68 @@ is_existence_check <- function(rule) {
   }
 }
 
+# TODO: review the rules in this function and add tests
+
+#' Determine whether a field has a value that can be validated
+#' 
+#' This function is based on [shiny::isTruthy()] but tweaked here in
+#' **shinyvalidate** to better embody the idea that a field value should be
+#' available (i.e., not `NULL`) and it should be in a form that is reasonable
+#' to validate. 
+#' 
+#' @param x An expression to test for availability of values and ability to be
+#'   validated.
+#'   
+#' @return A logical vector of length 1.
+#' 
 #' @export
+sv_has_value <- function(x) {
+
+  if (inherits(x, "try-error")) {
+    return(FALSE)
+  }
+  
+  if (is.null(x)) {
+    return(FALSE)
+  }
+  
+  if (length(x) == 0) {
+    return(FALSE)
+  }
+  
+  if (inherits(x, "shinyActionButtonValue") && x == 0) {
+    return(FALSE)
+  }
+  
+  if (isFALSE(x)) {
+    return(TRUE)
+  }
+  
+  if (isTRUE(x)) {
+    return(TRUE)
+  }
+  
+  if (is.character(x) && !any(nzchar(stats::na.omit(x)))) {
+    return(FALSE)
+  }
+  
+  if (is.logical(x) && !any(stats::na.omit(x))) {
+    return(FALSE)
+  }
+  
+  if (!is.atomic(x)) {
+    return(TRUE)
+  }
+  
+  # The following are from shiny::isTruthy() and are deactivated here
+
+  # if (all(is.na(x))) {
+  #   return(FALSE)
+  # }
+  
+  TRUE 
+}
+
 sv_make_validator <- function(name, func, ..., checks_existence = FALSE) {
   stopifnot(is.function(func) || inherits(func, "formula"))
   stopifnot(is.character(name) && length(name) == 1)

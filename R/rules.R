@@ -14,10 +14,11 @@
 
 #' Validate that the field is present
 #'
-#' Call `sv_required()` to generate a validation function that ensures an input
-#' value is present. By default, the definition of "is present" is based on
-#' [shiny::isTruthy()], which is the logic used by the [shiny::req()] function
-#' as well.
+#' Call `sv_required()` to generate a validation function for checking whether
+#' an input value is present. By default, the distinction for whether the input
+#' is available is governed through use of the [sv_has_value()] function, which
+#' is based on the rules contained in the [shiny::isTruthy()] function (but
+#' tweaked for validation purposes).
 #'
 #' @param message The validation error message to be displayed if the test does
 #'   not pass.
@@ -47,7 +48,7 @@
 #'
 #' })
 #' @export
-sv_required <- function(message = "Required", test = shiny::isTruthy) {
+sv_required <- function(message = "Required", test = sv_has_value) {
   force(message)
   force(test)
   

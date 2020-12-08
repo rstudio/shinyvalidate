@@ -22,7 +22,7 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   iv <- InputValidator$new()
   iv$add_rule("name", sv_required())
-  iv$add_rule("email", ~ if (isTruthy(.) && !is_valid_email(.)) "Please provide a valid email")
+  iv$add_rule("email", ~ if (sv_has_value(.) && !is_valid_email(.)) "Please provide a valid email")
   iv$add_rule("topics", ~ if (length(.) < 2) "Please choose two or more topics")
   iv$add_rule("accept_terms", sv_required(message = "The terms and conditions must be accepted in order to proceed"))
   

@@ -369,19 +369,7 @@ sv_has_value <- function(x) {
     return(FALSE)
   }
   
-  if (isFALSE(x)) {
-    return(TRUE)
-  }
-  
-  if (isTRUE(x)) {
-    return(TRUE)
-  }
-  
   if (is.character(x) && !any(nzchar(stats::na.omit(x)))) {
-    return(FALSE)
-  }
-  
-  if (is.logical(x) && !any(stats::na.omit(x))) {
     return(FALSE)
   }
   
@@ -389,11 +377,10 @@ sv_has_value <- function(x) {
     return(TRUE)
   }
   
-  # The following are from shiny::isTruthy() and are deactivated here
-
-  # if (all(is.na(x))) {
-  #   return(FALSE)
-  # }
+  # For example, numericInput with no value
+  if (length(x) == 1 && is.na(x)) {
+    return(FALSE)
+  }
   
   TRUE 
 }

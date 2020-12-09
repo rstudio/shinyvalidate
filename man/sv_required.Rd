@@ -4,7 +4,7 @@
 \alias{sv_required}
 \title{Validate that the field is present}
 \usage{
-sv_required(message = "Required", test = sv_has_value)
+sv_required(message = "Required", test = input_provided)
 }
 \arguments{
 \item{message}{The validation error message to be displayed if the test does
@@ -21,9 +21,9 @@ A function suitable for using as an
 \description{
 Call \code{sv_required()} to generate a validation function for checking whether
 an input value is present. By default, the distinction for whether the input
-is available is governed through use of the \code{\link[=sv_has_value]{sv_has_value()}} function, which
-is based on the rules contained in the \code{\link[shiny:req]{shiny::isTruthy()}} function (but
-tweaked for validation purposes).
+is available is governed through use of the \code{\link[=input_provided]{input_provided()}} function,
+which is based on the rules contained in the \code{\link[shiny:req]{shiny::isTruthy()}} function
+(but tweaked for validation purposes).
 }
 \examples{
 # Ignore withReactiveDomain(), it's just required to get this example to run

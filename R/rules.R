@@ -16,9 +16,9 @@
 #'
 #' Call `sv_required()` to generate a validation function for checking whether
 #' an input value is present. By default, the distinction for whether the input
-#' is available is governed through use of the [sv_has_value()] function, which
-#' is based on the rules contained in the [shiny::isTruthy()] function (but
-#' tweaked for validation purposes).
+#' is available is governed through use of the [input_provided()] function,
+#' which is based on the rules contained in the [shiny::isTruthy()] function
+#' (but tweaked for validation purposes).
 #'
 #' @param message The validation error message to be displayed if the test does
 #'   not pass.
@@ -48,7 +48,7 @@
 #'
 #' })
 #' @export
-sv_required <- function(message = "Required", test = sv_has_value) {
+sv_required <- function(message = "Required", test = input_provided) {
   force(message)
   force(test)
   

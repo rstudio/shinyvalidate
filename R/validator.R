@@ -182,10 +182,10 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       }
       
       # TODO: Determine whether this change from `shiny::isTruthy()`
-      # to the in-package variant `sv_has_value()` is a good change
+      # to the in-package variant `input_provided()` is a good change
       # (i.e., review the conditionals in that exported function)
       applied_rule <- function(value) {
-        if (skip_missing_value && !sv_has_value(value)) {
+        if (skip_missing_value && !input_provided(value)) {
           return(NULL)
         }
         # Do this instead of purrr::partial because purrr::partial doesn't
@@ -336,7 +336,7 @@ is_existence_check <- function(rule) {
   }
 }
 
-# TODO: review the rules in this function and add tests
+# TODO: add tests
 
 #' Determine whether a field has a value that can be validated
 #' 
@@ -351,34 +351,42 @@ is_existence_check <- function(rule) {
 #' @return A logical vector of length 1.
 #' 
 #' @export
-sv_has_value <- function(x) {
+input_provided <- function(val) {
+  
+  # The reason this differs from shiny::isTruthy is because isTruthy is more
+  # about "is the value present and true?", so e.g. a reactive that requires a
+  # checkbox to be checked can just use req(input$checkbox1). For validation
+  # purposes, we're only interested in whether an input was provided at all.
+  #
+  # Specific differences:
+  # * FALSE (or a logical vector containing only FALSEs) is not truthy, but it
+  #   is provided.
+  # * Objects of class "`try-error`" (see [try()]) are not truthy, but they are
+  #   provided.
 
-  if (inherits(x, "try-error")) {
+  if (is.null(val)) {
     return(FALSE)
   }
   
-  if (is.null(x)) {
+  if (length(val) == 0) {
     return(FALSE)
   }
   
-  if (length(x) == 0) {
+  if (inherits(val, "shinyActionButtonValue") && val == 0) {
     return(FALSE)
   }
   
-  if (inherits(x, "shinyActionButtonValue") && x == 0) {
+  if (is.character(val) && !any(nzchar(stats::na.omit(val)))) {
     return(FALSE)
   }
   
-  if (is.character(x) && !any(nzchar(stats::na.omit(x)))) {
-    return(FALSE)
-  }
-  
-  if (!is.atomic(x)) {
+  if (!is.atomic(val)) {
     return(TRUE)
   }
   
-  # For example, numericInput with no value
-  if (length(x) == 1 && is.na(x)) {
+  # For example, numericInput with no value is NA, and a dateRangeInput with
+  # cleared inputs is c(NA, NA)
+  if (all(is.na(val))) {
     return(FALSE)
   }
   

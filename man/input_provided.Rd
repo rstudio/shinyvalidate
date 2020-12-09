@@ -7,15 +7,13 @@
 input_provided(val)
 }
 \arguments{
-\item{x}{An expression to test for availability of values and ability to be
-validated.}
+\item{val}{Values to test for availability in a Shiny context.}
 }
 \value{
 A logical vector of length 1.
 }
 \description{
 This function is based on \code{\link[shiny:req]{shiny::isTruthy()}} but tweaked here in
-\strong{shinyvalidate} to better embody the idea that a field value should be
-available (i.e., not \code{NULL}) and it should be in a form that is reasonable
-to validate.
+\strong{shinyvalidate} to better embody the idea that a value should be available
+(i.e., not \code{NULL}) and it should be in a form that is reasonable to validate.
 }

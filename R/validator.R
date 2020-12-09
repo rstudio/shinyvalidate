@@ -341,13 +341,11 @@ is_existence_check <- function(rule) {
 #' Determine whether a field has a value that can be validated
 #' 
 #' This function is based on [shiny::isTruthy()] but tweaked here in
-#' **shinyvalidate** to better embody the idea that a field value should be
-#' available (i.e., not `NULL`) and it should be in a form that is reasonable
-#' to validate. 
+#' **shinyvalidate** to better embody the idea that a value should be available
+#' (i.e., not `NULL`) and it should be in a form that is reasonable to validate.
 #' 
-#' @param x An expression to test for availability of values and ability to be
-#'   validated.
-#'   
+#' @param val Values to test for availability in a Shiny context.
+#' 
 #' @return A logical vector of length 1.
 #' 
 #' @export

@@ -148,3 +148,49 @@ test_that("InputValidator$fields recurses over child validators", {
     })
   })
 })
+
+test_that("force_success skips remaining rules", {
+  session <- shiny::MockShinySession$new()
+  shiny::withReactiveDomain(session, {
+    iv <- InputValidator$new(session)
+    iv$add_rule("x", ~ force_success())
+    iv$add_rule("x", ~ "failure")
+    shiny::isolate({
+      expect_true(iv$is_valid())
+    })
+  })
+})
+
+test_that("force_success with child validators", {
+  session <- shiny::MockShinySession$new()
+  shiny::withReactiveDomain(session, {
+    child_iv <- InputValidator$new(session)
+    child_iv$add_rule("x", ~ force_success())
+    child_iv$add_rule("x", ~ "failure")
+    shiny::isolate({
+      expect_true(child_iv$is_valid())
+    })
+    
+    iv <- InputValidator$new(session)
+    iv$add_validator(child_iv)
+    shiny::isolate({
+      expect_true(iv$is_valid())
+    })
+    iv$add_rule("x", ~ "failure")
+    shiny::isolate({
+      expect_false(iv$is_valid())
+    })
+  })
+})
+
+test_that("only valid rule objects are accepted", {
+  session <- shiny::MockShinySession$new()
+  shiny::withReactiveDomain(session, {
+    iv <- InputValidator$new(session)
+    iv$add_rule("x", function(x) NULL)
+    iv$add_rule("x", ~ NULL)
+    expect_error(iv$add_rule("x", NULL))
+    expect_error(iv$add_rule("x", "string"))
+    expect_error(iv$add_rule("x", TRUE))
+  })
+})

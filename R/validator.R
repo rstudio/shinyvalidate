@@ -165,11 +165,12 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   almost never a reason to change this from the default.)
     add_rule = function(inputId, rule, ..., session. = shiny::getDefaultReactiveDomain()) {
       args <- rlang::list2(...)
-      if (is.null(rule)) {
-        rule <- function(value, ...) NULL
-      }
+
       if (inherits(rule, "formula")) {
         rule <- rlang::as_function(rule)
+      }
+      if (!is.function(rule)) {
+        stop("Invalid `rule` argument; a function or formula is expected")
       }
       applied_rule <- function(value) {
         # Do this instead of purrr::partial because purrr::partial doesn't
@@ -265,7 +266,10 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         
         try({
           result <- rule$rule(rule$session$input[[name]])
-          if (!is.null(result) && (!is.character(result) || length(result) != 1)) {
+          is_valid_result <- is.null(result) ||
+            (is.character(result) && length(result) == 1) ||
+            identical(force_success(), result)
+          if (!is_valid_result) {
             stop("Result of '", name, "' validation was not a single-character vector")
           }
           # Note that if there's an error in rule(), we won't get to the next
@@ -275,16 +279,29 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
               # Can't do results[[fullname]] <<- NULL, that just removes the element
               results <<- c(results, stats::setNames(list(NULL), fullname))
             }
+          } else if (identical(force_success(), result)) {
+            # Put a non-NULL, non-error value here to prevent remaining rules
+            # from executing
+            results[[fullname]] <<- TRUE
           } else {
             results[[fullname]] <<- list(type = "error", message = result)
           }
         })
       })
+      results[vapply(results, isTRUE, logical(1), USE.NAMES = FALSE)] <- NULL
       
       merge_results(dependency_results, results)
     }
   )
 )
+
+#' @export
+force_success <- local({
+  .force_success <- structure(list(), class = "shinyvalidate.force_success")
+  function() {
+    .force_success
+  }
+})
 
 # Combines two results lists (names are input IDs, values are NULL or a string).
 # We combine the two results lists by giving resultsA priority over resultsB,

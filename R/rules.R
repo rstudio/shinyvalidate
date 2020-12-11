@@ -60,6 +60,54 @@ sv_required <- function(message = "Required", test = shiny::isTruthy) {
   }
 }
 
+#' Indicate that a field is optional
+#'
+#' @description
+#' Call `sv_optional()` to generate a validation function that indicates an
+#' input is allowed to _not_ be present. If an `sv_optional()` rule sees that an
+#' input is not present, subsequent rules for that input are skipped and the
+#' input is considered valid. Otherwise, the rule simply passes.
+#' (`sv_optional()` will never return a validation error/message.)
+#' 
+#' By default, the definition of "is present" is based on [shiny::isTruthy()],
+#' which is the logic used by the [shiny::req()] function as well.
+#' 
+#' Child validators (see [`InputValidator$add_validator()`][InputValidator]) are
+#' not affected by `sv_optional()` rules in parent validators; only rules in the
+#' same validator instance as the `sv_optional()` will be skipped.
+#'
+#' @param test A single-argument function, or single-sided formula (using `.` to
+#'   access the value to test), that returns `TRUE` for success and `FALSE` for
+#'   failure.
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' 
+#'   iv <- InputValidator$new()
+#' 
+#'   # An email is not required, but if present, it must be valid
+#'   iv$add_rule("email", sv_optional())
+#'   iv$add_rule("email", ~ if (!is_valid_email(.)) "Please provide a valid email"))
+#' })
+#' @export
+sv_optional <- function(test = shiny::isTruthy) {
+  force(test)
+  
+  if (inherits(test, "formula")) {
+    test <- rlang::as_function(test)
+  }
+  
+  function(value) {
+    if (!test(value)) {
+      force_success() 
+    }
+  }
+}
+
 #' Validate that a field matches a regular expression
 #'
 #' A validation function, suitable for use with `InputValidator$add_rule()`,

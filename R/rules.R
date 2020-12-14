@@ -101,7 +101,7 @@ sv_optional <- function(test = input_provided) {
   
   function(value) {
     if (!test(value)) {
-      force_success() 
+      skip_validation() 
     }
   }
 }

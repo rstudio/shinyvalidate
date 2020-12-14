@@ -149,11 +149,11 @@ test_that("InputValidator$fields recurses over child validators", {
   })
 })
 
-test_that("force_success skips remaining rules", {
+test_that("`skip_validation()` succesfully skips remaining rules", {
   session <- shiny::MockShinySession$new()
   shiny::withReactiveDomain(session, {
     iv <- InputValidator$new(session)
-    iv$add_rule("x", ~ force_success())
+    iv$add_rule("x", ~ skip_validation())
     iv$add_rule("x", ~ "failure")
     shiny::isolate({
       expect_true(iv$is_valid())
@@ -161,11 +161,11 @@ test_that("force_success skips remaining rules", {
   })
 })
 
-test_that("force_success with child validators", {
+test_that("`skip_validation()` works with a child validators", {
   session <- shiny::MockShinySession$new()
   shiny::withReactiveDomain(session, {
     child_iv <- InputValidator$new(session)
-    child_iv$add_rule("x", ~ force_success())
+    child_iv$add_rule("x", ~ skip_validation())
     child_iv$add_rule("x", ~ "failure")
     shiny::isolate({
       expect_true(child_iv$is_valid())

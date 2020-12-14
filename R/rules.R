@@ -89,7 +89,7 @@ sv_required <- function(message = "Required", test = input_provided) {
 #' 
 #'   # An email is not required, but if present, it must be valid
 #'   iv$add_rule("email", sv_optional())
-#'   iv$add_rule("email", ~ if (!is_valid_email(.)) "Please provide a valid email"))
+#'   iv$add_rule("email", ~ if (!is_valid_email(.)) "Please provide a valid email")
 #' })
 #' @export
 sv_optional <- function(test = input_provided) {

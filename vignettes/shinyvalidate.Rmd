@@ -72,17 +72,42 @@ The most important part of the code above is the expression of validation rules 
 
 The `rule` argument can take various forms:
 
-### Rules from helper functions
+### `sv_required()`/`sv_optional()`
 
-For maximum convenience, shinyvalidate comes with a few helper functions that implement common validation rules. The [`sv_required`](https://rstudio.github.io/shinyvalidate/reference/sv_required.html) helper is likely to be the one you reach for most often:
+The first rule you'll need to add for each input is either [`sv_required()`](https://rstudio.github.io/shinyvalidate/reference/sv_required.html) or [`sv_optional()`](https://rstudio.github.io/shinyvalidate/reference/sv_optional.html).
+
+The `sv_required` helper is likely to be the one you reach for most often:
 
 ``` {.r}
 iv$add_rule("title", sv_required(message = "Title must be provided"))
 ```
 
+This rule will cause a validation failure if the user does not provide a value for `input$title`.
+
 The `message` argument is optional; if you omit it, the default message is simply "Required". Keep in mind that validation error messages will be displayed next to the erroneous input, so it's generally not strictly necessary for the error message to spell out which input it refers to.
 
-Currently, shinyvalidate provides only a handful of validation helper functions. Besides `sv_required`, there's also [`sv_numeric`](https://rstudio.github.io/shinyvalidate/reference/sv_numeric.html), [`sv_integer`](https://rstudio.github.io/shinyvalidate/reference/sv_numeric.html), and [`sv_regex`](https://rstudio.github.io/shinyvalidate/reference/sv_regex.html); see their help topics for more information.
+The `sv_optional()` helper is used when an input is not required, but when it is provided, it needs to be validated by subsequent rules. For example, if an email is not required:
+
+``` {.r}
+iv$add_rule("email", sv_optional())
+iv$add_rule("email", ~ if (!is_valid_email(.)) "Invalid email address")
+```
+
+If `sv_optional()` detects that an input was not provided, it causes remaining tests for that input to be skipped. In the example above, if the user does not provide a value for `input$email`, the input will be considered valid; but if they do provide an `input$email`, the input will be checked against `is_valid_email()` to determine validity.
+
+<!-- TODO: change the above when `sv_valid_email()` is available -->
+
+Because `sv_optional()` only causes _subsequent_ rules to be skipped, order matters; be sure to add `sv_optional()` before any other rules for the same input.
+
+### Rules from helper functions
+
+shinyvalidate comes with a few helper functions that implement common validation rules.
+
+* [`sv_numeric`](https://rstudio.github.io/shinyvalidate/reference/sv_numeric.html)
+* [`sv_integer`](https://rstudio.github.io/shinyvalidate/reference/sv_numeric.html)
+* [`sv_regex`](https://rstudio.github.io/shinyvalidate/reference/sv_regex.html)
+
+<!-- TODO: add more, and have an example or two -->
 
 ### Rules as formulas
 

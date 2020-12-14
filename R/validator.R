@@ -315,3 +315,56 @@ merge_results <- function(resultsA, resultsB) {
   results <- results[!duplicated(names(results))]
   results
 }
+
+#' Determine whether a field has a value that can be validated
+#' 
+#' This function is based on [shiny::isTruthy()] but tweaked here in
+#' **shinyvalidate** to better embody the idea that a value should be available
+#' (i.e., not `NULL`) and it should be in a form that is reasonable to validate.
+#' 
+#' @param val Values to test for availability in a Shiny context.
+#' 
+#' @return A logical vector of length 1.
+#' 
+#' @details 
+#' `input_provided` returns `TRUE` for all values except:
+#' 
+#' * `NULL`
+#' * `""`
+#' * An empty atomic vector or list
+#' * An atomic vector that contains only missing values
+#' * A character vector that contains only missing and/or `""` values
+#' * An object of class `"try-error"`
+#' * A value that represents an unclicked [shiny::actionButton()]
+#' 
+#' @export
+input_provided <- function(val) {
+  
+  # The reason this differs from shiny::isTruthy is because isTruthy is more
+  # about "is the value present and true?", so e.g. a reactive that requires a
+  # checkbox to be checked can just use req(input$checkbox1). For validation
+  # purposes, we're only interested in whether an input was provided at all.
+  #
+  # Specific differences:
+  # * FALSE (or a logical vector containing only FALSEs) is not truthy, but it
+  #   is provided.
+  
+  if (inherits(val, 'try-error'))
+    return(FALSE)
+  
+  if (!is.atomic(val))
+    return(TRUE)
+  
+  if (is.null(val))
+    return(FALSE)
+  if (length(val) == 0)
+    return(FALSE)
+  if (all(is.na(val)))
+    return(FALSE)
+  if (is.character(val) && !any(nzchar(stats::na.omit(val))))
+    return(FALSE)
+  if (inherits(val, 'shinyActionButtonValue') && val == 0)
+    return(FALSE)
+  
+  TRUE
+}

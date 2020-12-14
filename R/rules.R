@@ -14,8 +14,7 @@
 #'
 #' Call `sv_required()` to generate a validation function that ensures an input
 #' value is present. By default, the definition of "is present" is based on
-#' [shiny::isTruthy()], which is the logic used by the [shiny::req()] function
-#' as well.
+#' [input_provided()].
 #'
 #' @param message The validation error message to be displayed if the test does
 #'   not pass.
@@ -45,7 +44,7 @@
 #'
 #' })
 #' @export
-sv_required <- function(message = "Required", test = shiny::isTruthy) {
+sv_required <- function(message = "Required", test = input_provided) {
   force(message)
   force(test)
   
@@ -68,9 +67,8 @@ sv_required <- function(message = "Required", test = shiny::isTruthy) {
 #' input is not present, subsequent rules for that input are skipped and the
 #' input is considered valid. Otherwise, the rule simply passes.
 #' (`sv_optional()` will never return a validation error/message.)
-#' 
-#' By default, the definition of "is present" is based on [shiny::isTruthy()],
-#' which is the logic used by the [shiny::req()] function as well.
+#'
+#' By default, the definition of "is present" is based on [input_provided()].
 #' 
 #' Child validators (see [`InputValidator$add_validator()`][InputValidator]) are
 #' not affected by `sv_optional()` rules in parent validators; only rules in the
@@ -94,7 +92,7 @@ sv_required <- function(message = "Required", test = shiny::isTruthy) {
 #'   iv$add_rule("email", ~ if (!is_valid_email(.)) "Please provide a valid email"))
 #' })
 #' @export
-sv_optional <- function(test = shiny::isTruthy) {
+sv_optional <- function(test = input_provided) {
   force(test)
   
   if (inherits(test, "formula")) {

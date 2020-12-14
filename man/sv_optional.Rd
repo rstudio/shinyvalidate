@@ -4,7 +4,7 @@
 \alias{sv_optional}
 \title{Indicate that a field is optional}
 \usage{
-sv_optional(test = shiny::isTruthy)
+sv_optional(test = input_provided)
 }
 \arguments{
 \item{test}{A single-argument function, or single-sided formula (using \code{.} to
@@ -22,8 +22,7 @@ input is not present, subsequent rules for that input are skipped and the
 input is considered valid. Otherwise, the rule simply passes.
 (\code{sv_optional()} will never return a validation error/message.)
 
-By default, the definition of "is present" is based on \code{\link[shiny:req]{shiny::isTruthy()}},
-which is the logic used by the \code{\link[shiny:req]{shiny::req()}} function as well.
+By default, the definition of "is present" is based on \code{\link[=input_provided]{input_provided()}}.
 
 Child validators (see \code{\link[=InputValidator]{InputValidator$add_validator()}}) are
 not affected by \code{sv_optional()} rules in parent validators; only rules in the

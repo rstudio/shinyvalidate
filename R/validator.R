@@ -268,7 +268,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
           result <- rule$rule(rule$session$input[[name]])
           is_valid_result <- is.null(result) ||
             (is.character(result) && length(result) == 1) ||
-            identical(force_success(), result)
+            identical(skip_validation(), result)
           if (!is_valid_result) {
             stop("Result of '", name, "' validation was not a single-character vector")
           }
@@ -279,9 +279,9 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
               # Can't do results[[fullname]] <<- NULL, that just removes the element
               results <<- c(results, stats::setNames(list(NULL), fullname))
             }
-          } else if (identical(force_success(), result)) {
+          } else if (identical(skip_validation(), result)) {
             # Put a non-NULL, non-error value here to prevent remaining rules
-            # from executing
+            # from executing (i.e., skipping validation steps)
             results[[fullname]] <<- TRUE
           } else {
             results[[fullname]] <<- list(type = "error", message = result)
@@ -295,11 +295,14 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
   )
 )
 
+# TODO: rename to skip_validation
+# TODO: add documentation for exported function
+
 #' @export
-force_success <- local({
-  .force_success <- structure(list(), class = "shinyvalidate.force_success")
+skip_validation <- local({
+  .skip_validation <- structure(list(), class = "shinyvalidate.skip_validation")
   function() {
-    .force_success
+    .skip_validation
   }
 })
 

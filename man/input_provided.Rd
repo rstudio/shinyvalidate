@@ -22,7 +22,7 @@ This function is based on \code{\link[shiny:req]{shiny::isTruthy()}} but tweaked
 \itemize{
 \item \code{NULL}
 \item \code{""}
-\item An empty atomic vector
+\item An empty atomic vector or list
 \item An atomic vector that contains only missing values
 \item A character vector that contains only missing and/or \code{""} values
 \item An object of class \code{"try-error"}

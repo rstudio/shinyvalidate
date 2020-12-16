@@ -282,7 +282,7 @@ sv_integer <- function(message = "An integer is required",
 #' @param allow_na,allow_nan If `FALSE` (the default for both options), then any
 #'   `NA` or `NaN` element will cause validation to fail.
 #' @param message The validation error message to use if a value fails to match
-#'   the rule. By default, this is generic message provided by **shinyvalidate**
+#'   the rule. By default, this is generic message provided by shinyvalidate
 #'   but a custom message can be provided here.
 #'
 #' @return A function suitable for using as an

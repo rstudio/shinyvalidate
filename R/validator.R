@@ -336,26 +336,36 @@ merge_results <- function(resultsA, resultsB) {
   results
 }
 
-#' Determine whether a field has a value that can be validated
+#' Check whether an input value has been provided
 #' 
-#' This function is based on [shiny::isTruthy()] but tweaked here in
-#' **shinyvalidate** to better embody the idea that a value should be available
-#' (i.e., not `NULL`) and it should be in a form that is reasonable to validate.
+#' @description
+#' This function takes an input value and uses heuristics to guess whether it
+#' represents an "empty" input vs. one that the user has provided. This will
+#' vary by input type; for example, a [shiny::textInput()] is `""` when empty,
+#' while a [shiny::numericInput()] is `NA`.
+#' 
+#' `input_provided` returns `TRUE` for all values except:
+#' 
+#' * `NULL`
+#' * `""`
+#' * An empty atomic vector or list
+#' * An atomic vector that contains only missing (`NA`) values
+#' * A character vector that contains only missing and/or `""` values
+#' * An object of class `"try-error"`
+#' * A value that represents an unclicked [shiny::actionButton()]
+#' 
 #' 
 #' @param val Values to test for availability in a Shiny context.
 #' 
 #' @return A logical vector of length 1.
 #' 
 #' @details 
-#' `input_provided` returns `TRUE` for all values except:
-#' 
-#' * `NULL`
-#' * `""`
-#' * An empty atomic vector or list
-#' * An atomic vector that contains only missing values
-#' * A character vector that contains only missing and/or `""` values
-#' * An object of class `"try-error"`
-#' * A value that represents an unclicked [shiny::actionButton()]
+#' This function is based on [shiny::isTruthy()] but tweaked here in
+#' shinyvalidate to change the treatment of `FALSE` values: `isTruthy(FALSE)`
+#' returns `FALSE`, but `input_provided(FALSE)` returns `TRUE`. This difference
+#' is motivated by `shiny::checkboxInput()`, where `isTruthy()` answers the
+#' question of "is the input present _and checked_" while `input_provided` is
+#' just "is the input present".
 #' 
 #' @export
 input_provided <- function(val) {

@@ -195,3 +195,22 @@ test_that("only valid rule objects are accepted", {
     expect_error(iv$add_rule("x", TRUE))
   })
 })
+
+test_that("errors are correctly handled", {
+  session <- shiny::MockShinySession$new()
+  shiny::withReactiveDomain(session, {
+    iv <- InputValidator$new(session)
+    iv$add_rule("a", ~ stop("normal error"))
+    iv$add_rule("b", ~ stop(shiny::safeError("safe error")))
+    iv$add_rule("c", ~ shiny::req(FALSE))
+    shiny::isolate({
+      suppressWarnings(expect_warning(res <- iv$validate()))
+      expect_snapshot_output(res)
+      
+      op <- options(shiny.sanitize.errors = TRUE)
+      on.exit(options(op), add = TRUE)
+      suppressWarnings(expect_warning(res <- iv$validate()))
+      expect_snapshot_output(res)
+    })
+  })
+})

@@ -265,34 +265,45 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         # by an earlier rule for this input
         if (!is.null(results[[fullname]])) return()
         
-        try({
-          result <- rule$rule(rule$session$input[[name]])
-          # Validation rules are required to return one of the following:
-          # * NULL: the value has passed the validation rule
-          # * character(1): the rule didn't pass validation
-          # * skip_validation(): the value has passed and subsequent rules
-          #   should be skipped
-          is_valid_result <- is.null(result) ||
-            (is.character(result) && length(result) == 1) ||
-            identical(skip_validation(), result)
-          if (!is_valid_result) {
-            stop("Result of '", name, "' validation was not a single-character vector")
-          }
-          # Note that if there's an error in rule(), we won't get to the next
-          # line
-          if (is.null(result)) {
-            if (!fullname %in% names(results)) {
-              # Can't do results[[fullname]] <<- NULL, that just removes the element
-              results <<- c(results, stats::setNames(list(NULL), fullname))
+        result <- tryCatch(
+          shiny::withLogErrors(rule$rule(rule$session$input[[name]])),
+          shiny.silent.error = function(e) {
+            "An unexpected error occurred during input validation"
+          },
+          error = function(e) {
+            if (inherits(e, "shiny.custom.error") || !isTRUE(getOption("shiny.sanitize.errors", FALSE))) {
+              paste0("An unexpected error occurred during input validation: ",
+                     conditionMessage(e))
+            } else {
+              "An unexpected error occurred during input validation"
             }
-          } else if (identical(skip_validation(), result)) {
-            # Put a non-NULL, non-error value here to prevent remaining rules
-            # from executing (i.e., skipping validation steps)
-            results[[fullname]] <<- TRUE
-          } else {
-            results[[fullname]] <<- list(type = "error", message = result)
           }
-        })
+        )
+        # Validation rules are required to return one of the following:
+        # * NULL: the value has passed the validation rule
+        # * character(1): the rule didn't pass validation
+        # * skip_validation(): the value has passed and subsequent rules
+        #   should be skipped
+        is_valid_result <- is.null(result) ||
+          (is.character(result) && length(result) == 1) ||
+          identical(skip_validation(), result)
+        if (!is_valid_result) {
+          stop("Result of '", name, "' validation was not a single-character vector")
+        }
+        # Note that if there's an error in rule(), we won't get to the next
+        # line
+        if (is.null(result)) {
+          if (!fullname %in% names(results)) {
+            # Can't do results[[fullname]] <<- NULL, that just removes the element
+            results <<- c(results, stats::setNames(list(NULL), fullname))
+          }
+        } else if (identical(skip_validation(), result)) {
+          # Put a non-NULL, non-error value here to prevent remaining rules
+          # from executing (i.e., skipping validation steps)
+          results[[fullname]] <<- TRUE
+        } else {
+          results[[fullname]] <<- list(type = "error", message = result)
+        }
       })
       # Change all TRUE entries to NULL. We have to use list(NULL) instead of
       # NULL because the latter would simply remove these entries from the list.

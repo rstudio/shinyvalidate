@@ -261,11 +261,17 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       results <- list()
       mapply(names(private$rules()), private$rules(), FUN = function(name, rule) {
         fullname <- rule$session$ns(name)
-        # Short-circuit if already errored
+        # Short-circuit if already errored or if skip_validation() was returned
+        # by an earlier rule for this input
         if (!is.null(results[[fullname]])) return()
         
         try({
           result <- rule$rule(rule$session$input[[name]])
+          # Validation rules are required to return one of the following:
+          # * NULL: the value has passed the validation rule
+          # * character(1): the rule didn't pass validation
+          # * skip_validation(): the value has passed and subsequent rules
+          #   should be skipped
           is_valid_result <- is.null(result) ||
             (is.character(result) && length(result) == 1) ||
             identical(skip_validation(), result)
@@ -288,7 +294,11 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
           }
         })
       })
-      results[vapply(results, isTRUE, logical(1), USE.NAMES = FALSE)] <- NULL
+      # Change all TRUE entries to NULL. We have to use list(NULL) instead of
+      # NULL because the latter would simply remove these entries from the list.
+      # The effect of list(NULL) is correct though, you end up with NULL entries
+      # and not list(NULL) entries.
+      results[vapply(results, isTRUE, logical(1), USE.NAMES = FALSE)] <- list(NULL)
       
       merge_results(dependency_results, results)
     }

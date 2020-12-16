@@ -157,6 +157,7 @@ test_that("`skip_validation()` succesfully skips remaining rules", {
     iv$add_rule("x", ~ "failure")
     shiny::isolate({
       expect_true(iv$is_valid())
+      expect_identical(iv$validate(), rlang::list2(!!session$ns("x") := NULL))
     })
   })
 })

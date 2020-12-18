@@ -12,7 +12,7 @@ that any further validation rules for an input are to be skipped.
 }
 \description{
 While the predominant role of the \code{skip_validation()} function is tied to the
-\code{\link[=sv_optional]{sv_optional()}} function (where it's used internally), one can directly use
-\code{skip_validation()} as part of a rule for an input. When used, all subsequent
-validation rules defined for the input will be skipped.
+\code{\link[=sv_optional]{sv_optional()}} function (where it's used internally), you can also return
+\code{skip_validation()} from custom validation rules. When returned, all
+subsequent validation rules defined for the input will be skipped.
 }

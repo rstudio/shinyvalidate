@@ -149,7 +149,7 @@ test_that("InputValidator$fields recurses over child validators", {
   })
 })
 
-test_that("`skip_validation()` succesfully skips remaining rules", {
+test_that("`skip_validation()` successfully skips remaining rules", {
   session <- shiny::MockShinySession$new()
   shiny::withReactiveDomain(session, {
     iv <- InputValidator$new(session)
@@ -162,7 +162,7 @@ test_that("`skip_validation()` succesfully skips remaining rules", {
   })
 })
 
-test_that("`skip_validation()` works with a child validators", {
+test_that("`skip_validation()` works with a child validator", {
   session <- shiny::MockShinySession$new()
   shiny::withReactiveDomain(session, {
     child_iv <- InputValidator$new(session)

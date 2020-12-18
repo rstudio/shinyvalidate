@@ -319,8 +319,8 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
 #' Skip any normal validation performed by a rule
 #' 
 #' While the predominant role of the `skip_validation()` function is tied to the
-#' [sv_optional()] function (where it's used internally), one can directly use
-#' `skip_validation()` as part of a rule for an input. When used, all subsequent
+#' [sv_optional()] function (where it's used internally), you can also return
+#' `skip_validation()` from custom validation rules. When returned, all subsequent
 #' validation rules defined for the input will be skipped.
 #' 
 #' @return A function that returns a sentinel value, signaling to shinyvalidate

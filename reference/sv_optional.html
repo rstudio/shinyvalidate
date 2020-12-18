@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Validate that a field matches a regular expression — sv_regex • shinyvalidate</title>
+<title>Indicate that a field is optional — sv_optional • shinyvalidate</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,16 @@
 
 
 
-<meta property="og:title" content="Validate that a field matches a regular expression — sv_regex" />
-<meta property="og:description" content="A validation function, suitable for use with InputValidator$add_rule(),
-that checks whether input values match the specified regular expression." />
+<meta property="og:title" content="Indicate that a field is optional — sv_optional" />
+<meta property="og:description" content="Call sv_optional() to generate a validation function that indicates an
+input is allowed to not be present. If an sv_optional() rule sees that an
+input is not present, subsequent rules for that input are skipped and the
+input is considered valid. Otherwise, the rule simply passes.
+(sv_optional() will never return a validation error/message.)
+By default, the definition of &quot;is present&quot; is based on input_provided().
+Child validators (see InputValidator$add_validator()) are
+not affected by sv_optional() rules in parent validators; only rules in the
+same validator instance as the sv_optional() will be skipped." />
 
 
 
@@ -127,43 +134,33 @@ that checks whether input values match the specified regular expression." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Validate that a field matches a regular expression</h1>
+    <h1>Indicate that a field is optional</h1>
     <small class="dont-index">Source: <a href='https://github.com/rstudio/shinyvalidate/blob/master/R/rules.R'><code>R/rules.R</code></a></small>
-    <div class="hidden name"><code>sv_regex.Rd</code></div>
+    <div class="hidden name"><code>sv_optional.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>A validation function, suitable for use with <code>InputValidator$add_rule()</code>,
-that checks whether input values match the specified regular expression.</p>
+    <p>Call <code>sv_optional()</code> to generate a validation function that indicates an
+input is allowed to <em>not</em> be present. If an <code>sv_optional()</code> rule sees that an
+input is not present, subsequent rules for that input are skipped and the
+input is considered valid. Otherwise, the rule simply passes.
+(<code>sv_optional()</code> will never return a validation error/message.)</p>
+<p>By default, the definition of "is present" is based on <code><a href='input_provided.html'>input_provided()</a></code>.</p>
+<p>Child validators (see <code><a href='InputValidator.html'>InputValidator$add_validator()</a></code>) are
+not affected by <code>sv_optional()</code> rules in parent validators; only rules in the
+same validator instance as the <code>sv_optional()</code> will be skipped.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sv_regex</span><span class='op'>(</span>
-  <span class='va'>pattern</span>,
-  <span class='va'>message</span>,
-  ignore.case <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  perl <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  fixed <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  useBytes <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  invert <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sv_optional</span><span class='op'>(</span>test <span class='op'>=</span> <span class='va'>input_provided</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>pattern</th>
-      <td><p>Character string containing a regular expression (or character
-string if <code>fixed = TRUE</code>) to be tested against. If a character vector of
-length 2 or more is supplied, the first element is used with a warning.</p></td>
-    </tr>
-    <tr>
-      <th>message</th>
-      <td><p>The validation error message to use if a value fails to match
-the pattern.</p></td>
-    </tr>
-    <tr>
-      <th>ignore.case, perl, fixed, useBytes, invert</th>
-      <td><p>Passed through to <code><a href='https://rdrr.io/r/base/grep.html'>base::grepl()</a></code>.</p></td>
+      <th>test</th>
+      <td><p>A single-argument function, or single-sided formula (using <code>.</code> to
+access the value to test), that returns <code>TRUE</code> for success and <code>FALSE</code> for
+failure.</p></td>
     </tr>
     </table>
 
@@ -179,20 +176,10 @@ the pattern.</p></td>
 
   <span class='va'>iv</span> <span class='op'>&lt;-</span> <span class='va'><a href='InputValidator.html'>InputValidator</a></span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='op'>)</span>
 
-  <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"lookup_id"</span>,
-    <span class='fu'>sv_regex</span><span class='op'>(</span><span class='st'>"^[a-zA-Z0-9]$"</span>, <span class='st'>"Only alphanumeric characters are allowed"</span><span class='op'>)</span>
-  <span class='op'>)</span>
-
-  <span class='co'># If you're more comfortable with wildcards than regex, use glob2rx</span>
-  <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"image_filename"</span>,
-    <span class='fu'>sv_regex</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/utils/glob2rx.html'>glob2rx</a></span><span class='op'>(</span><span class='st'>"*.png"</span><span class='op'>)</span>,
-      message <span class='op'>=</span> <span class='st'>"A filename ending in png was expected"</span>,
-      ignore.case <span class='op'>=</span> <span class='cn'>TRUE</span>
-    <span class='op'>)</span>
-  <span class='op'>)</span>
-
+  <span class='co'># An email is not required, but if present, it must be valid</span>
+  <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"email"</span>, <span class='fu'>sv_optional</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"email"</span>, <span class='op'>~</span> <span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'>is_valid_email</span><span class='op'>(</span><span class='va'>.</span><span class='op'>)</span><span class='op'>)</span> <span class='st'>"Please provide a valid email"</span><span class='op'>)</span>
 <span class='op'>}</span><span class='op'>)</span>
-
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

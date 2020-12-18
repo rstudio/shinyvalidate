@@ -26,7 +26,7 @@ are by default are inclusive, using \code{c(TRUE, TRUE)}.}
 \code{NA} or \code{NaN} element will cause validation to fail.}
 
 \item{message}{The validation error message to use if a value fails to match
-the rule. By default, this is generic message provided by \strong{shinyvalidate}
+the rule. By default, this is generic message provided by shinyvalidate
 but a custom message can be provided here.}
 }
 \value{

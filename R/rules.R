@@ -112,8 +112,6 @@ sv_regex <- function(pattern,
   force(useBytes)
   force(invert)
   
-  # TODO: include a `message` value in the signature
-  
   function(value) {
     result <- grepl(pattern, value, ignore.case = ignore.case, perl = perl,
       fixed = fixed, useBytes = useBytes)

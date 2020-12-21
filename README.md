@@ -58,7 +58,7 @@ To learn about other features of shinyvalidate, including deferred validation, p
 
 ## Input widget compatibility
 
-shinyvalidate should work with all of the inputs that are included in Shiny. It will also work with most custom inputs that follow Bootstrap 3 conventions. Other types of custom inputs can include their own logic for displaying shinyvalidate error messages; see the (TODO) article to learn more.
+shinyvalidate should work with all of the inputs that are included in Shiny. It will also work with most custom inputs that follow Bootstrap 3 or 4 conventions. Other types of custom inputs can include their own logic for displaying shinyvalidate error messages; see the article [_Displaying validation errors_](https://rstudio.github.io/shinyvalidate/articles/displaying.html) to learn more.
 
 ## Prior art
 

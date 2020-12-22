@@ -148,3 +148,69 @@ test_that("InputValidator$fields recurses over child validators", {
     })
   })
 })
+
+test_that("`skip_validation()` successfully skips remaining rules", {
+  session <- shiny::MockShinySession$new()
+  shiny::withReactiveDomain(session, {
+    iv <- InputValidator$new(session)
+    iv$add_rule("x", ~ skip_validation())
+    iv$add_rule("x", ~ "failure")
+    shiny::isolate({
+      expect_true(iv$is_valid())
+      expect_identical(iv$validate(), rlang::list2(!!session$ns("x") := NULL))
+    })
+  })
+})
+
+test_that("`skip_validation()` works with a child validator", {
+  session <- shiny::MockShinySession$new()
+  shiny::withReactiveDomain(session, {
+    child_iv <- InputValidator$new(session)
+    child_iv$add_rule("x", ~ skip_validation())
+    child_iv$add_rule("x", ~ "failure")
+    shiny::isolate({
+      expect_true(child_iv$is_valid())
+    })
+    
+    iv <- InputValidator$new(session)
+    iv$add_validator(child_iv)
+    shiny::isolate({
+      expect_true(iv$is_valid())
+    })
+    iv$add_rule("x", ~ "failure")
+    shiny::isolate({
+      expect_false(iv$is_valid())
+    })
+  })
+})
+
+test_that("only valid rule objects are accepted", {
+  session <- shiny::MockShinySession$new()
+  shiny::withReactiveDomain(session, {
+    iv <- InputValidator$new(session)
+    iv$add_rule("x", function(x) NULL)
+    iv$add_rule("x", ~ NULL)
+    expect_error(iv$add_rule("x", NULL))
+    expect_error(iv$add_rule("x", "string"))
+    expect_error(iv$add_rule("x", TRUE))
+  })
+})
+
+test_that("errors are correctly handled", {
+  session <- shiny::MockShinySession$new()
+  shiny::withReactiveDomain(session, {
+    iv <- InputValidator$new(session)
+    iv$add_rule("a", ~ stop("normal error"))
+    iv$add_rule("b", ~ stop(shiny::safeError("safe error")))
+    iv$add_rule("c", ~ shiny::req(FALSE))
+    shiny::isolate({
+      suppressWarnings(expect_warning(res <- iv$validate()))
+      expect_snapshot_output(res)
+      
+      op <- options(shiny.sanitize.errors = TRUE)
+      on.exit(options(op), add = TRUE)
+      suppressWarnings(expect_warning(res <- iv$validate()))
+      expect_snapshot_output(res)
+    })
+  })
+})

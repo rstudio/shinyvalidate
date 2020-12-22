@@ -165,11 +165,12 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   almost never a reason to change this from the default.)
     add_rule = function(inputId, rule, ..., session. = shiny::getDefaultReactiveDomain()) {
       args <- rlang::list2(...)
-      if (is.null(rule)) {
-        rule <- function(value, ...) NULL
-      }
+
       if (inherits(rule, "formula")) {
         rule <- rlang::as_function(rule)
+      }
+      if (!is.function(rule)) {
+        stop("Invalid `rule` argument; a function or formula is expected")
       }
       applied_rule <- function(value) {
         # Do this instead of purrr::partial because purrr::partial doesn't
@@ -260,31 +261,78 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       results <- list()
       mapply(names(private$rules()), private$rules(), FUN = function(name, rule) {
         fullname <- rule$session$ns(name)
-        # Short-circuit if already errored
+        # Short-circuit if already errored or if skip_validation() was returned
+        # by an earlier rule for this input
         if (!is.null(results[[fullname]])) return()
         
-        try({
-          result <- rule$rule(rule$session$input[[name]])
-          if (!is.null(result) && (!is.character(result) || length(result) != 1)) {
-            stop("Result of '", name, "' validation was not a single-character vector")
-          }
-          # Note that if there's an error in rule(), we won't get to the next
-          # line
-          if (is.null(result)) {
-            if (!fullname %in% names(results)) {
-              # Can't do results[[fullname]] <<- NULL, that just removes the element
-              results <<- c(results, stats::setNames(list(NULL), fullname))
+        result <- tryCatch(
+          shiny::withLogErrors(rule$rule(rule$session$input[[name]])),
+          shiny.silent.error = function(e) {
+            "An unexpected error occurred during input validation"
+          },
+          error = function(e) {
+            if (inherits(e, "shiny.custom.error") || !isTRUE(getOption("shiny.sanitize.errors", FALSE))) {
+              paste0("An unexpected error occurred during input validation: ",
+                     conditionMessage(e))
+            } else {
+              "An unexpected error occurred during input validation"
             }
-          } else {
-            results[[fullname]] <<- list(type = "error", message = result)
           }
-        })
+        )
+        # Validation rules are required to return one of the following:
+        # * NULL: the value has passed the validation rule
+        # * character(1): the rule didn't pass validation
+        # * skip_validation(): the value has passed and subsequent rules
+        #   should be skipped
+        is_valid_result <- is.null(result) ||
+          (is.character(result) && length(result) == 1) ||
+          identical(skip_validation(), result)
+        if (!is_valid_result) {
+          stop("Result of '", name, "' validation was not a single-character vector (actual class: ", class(result)[1], ")")
+        }
+        # Note that if there's an error in rule(), we won't get to the next
+        # line
+        if (is.null(result)) {
+          if (!fullname %in% names(results)) {
+            # Can't do results[[fullname]] <<- NULL, that just removes the element
+            results <<- c(results, stats::setNames(list(NULL), fullname))
+          }
+        } else if (identical(skip_validation(), result)) {
+          # Put a non-NULL, non-error value here to prevent remaining rules
+          # from executing (i.e., skipping validation steps)
+          results[[fullname]] <<- TRUE
+        } else {
+          results[[fullname]] <<- list(type = "error", message = result)
+        }
       })
+      # Change all TRUE entries to NULL. We have to use list(NULL) instead of
+      # NULL because the latter would simply remove these entries from the list.
+      # The effect of list(NULL) is correct though, you end up with NULL entries
+      # and not list(NULL) entries.
+      results[vapply(results, isTRUE, logical(1), USE.NAMES = FALSE)] <- list(NULL)
       
       merge_results(dependency_results, results)
     }
   )
 )
+
+#' Skip any normal validation performed by a rule
+#'
+#' While the predominant role of the `skip_validation()` function is tied to the
+#' [sv_optional()] function (where it's used internally), you can also return
+#' `skip_validation()` from custom validation rules. When returned, all
+#' subsequent validation rules defined for the input will be skipped.
+#'
+#' @return A function that returns a sentinel value, signaling to shinyvalidate
+#'   that any further validation rules for an input are to be skipped.
+#'
+#' @export
+skip_validation <- local({
+  .skip_validation <- structure(list(), class = "shinyvalidate.skip_validation")
+  function() {
+    .skip_validation
+  }
+})
 
 # Combines two results lists (names are input IDs, values are NULL or a string).
 # We combine the two results lists by giving resultsA priority over resultsB,
@@ -297,4 +345,67 @@ merge_results <- function(resultsA, resultsB) {
   results <- results[c(which(has_error), which(!has_error))]
   results <- results[!duplicated(names(results))]
   results
+}
+
+#' Check whether an input value has been provided
+#' 
+#' @description
+#' This function takes an input value and uses heuristics to guess whether it
+#' represents an "empty" input vs. one that the user has provided. This will
+#' vary by input type; for example, a [shiny::textInput()] is `""` when empty,
+#' while a [shiny::numericInput()] is `NA`.
+#' 
+#' `input_provided` returns `TRUE` for all values except:
+#' 
+#' * `NULL`
+#' * `""`
+#' * An empty atomic vector or list
+#' * An atomic vector that contains only missing (`NA`) values
+#' * A character vector that contains only missing and/or `""` values
+#' * An object of class `"try-error"`
+#' * A value that represents an unclicked [shiny::actionButton()]
+#' 
+#' 
+#' @param val Values to test for availability in a Shiny context.
+#' 
+#' @return A logical vector of length 1.
+#' 
+#' @details 
+#' This function is based on [shiny::isTruthy()] but tweaked here in
+#' shinyvalidate to change the treatment of `FALSE` values: `isTruthy(FALSE)`
+#' returns `FALSE`, but `input_provided(FALSE)` returns `TRUE`. This difference
+#' is motivated by `shiny::checkboxInput()`, where `isTruthy()` answers the
+#' question of "is the input present _and checked_" while `input_provided` is
+#' just "is the input present".
+#' 
+#' @export
+input_provided <- function(val) {
+  
+  # The reason this differs from shiny::isTruthy is because isTruthy is more
+  # about "is the value present and true?", so e.g. a reactive that requires a
+  # checkbox to be checked can just use req(input$checkbox1). For validation
+  # purposes, we're only interested in whether an input was provided at all.
+  #
+  # Specific differences:
+  # * FALSE (or a logical vector containing only FALSEs) is not truthy, but it
+  #   is provided.
+  
+  if (inherits(val, 'try-error'))
+    return(FALSE)
+  
+  if (!is.atomic(val))
+    return(TRUE)
+  
+  if (is.null(val))
+    return(FALSE)
+  if (length(val) == 0)
+    return(FALSE)
+  if (all(is.na(val)))
+    return(FALSE)
+  if (is.character(val) && !any(nzchar(stats::na.omit(val))))
+    return(FALSE)
+  if (inherits(val, 'shinyActionButtonValue') && val == 0)
+    return(FALSE)
+  
+  TRUE
 }

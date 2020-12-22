@@ -1,8 +1,9 @@
 Package: shinyvalidate
 Title: Input validation for Shiny apps
-Version: 0.0.0.9001
+Version: 0.0.0.9002
 Authors@R: c(
-    person("Joe", "Cheng", , "joe@rstudio.com", c("aut", "cre")),
+    person("Rich", "Iannone", , "rich@rstudio.com", c("aut", "cre")),
+    person("Joe", "Cheng", , "joe@rstudio.com", c("aut")),
     person(family = "RStudio", role = c("cph", "fnd"))
     )
 Description: Improves the user experience of Shiny apps by helping to
@@ -29,3 +30,4 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+Config/testthat/edition: 3

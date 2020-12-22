@@ -14,8 +14,7 @@
 #'
 #' Call `sv_required()` to generate a validation function that ensures an input
 #' value is present. By default, the definition of "is present" is based on
-#' [shiny::isTruthy()], which is the logic used by the [shiny::req()] function
-#' as well.
+#' [input_provided()].
 #'
 #' @param message The validation error message to be displayed if the test does
 #'   not pass.
@@ -29,34 +28,80 @@
 #' # Ignore withReactiveDomain(), it's just required to get this example to run
 #' # outside of Shiny
 #' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
-#' 
+#'
 #'   iv <- InputValidator$new()
-#' 
+#'
 #'   # Basic usage: ensure that `input$title` is present, and return a terse
 #'   # validation message if not
 #'   iv$add_rule("title", sv_required())
-#' 
+#'
 #'   # You can easily provide a custom message to display
 #'   iv$add_rule("email", sv_required("An email is required"))
-#' 
+#'
 #'   # Provide a `test` argument to change the definition of "is present";
 #'   # in this example, any non-NULL value will be accepted.
 #'   iv$add_rule("choices", sv_required(test = is.null))
 #' })
-#' 
+#'
 #' @export
-sv_required <- function(message = "Required",
-                        test = shiny::isTruthy) {
+sv_required <- function(message = "Required", test = input_provided) {
   force(message)
   force(test)
-  
+
   if (inherits(test, "formula")) {
     test <- rlang::as_function(test)
   }
-  
+
   function(value) {
     if (!test(value)) {
       message
+    }
+  }
+}
+
+#' Indicate that a field is optional
+#'
+#' @description
+#' Call `sv_optional()` to generate a validation function that indicates an
+#' input is allowed to _not_ be present. If an `sv_optional()` rule sees that an
+#' input is not present, subsequent rules for that input are skipped and the
+#' input is considered valid. Otherwise, the rule simply passes.
+#' (`sv_optional()` will never return a validation error/message.)
+#'
+#' By default, the definition of "is present" is based on [input_provided()].
+#'
+#' Child validators (see [`InputValidator$add_validator()`][InputValidator]) are
+#' not affected by `sv_optional()` rules in parent validators; only rules in the
+#' same validator instance as the `sv_optional()` will be skipped.
+#'
+#' @param test A single-argument function, or single-sided formula (using `.` to
+#'   access the value to test), that returns `TRUE` for success and `FALSE` for
+#'   failure.
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#'
+#'   iv <- InputValidator$new()
+#'
+#'   # An email is not required, but if present, it must be valid
+#'   iv$add_rule("email", sv_optional())
+#'   iv$add_rule("email", ~ if (!is_valid_email(.)) "Please provide a valid email")
+#' })
+#' @export
+sv_optional <- function(test = input_provided) {
+  force(test)
+
+  if (inherits(test, "formula")) {
+    test <- rlang::as_function(test)
+  }
+
+  function(value) {
+    if (!test(value)) {
+      skip_validation()
     }
   }
 }
@@ -80,7 +125,7 @@ sv_required <- function(message = "Required",
 #' # Ignore withReactiveDomain(), it's just required to get this example to run
 #' # outside of Shiny
 #' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
-#' 
+#'
 #'   iv <- InputValidator$new()
 #'
 #'   iv$add_rule("lookup_id",
@@ -111,15 +156,15 @@ sv_regex <- function(pattern,
   force(fixed)
   force(useBytes)
   force(invert)
-  
+
   function(value) {
     result <- grepl(pattern, value, ignore.case = ignore.case, perl = perl,
       fixed = fixed, useBytes = useBytes)
-    
+
     if (invert) {
       result <- !result
     }
-    
+
     if (!result) {
       return(message)
     }
@@ -149,18 +194,18 @@ sv_regex <- function(pattern,
 #' # Ignore withReactiveDomain(), it's just required to get this example to run
 #' # outside of Shiny
 #' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
-#' 
+#'
 #'   iv <- InputValidator$new()
-#' 
+#'
 #'   iv$add_rule("count", sv_numeric())
 #'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
 #' })
-#' 
+#'
 #' @export
 sv_numeric <- function(message = "A number is required",
                        allow_multiple = FALSE,
-                       allow_na = FALSE, 
-                       allow_nan = FALSE, 
+                       allow_na = FALSE,
+                       allow_nan = FALSE,
                        allow_inf = FALSE) {
 
   force(message)
@@ -197,35 +242,35 @@ sv_numeric <- function(message = "A number is required",
 #' [base::is.integer()] function. By default, only a single, finite,
 #' not-missing, valid integer is allowed, but each of those criteria can be
 #' controlled via arguments.
-#' 
+#'
 #' @param message The validation error message to use if a value is not an
 #'   integer.
 #' @inheritParams sv_numeric
-#' 
+#'
 #' @examples
 #' # Ignore withReactiveDomain(), it's just required to get this example to run
 #' # outside of Shiny
 #' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
-#' 
+#'
 #'   iv <- InputValidator$new()
-#' 
+#'
 #'   iv$add_rule("count", sv_integer())
 #'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
 #' })
-#' 
+#'
 #' @export
 sv_integer <- function(message = "An integer is required",
                        allow_multiple = FALSE,
                        allow_na = FALSE,
                        allow_nan = FALSE,
                        allow_inf = FALSE) {
-  
+
   force(message)
   force(allow_multiple)
   force(allow_na)
   force(allow_nan)
   force(allow_inf)
-  
+
   function(value) {
     if (!is.integer(value)) {
       return(message)
@@ -255,7 +300,7 @@ sv_integer <- function(message = "An integer is required",
 #' be set as either inclusive or exclusive with the `inclusive` argument. In its
 #' default mode, the validation check will effectively be of the form `<left> <=
 #' <field> <= <right>`.
-#' 
+#'
 #' @param left,right The left and right boundary values. Inclusively for each of
 #'   the boundaries is set with the `inclusive` argument; the defaults are set
 #'   for inclusive bounds.
@@ -263,7 +308,7 @@ sv_integer <- function(message = "An integer is required",
 #'   `left` and `right` bounds, respectively, should be inclusive. Both bounds
 #'   are by default are inclusive, using `c(TRUE, TRUE)`.
 #' @param message The validation error message to use if a value fails to match
-#'   the rule. By default, this is generic message provided by **shinyvalidate**
+#'   the rule. By default, this is generic message provided by shinyvalidate
 #'   but a custom message can be provided here.
 #' @inheritParams sv_numeric
 #'
@@ -274,13 +319,13 @@ sv_integer <- function(message = "An integer is required",
 #' # Ignore withReactiveDomain(), it's just required to get this example to run
 #' # outside of Shiny
 #' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
-#' 
+#'
 #'   iv <- InputValidator$new()
-#' 
+#'
 #'   iv$add_rule("count", sv_between(10, 10000))
 #'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
 #' })
-#' 
+#'
 #' @export
 sv_between <- function(left,
                        right,
@@ -294,18 +339,18 @@ sv_between <- function(left,
   force(message)
   force(allow_na)
   force(allow_nan)
-  
+
   # TODO: allow for check of multiple values with `allow_multiple`
-  # TODO: `message` should have the message string 
-  
+  # TODO: `message` should have the message string
+
   if (is.null(message)) {
-    message <- 
+    message <-
       glue::glue_data_safe(
         list(left = left, right = right),
         "Must be between {left} and {right}."
       )
   }
-  
+
   function(value) {
     # TODO: use the "noNA" lsv for the message
     if (!allow_na && any(is.na(value))) {
@@ -315,14 +360,14 @@ sv_between <- function(left,
     if (!allow_nan && any(is.nan(value))) {
       return(message)
     }
-    
+
     # TODO: perhaps check that `value` has a class where
     # comparison operators successfully eval to a logical value,
     # or better yet, use a `try()/tryCatch()` scheme here
-    
+
     l_of_left <- if (inclusive[1]) value < left else value <= left
     r_of_right <- if (inclusive[2]) value > right else value >= right
-    
+
     if (any(l_of_left, r_of_right)) {
       return(message)
     }
@@ -333,7 +378,7 @@ sv_between <- function(left,
 #'
 #' The `sv_in_set()` function checks whether the field value is part of a
 #' specified set of values.
-#' 
+#'
 #' @param set A vector or list of elements for which the field value must be a
 #'   part of to pass validation. To allow an empty field, `NA` should be
 #'   included in the `set` vector. Optionally, `NaN` can be included as well.
@@ -354,13 +399,13 @@ sv_between <- function(left,
 #' # Ignore withReactiveDomain(), it's just required to get this example to run
 #' # outside of Shiny
 #' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
-#' 
+#'
 #'   iv <- InputValidator$new()
-#' 
+#'
 #'   iv$add_rule("count", sv_in_set(1:5))
 #'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
 #' })
-#' 
+#'
 #' @export
 sv_in_set <- function(set,
                       message = "Must be in the set of {values_text}.",
@@ -368,21 +413,21 @@ sv_in_set <- function(set,
   force(set)
   force(message)
   force(msg_limit)
-  
+
   if (length(set) < 1) {
     stop("The `set` must contain values.", call. = FALSE)
   }
-  
+
   values_text <- prepare_values_text(set, limit = msg_limit)
-  
-  message <- 
+
+  message <-
     glue::glue_data_safe(
       list(values_text = values_text),
       message
     )
-  
+
   function(value) {
-    
+
     if (!all(value %in% set)) {
       return(message)
     }
@@ -391,26 +436,26 @@ sv_in_set <- function(set,
 
 prepare_values_text <- function(set,
                                 limit) {
-  
+
   # TODO: consider special handling of `NA`, producing additional
   # text that states that empty fields are allowed (right now, `NA`
   # is just echoed in the string if it is in the first `1:limit`
   # elements of the `set`)
-  
+
   if (!is.null(limit) && length(set) > limit) {
-    
+
     num_omitted <- length(set) - limit
-    
+
     values_str <- paste0(set[seq_len(limit)], collapse = ", ")
-    
+
     additional_text <- glue::glue("(and {num_omitted} more)")
-      
+
     values_str <- paste0(values_str, " ", additional_text)
-    
+
   } else {
     values_str <- paste0(set, collapse = ", ")
   }
-  
+
   values_str
 }
 
@@ -418,7 +463,7 @@ prepare_values_text <- function(set,
 #'
 #' The `sv_gt()` function compares the field value to a specified value with the
 #' `>` operator.
-#' 
+#'
 #' @param rhs The right hand side (RHS) value is to be used for the comparison
 #'   with the field value. The validation check will effectively be of the form
 #'   `<field> > <rhs>`.
@@ -441,14 +486,14 @@ sv_gt <- function(rhs,
                   allow_na = FALSE,
                   allow_nan = FALSE,
                   allow_inf = FALSE) {
-    
+
   force(rhs)
   force(message)
   force(allow_multiple)
   force(allow_na)
   force(allow_nan)
   force(allow_inf)
-  
+
   # Preparation of the message and the validation test
   sv_comparison(
     rhs = rhs,
@@ -466,15 +511,15 @@ sv_gt <- function(rhs,
 #'
 #' The `sv_gte()` function compares the field value to a specified value with
 #' the `>=` operator.
-#' 
+#'
 #' @param rhs The right hand side (RHS) value is to be used for the comparison
 #'   with the field value. The validation check will effectively be of the form
 #'   `<field> >= <rhs>`.
 #' @inheritParams sv_gt
-#' 
+#'
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
-#' 
+#'
 #' @export
 sv_gte <- function(rhs,
                    message = "Must be greater than or equal to {rhs}.",
@@ -482,14 +527,14 @@ sv_gte <- function(rhs,
                    allow_na = FALSE,
                    allow_nan = FALSE,
                    allow_inf = FALSE) {
-  
+
   force(rhs)
   force(message)
   force(allow_multiple)
   force(allow_na)
   force(allow_nan)
   force(allow_inf)
-  
+
   # Preparation of the message and the validation test
   sv_comparison(
     rhs = rhs,
@@ -506,7 +551,7 @@ sv_gte <- function(rhs,
 #'
 #' The `sv_lt()` function compares the field value to a specified value with the
 #' `<` operator.
-#' 
+#'
 #' @param rhs The right hand side (RHS) value is to be used for the comparison
 #'   with the field value. The validation check will effectively be of the form
 #'   `<field> < <rhs>`.
@@ -522,14 +567,14 @@ sv_lt <- function(rhs,
                   allow_na = FALSE,
                   allow_nan = FALSE,
                   allow_inf = FALSE) {
-  
+
   force(rhs)
   force(message)
   force(allow_multiple)
   force(allow_na)
   force(allow_nan)
   force(allow_inf)
-  
+
   # Preparation of the message and the validation test
   sv_comparison(
     rhs = rhs,
@@ -546,12 +591,12 @@ sv_lt <- function(rhs,
 #'
 #' The `sv_lte()` function compares the field value to a specified value with
 #' the `<=` operator.
-#' 
+#'
 #' @param rhs The right hand side (RHS) value is to be used for the comparison
 #'   with the field value. The validation check will effectively be of the form
 #'   `<field> <= <rhs>`.
 #' @inheritParams sv_gt
-#' 
+#'
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
@@ -562,14 +607,14 @@ sv_lte <- function(rhs,
                    allow_na = FALSE,
                    allow_nan = FALSE,
                    allow_inf = FALSE) {
-  
+
   force(rhs)
   force(message)
   force(allow_multiple)
   force(allow_na)
   force(allow_nan)
   force(allow_inf)
-  
+
   # Preparation of the message and the validation test
   sv_comparison(
     rhs = rhs,
@@ -586,7 +631,7 @@ sv_lte <- function(rhs,
 #'
 #' The `sv_equal()` function compares the field value to a specified value with
 #' the `==` operator.
-#' 
+#'
 #' @param rhs The right hand side (RHS) value is to be used for the comparison
 #'   with the field value. The validation check will effectively be of the form
 #'   `<field> == <rhs>`.
@@ -602,14 +647,14 @@ sv_equal <- function(rhs,
                      allow_na = FALSE,
                      allow_nan = FALSE,
                      allow_inf = FALSE) {
-  
+
   force(rhs)
   force(message)
   force(allow_multiple)
   force(allow_na)
   force(allow_nan)
   force(allow_inf)
-  
+
   # Preparation of the message and the validation test
   sv_comparison(
     rhs = rhs,
@@ -626,7 +671,7 @@ sv_equal <- function(rhs,
 #'
 #' The `sv_not_equal()` function compares the field value to a specified value
 #' with the `!=` operator.
-#' 
+#'
 #' @param rhs The right hand side (RHS) value is to be used for the comparison
 #'   with the field value. The validation check will effectively be of the form
 #'   `<field> != <rhs>`.
@@ -642,14 +687,14 @@ sv_not_equal <- function(rhs,
                          allow_na = FALSE,
                          allow_nan = FALSE,
                          allow_inf = FALSE) {
-  
+
   force(rhs)
   force(message)
   force(allow_multiple)
   force(allow_na)
   force(allow_nan)
   force(allow_inf)
-  
+
   # Preparation of the message and the validation test
   sv_comparison(
     rhs = rhs,
@@ -669,17 +714,17 @@ sv_comparison <- function(rhs,
                           allow_nan,
                           allow_inf,
                           operator) {
-  
+
   # Preparation of the message
-  message <- 
+  message <-
     glue::glue_data_safe(
       list(rhs = rhs),
       message
     )
-  
+
   # Testing of `value` and validation
   function(value) {
-    
+
     # Validity testing of `value` within set constraints
     if (!is.numeric(value)) {
       return(message)
@@ -699,10 +744,10 @@ sv_comparison <- function(rhs,
     if (!allow_inf && any(!is.finite(value))) {
       return(message)
     }
-    
+
     # Validation test
     res <- rlang::eval_tidy(rlang::parse_expr(paste("value", operator, "rhs")))
-    
+
     if (!all(res)) {
       return(message)
     }

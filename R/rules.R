@@ -683,9 +683,6 @@ sv_comparison <- function(rhs,
   function(value) {
 
     # Validity testing of `value` within set constraints
-    if (!is.numeric(value)) {
-      return(message)
-    }
     if (length(value) == 0) {
       return(message)
     }

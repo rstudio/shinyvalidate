@@ -207,7 +207,6 @@ sv_numeric <- function(message = "A number is required",
                        allow_na = FALSE,
                        allow_nan = FALSE,
                        allow_inf = FALSE) {
-
   force(message)
   force(allow_multiple)
   force(allow_na)
@@ -264,7 +263,6 @@ sv_integer <- function(message = "An integer is required",
                        allow_na = FALSE,
                        allow_nan = FALSE,
                        allow_inf = FALSE) {
-
   force(message)
   force(allow_multiple)
   force(allow_na)
@@ -487,14 +485,6 @@ sv_gt <- function(rhs,
                   allow_nan = FALSE,
                   allow_inf = FALSE) {
 
-  force(rhs)
-  force(message)
-  force(allow_multiple)
-  force(allow_na)
-  force(allow_nan)
-  force(allow_inf)
-
-  # Preparation of the message and the validation test
   sv_comparison(
     rhs = rhs,
     message = message,
@@ -502,7 +492,7 @@ sv_gt <- function(rhs,
     allow_na = allow_na,
     allow_nan = allow_nan,
     allow_inf = allow_inf,
-    operator = ">"
+    operator = `>`
   )
 }
 
@@ -528,14 +518,6 @@ sv_gte <- function(rhs,
                    allow_nan = FALSE,
                    allow_inf = FALSE) {
 
-  force(rhs)
-  force(message)
-  force(allow_multiple)
-  force(allow_na)
-  force(allow_nan)
-  force(allow_inf)
-
-  # Preparation of the message and the validation test
   sv_comparison(
     rhs = rhs,
     message = message,
@@ -543,7 +525,7 @@ sv_gte <- function(rhs,
     allow_na = allow_na,
     allow_nan = allow_nan,
     allow_inf = allow_inf,
-    operator = ">="
+    operator = `>=`
   )
 }
 
@@ -568,14 +550,6 @@ sv_lt <- function(rhs,
                   allow_nan = FALSE,
                   allow_inf = FALSE) {
 
-  force(rhs)
-  force(message)
-  force(allow_multiple)
-  force(allow_na)
-  force(allow_nan)
-  force(allow_inf)
-
-  # Preparation of the message and the validation test
   sv_comparison(
     rhs = rhs,
     message = message,
@@ -583,7 +557,7 @@ sv_lt <- function(rhs,
     allow_na = allow_na,
     allow_nan = allow_nan,
     allow_inf = allow_inf,
-    operator = "<"
+    operator = `<`
   )
 }
 
@@ -608,14 +582,6 @@ sv_lte <- function(rhs,
                    allow_nan = FALSE,
                    allow_inf = FALSE) {
 
-  force(rhs)
-  force(message)
-  force(allow_multiple)
-  force(allow_na)
-  force(allow_nan)
-  force(allow_inf)
-
-  # Preparation of the message and the validation test
   sv_comparison(
     rhs = rhs,
     message = message,
@@ -623,7 +589,7 @@ sv_lte <- function(rhs,
     allow_na = allow_na,
     allow_nan = allow_nan,
     allow_inf = allow_inf,
-    operator = "<="
+    operator = `<=`
   )
 }
 
@@ -648,14 +614,6 @@ sv_equal <- function(rhs,
                      allow_nan = FALSE,
                      allow_inf = FALSE) {
 
-  force(rhs)
-  force(message)
-  force(allow_multiple)
-  force(allow_na)
-  force(allow_nan)
-  force(allow_inf)
-
-  # Preparation of the message and the validation test
   sv_comparison(
     rhs = rhs,
     message = message,
@@ -663,7 +621,7 @@ sv_equal <- function(rhs,
     allow_na = allow_na,
     allow_nan = allow_nan,
     allow_inf = allow_inf,
-    operator = "=="
+    operator = `==`
   )
 }
 
@@ -688,14 +646,6 @@ sv_not_equal <- function(rhs,
                          allow_nan = FALSE,
                          allow_inf = FALSE) {
 
-  force(rhs)
-  force(message)
-  force(allow_multiple)
-  force(allow_na)
-  force(allow_nan)
-  force(allow_inf)
-
-  # Preparation of the message and the validation test
   sv_comparison(
     rhs = rhs,
     message = message,
@@ -703,7 +653,7 @@ sv_not_equal <- function(rhs,
     allow_na = allow_na,
     allow_nan = allow_nan,
     allow_inf = allow_inf,
-    operator = "!="
+    operator = `!=`
   )
 }
 
@@ -715,6 +665,13 @@ sv_comparison <- function(rhs,
                           allow_inf,
                           operator) {
 
+  force(rhs)
+  force(message)
+  force(allow_multiple)
+  force(allow_na)
+  force(allow_nan)
+  force(allow_inf)
+  
   # Preparation of the message
   message <-
     glue::glue_data_safe(
@@ -746,7 +703,7 @@ sv_comparison <- function(rhs,
     }
 
     # Validation test
-    res <- rlang::eval_tidy(rlang::parse_expr(paste("value", operator, "rhs")))
+    res <- operator(value, rhs)
 
     if (!all(res)) {
       return(message)

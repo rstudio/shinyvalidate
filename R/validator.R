@@ -165,6 +165,8 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   almost never a reason to change this from the default.)
     add_rule = function(inputId, rule, ..., session. = shiny::getDefaultReactiveDomain()) {
       args <- rlang::list2(...)
+      
+      label <- deparse(substitute(rule))
 
       if (inherits(rule, "formula")) {
         rule <- rlang::as_function(rule)
@@ -177,7 +179,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         # support leaving a "hole" for the first argument
         do.call(rule, c(list(value), args))
       }
-      rule_info <- list(rule = applied_rule, session = session.)
+      rule_info <- list(rule = applied_rule, label = label, session = session.)
       private$rules(c(shiny::isolate(private$rules()), stats::setNames(list(rule_info), inputId)))
       invisible(self)
     },
@@ -245,15 +247,26 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   either `NULL` (if the input value is passing) or a single-element
     #'   character vector describing a validation problem.
     validate = function() {
+      verbose <- getOption("shinyvalidate.verbose", FALSE)
+      console_log <- function(...) {
+        if (verbose) {
+          message("[shinyvalidate] ", ...)
+        }
+      }
+      
+      console_log("InputValidator$validate() starting")
+      
       condition <- private$condition_()
       skip_all <- is.function(condition) && !isTRUE(condition())
       if (skip_all) {
+        console_log("condition() is FALSE, skipping validation")
         fields <- self$fields()
         return(setNames(rep_len(list(), length(fields)), fields))
       }
       
       dependency_results <- list()
       for (validator in private$validators()) {
+        console_log("Running child validator")
         child_results <- validator$validate()
         dependency_results <- merge_results(dependency_results, child_results)
       }
@@ -263,8 +276,12 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         fullname <- rule$session$ns(name)
         # Short-circuit if already errored or if skip_validation() was returned
         # by an earlier rule for this input
-        if (!is.null(results[[fullname]])) return()
+        if (!is.null(results[[fullname]])) {
+          console_log("Skipping `", name, "`: ", rule$label)
+          return()
+        }
         
+        console_log("Trying `", name, "`: ", rule$label)
         result <- tryCatch(
           shiny::withLogErrors(rule$rule(rule$session$input[[name]])),
           shiny.silent.error = function(e) {
@@ -293,15 +310,18 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         # Note that if there's an error in rule(), we won't get to the next
         # line
         if (is.null(result)) {
+          console_log("...Passed")
           if (!fullname %in% names(results)) {
             # Can't do results[[fullname]] <<- NULL, that just removes the element
             results <<- c(results, stats::setNames(list(NULL), fullname))
           }
         } else if (identical(skip_validation(), result)) {
+          console_log("...Skipping remaining rules")
           # Put a non-NULL, non-error value here to prevent remaining rules
           # from executing (i.e., skipping validation steps)
           results[[fullname]] <<- TRUE
         } else {
+          console_log("...Failed")
           results[[fullname]] <<- list(type = "error", message = result)
         }
       })
@@ -311,6 +331,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       # and not list(NULL) entries.
       results[vapply(results, isTRUE, logical(1), USE.NAMES = FALSE)] <- list(NULL)
       
+      console_log("InputValidator$validate() complete")
       merge_results(dependency_results, results)
     }
   )

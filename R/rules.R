@@ -21,6 +21,7 @@
 #' @param test A single-argument function, or single-sided formula (using `.` to
 #'   access the value to test), that returns `TRUE` for success and `FALSE` for
 #'   failure.
+#' 
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
@@ -44,7 +45,8 @@
 #' })
 #'
 #' @export
-sv_required <- function(message = "Required", test = input_provided) {
+sv_required <- function(message = "Required", 
+                        test = input_provided) {
   force(message)
   force(test)
 
@@ -77,6 +79,7 @@ sv_required <- function(message = "Required", test = input_provided) {
 #' @param test A single-argument function, or single-sided formula (using `.` to
 #'   access the value to test), that returns `TRUE` for success and `FALSE` for
 #'   failure.
+#'   
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
@@ -116,8 +119,9 @@ sv_optional <- function(test = input_provided) {
 #'   length 2 or more is supplied, the first element is used with a warning.
 #' @param message The validation error message to use if a value fails to match
 #'   the pattern.
-#' @param ignore.case,perl,fixed,useBytes,invert Passed through to
+#' @param ignore.case,perl,fixed,useBytes,invert Options passed through to
 #'   [base::grepl()].
+#'
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
@@ -187,6 +191,7 @@ sv_regex <- function(pattern,
 #'   `NA` or `NaN` element will cause validation to fail.
 #' @param allow_inf If `FALSE` (the default), then any `Inf` or `-Inf` element
 #'   will cause validation to fail.
+#' 
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
@@ -245,6 +250,9 @@ sv_numeric <- function(message = "A number is required",
 #' @param message The validation error message to use if a value is not an
 #'   integer.
 #' @inheritParams sv_numeric
+#' 
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
 #' # Ignore withReactiveDomain(), it's just required to get this example to run
@@ -305,9 +313,11 @@ sv_integer <- function(message = "An integer is required",
 #' @param inclusive A two-element logical vector that indicates whether the
 #'   `left` and `right` bounds, respectively, should be inclusive. Both bounds
 #'   are by default are inclusive, using `c(TRUE, TRUE)`.
-#' @param message The validation error message to use if a value fails to match
-#'   the rule. By default, this is generic message provided by shinyvalidate
-#'   but a custom message can be provided here.
+#' @param message_fmt The validation error message to use if a value fails to
+#'   match the rule. The message can be customized by using the `"{left}"` and
+#'   `"{right}"` string parameters, which allows for the insertion of the `left`
+#'   and `right` values. While the default message uses both of these string
+#'   parameters, they are not required in a user-defined `message_fmt` string.
 #' @inheritParams sv_numeric
 #'
 #' @return A function suitable for using as an
@@ -328,27 +338,24 @@ sv_integer <- function(message = "An integer is required",
 sv_between <- function(left,
                        right,
                        inclusive = c(TRUE, TRUE),
-                       message = NULL,
+                       message_fmt = "Must be between {left} and {right}.",
                        allow_na = FALSE,
                        allow_nan = FALSE) {
   force(left)
   force(right)
   force(inclusive)
-  force(message)
+  force(message_fmt)
   force(allow_na)
   force(allow_nan)
 
   # TODO: allow for check of multiple values with `allow_multiple`
-  # TODO: `message` should have the message string
-
-  if (is.null(message)) {
-    message <-
-      glue::glue_data_safe(
-        list(left = left, right = right),
-        "Must be between {left} and {right}."
-      )
-  }
-
+  
+  message <-
+    glue::glue_data_safe(
+      list(left = left, right = right),
+      message_fmt
+    )
+  
   function(value) {
     # TODO: use the "noNA" lsv for the message
     if (!allow_na && any(is.na(value))) {
@@ -380,13 +387,16 @@ sv_between <- function(left,
 #' @param set A vector or list of elements for which the field value must be a
 #'   part of to pass validation. To allow an empty field, `NA` should be
 #'   included in the `set` vector. Optionally, `NaN` can be included as well.
-#' @param message The validation error message to use if a value fails to match
-#'   the rule. Use `"{values_text}"` within the message to include a short list
-#'   of values based on `set`.
-#' @param msg_limit The limit of `set` values to include in the
+#' @param message_fmt The validation error message to use if a value fails to
+#'   match the rule. The message can be customized by using the
+#'   `"{values_text}"` string parameter, which allows for the insertion of `set`
+#'   values (formatted internally as a text list and controlled via the
+#'   `set_limit` parameter). While the default message uses this string
+#'   parameter, it is not required in a user-defined `message_fmt` string.
+#' @param set_limit The limit of `set` values to include in the
 #'   automatically-generated error message (i.e., when `message = NULL`, the
 #'   default). If the number of elements provided in `set` is greater than
-#'   `msg_limit` then only the first `<message_limit>` set elements will be
+#'   `set_limit` then only the first `<message_limit>` set elements will be
 #'   echoed along with text that states how many extra elements are part of the
 #'   `set`.
 #'
@@ -400,28 +410,27 @@ sv_between <- function(left,
 #'
 #'   iv <- InputValidator$new()
 #'
-#'   iv$add_rule("count", sv_in_set(1:5))
-#'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
+#'   iv$add_rule("rating", sv_in_set(1:5, set_limit = 5))
 #' })
 #'
 #' @export
 sv_in_set <- function(set,
-                      message = "Must be in the set of {values_text}.",
-                      msg_limit = 3) {
+                      message_fmt = "Must be in the set of {values_text}.",
+                      set_limit = 3) {
   force(set)
-  force(message)
-  force(msg_limit)
+  force(message_fmt)
+  force(set_limit)
 
   if (length(set) < 1) {
     stop("The `set` must contain values.", call. = FALSE)
   }
 
-  values_text <- prepare_values_text(set, limit = msg_limit)
+  values_text <- prepare_values_text(set, limit = set_limit)
 
   message <-
     glue::glue_data_safe(
       list(values_text = values_text),
-      message
+      message_fmt
     )
 
   function(value) {
@@ -465,9 +474,11 @@ prepare_values_text <- function(set,
 #' @param rhs The right hand side (RHS) value is to be used for the comparison
 #'   with the field value. The validation check will effectively be of the form
 #'   `<field> > <rhs>`.
-#' @param message The validation error message to use if the field fails the
-#'   validation test. Use `"{rhs}"` within the message to include what was set
-#'   in `rhs`.
+#' @param message_fmt The validation error message to use if the field fails the
+#'   validation test. Use the `"{rhs}"` string parameter to customize the
+#'   message, including what was set in `rhs`. While the default message uses
+#'   this string parameter, it is not required in a user-defined `message_fmt`
+#'   string.
 #' @param allow_multiple If `FALSE` (the default), then the length of the input
 #'   vector must be exactly one; if `TRUE`, then any length is allowed
 #'   (including a length of zero; use [sv_required()] if one or more values
@@ -476,10 +487,20 @@ prepare_values_text <- function(set,
 #'
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'   
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#'
+#'   iv <- InputValidator$new()
+#'
+#'   iv$add_rule("number", sv_gt(3))
+#' })
 #'
 #' @export
 sv_gt <- function(rhs,
-                  message = "Must be greater than {rhs}.",
+                  message_fmt = "Must be greater than {rhs}.",
                   allow_multiple = FALSE,
                   allow_na = FALSE,
                   allow_nan = FALSE,
@@ -487,7 +508,7 @@ sv_gt <- function(rhs,
 
   sv_comparison(
     rhs = rhs,
-    message = message,
+    message_fmt = message_fmt,
     allow_multiple = allow_multiple,
     allow_na = allow_na,
     allow_nan = allow_nan,
@@ -509,10 +530,20 @@ sv_gt <- function(rhs,
 #'
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'   
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#'
+#'   iv <- InputValidator$new()
+#'
+#'   iv$add_rule("number", sv_gte(4))
+#' })
 #'
 #' @export
 sv_gte <- function(rhs,
-                   message = "Must be greater than or equal to {rhs}.",
+                   message_fmt = "Must be greater than or equal to {rhs}.",
                    allow_multiple = FALSE,
                    allow_na = FALSE,
                    allow_nan = FALSE,
@@ -520,7 +551,7 @@ sv_gte <- function(rhs,
 
   sv_comparison(
     rhs = rhs,
-    message = message,
+    message_fmt = message_fmt,
     allow_multiple = allow_multiple,
     allow_na = allow_na,
     allow_nan = allow_nan,
@@ -541,10 +572,20 @@ sv_gte <- function(rhs,
 #'
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'   
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#'
+#'   iv <- InputValidator$new()
+#'
+#'   iv$add_rule("number", sv_lt(8))
+#' })
 #'
 #' @export
 sv_lt <- function(rhs,
-                  message = "Must be less than {rhs}.",
+                  message_fmt = "Must be less than {rhs}.",
                   allow_multiple = FALSE,
                   allow_na = FALSE,
                   allow_nan = FALSE,
@@ -552,7 +593,7 @@ sv_lt <- function(rhs,
 
   sv_comparison(
     rhs = rhs,
-    message = message,
+    message_fmt = message_fmt,
     allow_multiple = allow_multiple,
     allow_na = allow_na,
     allow_nan = allow_nan,
@@ -573,10 +614,20 @@ sv_lt <- function(rhs,
 #'
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'   
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#'
+#'   iv <- InputValidator$new()
+#'
+#'   iv$add_rule("number", sv_lte(7))
+#' })
 #'
 #' @export
 sv_lte <- function(rhs,
-                   message = "Must be less than or equal to {rhs}.",
+                   message_fmt = "Must be less than or equal to {rhs}.",
                    allow_multiple = FALSE,
                    allow_na = FALSE,
                    allow_nan = FALSE,
@@ -584,7 +635,7 @@ sv_lte <- function(rhs,
 
   sv_comparison(
     rhs = rhs,
-    message = message,
+    message_fmt = message_fmt,
     allow_multiple = allow_multiple,
     allow_na = allow_na,
     allow_nan = allow_nan,
@@ -605,10 +656,20 @@ sv_lte <- function(rhs,
 #'
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'   
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#'
+#'   iv <- InputValidator$new()
+#'
+#'   iv$add_rule("sum", sv_equal(10))
+#' })
 #'
 #' @export
 sv_equal <- function(rhs,
-                     message = "Must be equal to {rhs}.",
+                     message_fmt = "Must be equal to {rhs}.",
                      allow_multiple = FALSE,
                      allow_na = FALSE,
                      allow_nan = FALSE,
@@ -616,7 +677,7 @@ sv_equal <- function(rhs,
 
   sv_comparison(
     rhs = rhs,
-    message = message,
+    message_fmt = message_fmt,
     allow_multiple = allow_multiple,
     allow_na = allow_na,
     allow_nan = allow_nan,
@@ -637,10 +698,20 @@ sv_equal <- function(rhs,
 #'
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'   
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#'
+#'   iv <- InputValidator$new()
+#'
+#'   iv$add_rule("score", sv_not_equal(0))
+#' })
 #'
 #' @export
 sv_not_equal <- function(rhs,
-                         message = "Must not be equal to {rhs}.",
+                         message_fmt = "Must not be equal to {rhs}.",
                          allow_multiple = FALSE,
                          allow_na = FALSE,
                          allow_nan = FALSE,
@@ -648,7 +719,7 @@ sv_not_equal <- function(rhs,
 
   sv_comparison(
     rhs = rhs,
-    message = message,
+    message_fmt = message_fmt,
     allow_multiple = allow_multiple,
     allow_na = allow_na,
     allow_nan = allow_nan,
@@ -658,7 +729,7 @@ sv_not_equal <- function(rhs,
 }
 
 sv_comparison <- function(rhs,
-                          message,
+                          message_fmt,
                           allow_multiple,
                           allow_na,
                           allow_nan,
@@ -666,7 +737,7 @@ sv_comparison <- function(rhs,
                           operator) {
 
   force(rhs)
-  force(message)
+  force(message_fmt)
   force(allow_multiple)
   force(allow_na)
   force(allow_nan)
@@ -676,7 +747,7 @@ sv_comparison <- function(rhs,
   message <-
     glue::glue_data_safe(
       list(rhs = rhs),
-      message
+      message_fmt
     )
 
   # Testing of `value` and validation

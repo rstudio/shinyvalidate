@@ -4,21 +4,28 @@
 \alias{sv_in_set}
 \title{Validate that a field is part of a defined set}
 \usage{
-sv_in_set(set, message = "Must be in the set of {values_text}.", msg_limit = 3)
+sv_in_set(
+  set,
+  message_fmt = "Must be in the set of {values_text}.",
+  set_limit = 3
+)
 }
 \arguments{
 \item{set}{A vector or list of elements for which the field value must be a
 part of to pass validation. To allow an empty field, \code{NA} should be
 included in the \code{set} vector. Optionally, \code{NaN} can be included as well.}
 
-\item{message}{The validation error message to use if a value fails to match
-the rule. Use \code{"{values_text}"} within the message to include a short list
-of values based on \code{set}.}
+\item{message_fmt}{The validation error message to use if a value fails to
+match the rule. The message can be customized by using the
+\code{"{values_text}"} string parameter, which allows for the insertion of \code{set}
+values (formatted internally as a text list and controlled via the
+\code{set_limit} parameter). While the default message uses this string
+parameter, it is not required in a user-defined \code{message_fmt} string.}
 
-\item{msg_limit}{The limit of \code{set} values to include in the
+\item{set_limit}{The limit of \code{set} values to include in the
 automatically-generated error message (i.e., when \code{message = NULL}, the
 default). If the number of elements provided in \code{set} is greater than
-\code{msg_limit} then only the first \verb{<message_limit>} set elements will be
+\code{set_limit} then only the first \verb{<message_limit>} set elements will be
 echoed along with text that states how many extra elements are part of the
 \code{set}.}
 }
@@ -37,8 +44,7 @@ shiny::withReactiveDomain(shiny::MockShinySession$new(), {
 
   iv <- InputValidator$new()
 
-  iv$add_rule("count", sv_in_set(1:5))
-  iv$add_rule("count", ~if (. <= 0) "A positive value is required")
+  iv$add_rule("rating", sv_in_set(1:5, set_limit = 5))
 })
 
 }

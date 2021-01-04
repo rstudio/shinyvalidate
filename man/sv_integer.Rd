@@ -30,6 +30,10 @@ should be required).}
 \item{allow_inf}{If \code{FALSE} (the default), then any \code{Inf} or \code{-Inf} element
 will cause validation to fail.}
 }
+\value{
+A function suitable for using as an
+\code{\link[=InputValidator]{InputValidator$add_rule()}} rule.
+}
 \description{
 The \code{sv_integer()} function validates that a field is an integer with the
 \code{\link[base:integer]{base::is.integer()}} function. By default, only a single, finite,

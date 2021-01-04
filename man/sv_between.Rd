@@ -8,7 +8,7 @@ sv_between(
   left,
   right,
   inclusive = c(TRUE, TRUE),
-  message = NULL,
+  message_fmt = "Must be between {left} and {right}.",
   allow_na = FALSE,
   allow_nan = FALSE
 )
@@ -22,9 +22,11 @@ for inclusive bounds.}
 \code{left} and \code{right} bounds, respectively, should be inclusive. Both bounds
 are by default are inclusive, using \code{c(TRUE, TRUE)}.}
 
-\item{message}{The validation error message to use if a value fails to match
-the rule. By default, this is generic message provided by shinyvalidate
-but a custom message can be provided here.}
+\item{message_fmt}{The validation error message to use if a value fails to
+match the rule. The message can be customized by using the \code{"{left}"} and
+\code{"{right}"} string parameters, which allows for the insertion of the \code{left}
+and \code{right} values. While the default message uses both of these string
+parameters, they are not required in a user-defined \code{message_fmt} string.}
 
 \item{allow_na}{If \code{FALSE} (the default for both options), then any
 \code{NA} or \code{NaN} element will cause validation to fail.}

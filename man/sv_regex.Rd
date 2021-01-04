@@ -22,7 +22,7 @@ length 2 or more is supplied, the first element is used with a warning.}
 \item{message}{The validation error message to use if a value fails to match
 the pattern.}
 
-\item{ignore.case, perl, fixed, useBytes, invert}{Passed through to
+\item{ignore.case, perl, fixed, useBytes, invert}{Options passed through to
 \code{\link[base:grep]{base::grepl()}}.}
 }
 \value{

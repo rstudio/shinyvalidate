@@ -6,7 +6,7 @@
 \usage{
 sv_lte(
   rhs,
-  message = "Must be less than or equal to {rhs}.",
+  message_fmt = "Must be less than or equal to {rhs}.",
   allow_multiple = FALSE,
   allow_na = FALSE,
   allow_nan = FALSE,
@@ -18,9 +18,11 @@ sv_lte(
 with the field value. The validation check will effectively be of the form
 \verb{<field> <= <rhs>}.}
 
-\item{message}{The validation error message to use if the field fails the
-validation test. Use \code{"{rhs}"} within the message to include what was set
-in \code{rhs}.}
+\item{message_fmt}{The validation error message to use if the field fails the
+validation test. Use the \code{"{rhs}"} string parameter to customize the
+message, including what was set in \code{rhs}. While the default message uses
+this string parameter, it is not required in a user-defined \code{message_fmt}
+string.}
 
 \item{allow_multiple}{If \code{FALSE} (the default), then the length of the input
 vector must be exactly one; if \code{TRUE}, then any length is allowed
@@ -43,4 +45,15 @@ A function suitable for using as an
 \description{
 The \code{sv_lte()} function compares the field value to a specified value with
 the \code{<=} operator.
+}
+\examples{
+# Ignore withReactiveDomain(), it's just required to get this example to run
+# outside of Shiny
+shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+
+  iv <- InputValidator$new()
+
+  iv$add_rule("number", sv_lte(7))
+})
+
 }

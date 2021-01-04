@@ -1,0 +1,31 @@
+{
+  "name": "shinyvalidate",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "man": "man",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel srcjs/shinyvalidate.js > inst/assets/shinyvalidate.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rstudio/shinyvalidate.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rstudio/shinyvalidate/issues"
+  },
+  "homepage": "https://github.com/rstudio/shinyvalidate#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/cli": "^7.12.10",
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11"
+  }
+}

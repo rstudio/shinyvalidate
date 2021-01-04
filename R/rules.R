@@ -348,6 +348,11 @@ sv_between <- function(left,
   force(allow_na)
   force(allow_nan)
 
+  # Prechecking of inputs; this stops the function immediately (not entering
+  # the validation phase) since failures here are recognized as usage errors
+  check_input_length(input = left, input_name = "left")
+  check_input_length(input = right, input_name = "right")
+  
   # TODO: allow for check of multiple values with `allow_multiple`
   
   message <-
@@ -421,9 +426,10 @@ sv_in_set <- function(set,
   force(message_fmt)
   force(set_limit)
 
-  if (length(set) < 1) {
-    stop("The `set` must contain values.", call. = FALSE)
-  }
+  # Prechecking of inputs; this stops the function immediately (not entering
+  # the validation phase) since failures here are recognized as usage errors
+  check_input_length(input = set, input_name = "set")
+  check_input_length(input = set_limit, input_name = "set_limit")
 
   values_text <- prepare_values_text(set, limit = set_limit)
 
@@ -743,6 +749,10 @@ sv_comparison <- function(rhs,
   force(allow_nan)
   force(allow_inf)
   
+  # Prechecking of inputs; this stops the function immediately (not entering
+  # the validation phase) since failures here are recognized as usage errors
+  check_input_length(input = rhs, input_name = "rhs")
+  
   # Preparation of the message
   message <-
     glue::glue_data_safe(
@@ -776,5 +786,21 @@ sv_comparison <- function(rhs,
     if (!all(res)) {
       return(message)
     }
+  }
+}
+
+check_input_length <- function(input,
+                               input_name,
+                               stop_message = "The input for `{input_name}` must contain values.") {
+  
+  if (length(input) < 1) {
+    
+    stop_message <-
+      glue::glue_data_safe(
+        list(input_name = input_name),
+        stop_message
+      )
+    
+    stop(stop_message, call. = FALSE)
   }
 }

@@ -219,23 +219,25 @@ sv_numeric <- function(message = "A number is required",
   force(allow_inf)
 
   function(value) {
+
     if (!is.numeric(value)) {
       return(message)
     }
+    
     if (length(value) == 0) {
-      return(message)
+      return(err_condition_messages[["err_zero_length_value"]])
     }
     if (!allow_multiple && length(value) != 1) {
-      return(message)
+      return(err_condition_messages[["err_allow_multiple"]])
     }
     if (!allow_na && any(is.na(value))) {
-      return(message)
+      return(err_condition_messages[["err_allow_na"]])
     }
     if (!allow_nan && any(is.nan(value))) {
-      return(message)
+      return(err_condition_messages[["err_allow_nan"]])
     }
     if (!allow_inf && any(!is.finite(value))) {
-      return(message)
+      return(err_condition_messages[["err_allow_infinite"]])
     }
   }
 }
@@ -278,23 +280,25 @@ sv_integer <- function(message = "An integer is required",
   force(allow_inf)
 
   function(value) {
+    
     if (!is.integer(value)) {
       return(message)
     }
+
     if (length(value) == 0) {
-      return(message)
+      return(err_condition_messages[["err_zero_length_value"]])
     }
     if (!allow_multiple && length(value) != 1) {
-      return(message)
+      return(err_condition_messages[["err_allow_multiple"]])
     }
     if (!allow_na && any(is.na(value))) {
-      return(message)
+      return(err_condition_messages[["err_allow_na"]])
     }
     if (!allow_nan && any(is.nan(value))) {
-      return(message)
+      return(err_condition_messages[["err_allow_nan"]])
     }
     if (!allow_inf && any(!is.finite(value))) {
-      return(message)
+      return(err_condition_messages[["err_allow_infinite"]])
     }
   }
 }
@@ -362,13 +366,12 @@ sv_between <- function(left,
     )
   
   function(value) {
-    # TODO: use the "noNA" lsv for the message
+    
     if (!allow_na && any(is.na(value))) {
-      return(message)
+      return(err_condition_messages[["err_allow_na"]])
     }
-    # TODO: use the "noNaN" lsv for the message
     if (!allow_nan && any(is.nan(value))) {
-      return(message)
+      return(err_condition_messages[["err_allow_nan"]])
     }
 
     # TODO: perhaps check that `value` has a class where
@@ -765,19 +768,19 @@ sv_comparison <- function(rhs,
 
     # Validity testing of `value` within set constraints
     if (length(value) == 0) {
-      return(message)
+      return(err_condition_messages[["err_zero_length_value"]])
     }
     if (!allow_multiple && length(value) != 1) {
-      return(message)
+      return(err_condition_messages[["err_allow_multiple"]])
     }
     if (!allow_na && any(is.na(value))) {
-      return(message)
+      return(err_condition_messages[["err_allow_na"]])
     }
     if (!allow_nan && any(is.nan(value))) {
-      return(message)
+      return(err_condition_messages[["err_allow_nan"]])
     }
     if (!allow_inf && any(!is.finite(value))) {
-      return(message)
+      return(err_condition_messages[["err_allow_infinite"]])
     }
 
     # Validation test
@@ -804,3 +807,12 @@ check_input_length <- function(input,
     stop(stop_message, call. = FALSE)
   }
 }
+
+err_condition_messages <- 
+  list(
+    err_zero_length_value = "Must not contain zero values.",
+    err_allow_multiple = "Must not contain multiple values.",
+    err_allow_na = "Must not contain `NA` values.",
+    err_allow_nan = "Must not contain `NaN` values.",
+    err_allow_inf = "Must not contain infinite values."
+  )

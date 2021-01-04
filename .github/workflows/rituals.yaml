@@ -45,4 +45,4 @@ jobs:
           node-version: '12.x'
       - name: Check node build
         run: |
-          ./tools/checkJSCurrent.sh
+          ./scripts/checkJSCurrent.sh

@@ -7,3 +7,6 @@
 ^pkgdown$
 ^doc$
 ^Meta$
+^node_modules$
+^srcjs$
+^scripts$

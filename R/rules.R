@@ -747,11 +747,7 @@ sv_comparison <- function(rhs,
 
   force(rhs)
   force(message_fmt)
-  force(allow_multiple)
-  force(allow_na)
-  force(allow_nan)
-  force(allow_inf)
-  
+
   # Prechecking of inputs; this stops the function immediately (not entering
   # the validation phase) since failures here are recognized as usage errors
   check_input_length(input = rhs, input_name = "rhs")
@@ -764,12 +760,48 @@ sv_comparison <- function(rhs,
     )
 
   # Testing of `value` and validation
+  sv_basic(allow_multiple = allow_multiple,
+           allow_na = allow_na,
+           allow_nan = allow_nan,
+           allow_inf = allow_inf) %extend_rule%
   function(value) {
+    # Validation test
+    res <- operator(value, rhs)
 
-    # Validity testing of `value` within set constraints
-    if (length(value) == 0) {
-      return(err_condition_messages[["err_zero_length_value"]])
+    if (!all(res)) {
+      return(message)
     }
+  }
+}
+
+
+`%extend_rule%` <- function(rule1, rule2) {
+  force(rule1)
+  force(rule2)
+  stopifnot(is.function(rule1))
+  stopifnot(is.function(rule2))
+  
+  function(value) {
+    res <- rule1(value)
+    if (is.null(res)) {
+      res <- rule2(value)
+    }
+    res
+  }
+}
+
+sv_basic <- function(allow_multiple,
+                     allow_na,
+                     allow_nan,
+                     allow_inf) {
+  
+  force(allow_multiple)
+  force(allow_na)
+  force(allow_nan)
+  force(allow_inf)
+  
+  function(value) {
+    # Validity testing of `value` within set constraints
     if (!allow_multiple && length(value) != 1) {
       return(err_condition_messages[["err_allow_multiple"]])
     }
@@ -782,13 +814,7 @@ sv_comparison <- function(rhs,
     if (!allow_inf && any(!is.finite(value))) {
       return(err_condition_messages[["err_allow_infinite"]])
     }
-
-    # Validation test
-    res <- operator(value, rhs)
-
-    if (!all(res)) {
-      return(message)
-    }
+    NULL
   }
 }
 

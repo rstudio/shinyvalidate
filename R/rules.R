@@ -218,28 +218,23 @@ sv_numeric <- function(message = "A number is required",
   force(allow_nan)
   force(allow_inf)
 
-  function(value) {
-
-    if (!is.numeric(value)) {
-      return(message)
-    }
-    
-    if (length(value) == 0) {
-      return(err_condition_messages[["err_zero_length_value"]])
-    }
-    if (!allow_multiple && length(value) != 1) {
-      return(err_condition_messages[["err_allow_multiple"]])
-    }
-    if (!allow_na && any(is.na(value))) {
-      return(err_condition_messages[["err_allow_na"]])
-    }
-    if (!allow_nan && any(is.nan(value))) {
-      return(err_condition_messages[["err_allow_nan"]])
-    }
-    if (!allow_inf && any(!is.finite(value))) {
-      return(err_condition_messages[["err_allow_infinite"]])
-    }
-  }
+  compose_rules(
+    function(value) {
+      
+      if (!is.numeric(value)) {
+        return(message)
+      }
+      if (length(value) == 0) {
+        return(err_condition_messages[["err_zero_length_value"]])
+      }
+    },
+    sv_basic(
+      allow_multiple = allow_multiple,
+      allow_na = allow_na,
+      allow_nan = allow_nan,
+      allow_inf = allow_inf
+    )
+  )
 }
 
 #' Validate that a field is an integer
@@ -279,28 +274,23 @@ sv_integer <- function(message = "An integer is required",
   force(allow_nan)
   force(allow_inf)
 
-  function(value) {
-    
-    if (!is.integer(value)) {
-      return(message)
-    }
-
-    if (length(value) == 0) {
-      return(err_condition_messages[["err_zero_length_value"]])
-    }
-    if (!allow_multiple && length(value) != 1) {
-      return(err_condition_messages[["err_allow_multiple"]])
-    }
-    if (!allow_na && any(is.na(value))) {
-      return(err_condition_messages[["err_allow_na"]])
-    }
-    if (!allow_nan && any(is.nan(value))) {
-      return(err_condition_messages[["err_allow_nan"]])
-    }
-    if (!allow_inf && any(!is.finite(value))) {
-      return(err_condition_messages[["err_allow_infinite"]])
-    }
-  }
+  compose_rules(
+    function(value) {
+      
+      if (!is.integer(value)) {
+        return(message)
+      }
+      if (length(value) == 0) {
+        return(err_condition_messages[["err_zero_length_value"]])
+      }
+    },
+    sv_basic(
+      allow_multiple = allow_multiple,
+      allow_na = allow_na,
+      allow_nan = allow_nan,
+      allow_inf = allow_inf
+    )
+  )
 }
 
 #' Validate that a field is a number bounded by minimum and maximum values
@@ -365,26 +355,26 @@ sv_between <- function(left,
       message_fmt
     )
   
-  function(value) {
-    
-    if (!allow_na && any(is.na(value))) {
-      return(err_condition_messages[["err_allow_na"]])
+  compose_rules(
+    sv_basic(
+      allow_multiple = TRUE,
+      allow_na = allow_na,
+      allow_nan = allow_nan,
+      allow_inf = TRUE
+    ),
+    function(value) {
+      # TODO: perhaps check that `value` has a class where
+      # comparison operators successfully eval to a logical value,
+      # or better yet, use a `try()/tryCatch()` scheme here
+      
+      l_of_left <- if (inclusive[1]) value < left else value <= left
+      r_of_right <- if (inclusive[2]) value > right else value >= right
+      
+      if (any(l_of_left, r_of_right)) {
+        return(message)
+      }
     }
-    if (!allow_nan && any(is.nan(value))) {
-      return(err_condition_messages[["err_allow_nan"]])
-    }
-
-    # TODO: perhaps check that `value` has a class where
-    # comparison operators successfully eval to a logical value,
-    # or better yet, use a `try()/tryCatch()` scheme here
-
-    l_of_left <- if (inclusive[1]) value < left else value <= left
-    r_of_right <- if (inclusive[2]) value > right else value >= right
-
-    if (any(l_of_left, r_of_right)) {
-      return(message)
-    }
-  }
+  )
 }
 
 #' Validate that a field is part of a defined set
@@ -760,33 +750,88 @@ sv_comparison <- function(rhs,
     )
 
   # Testing of `value` and validation
-  sv_basic(allow_multiple = allow_multiple,
-           allow_na = allow_na,
-           allow_nan = allow_nan,
-           allow_inf = allow_inf) %extend_rule%
-  function(value) {
-    # Validation test
-    res <- operator(value, rhs)
-
-    if (!all(res)) {
-      return(message)
+  compose_rules(
+    sv_basic(
+      allow_multiple = allow_multiple,
+      allow_na = allow_na,
+      allow_nan = allow_nan,
+      allow_inf = allow_inf
+    ),
+    function(value) {
+      # Validation test
+      res <- operator(value, rhs)
+      
+      if (!all(res)) {
+        return(message)
+      }
     }
-  }
+  )
 }
 
-
-`%extend_rule%` <- function(rule1, rule2) {
-  force(rule1)
-  force(rule2)
-  stopifnot(is.function(rule1))
-  stopifnot(is.function(rule2))
+#' Combine shinyvalidate rule functions
+#' 
+#' @description
+#' Takes multiple shinyvalidate rule functions, and returns a shinyvalidate rule
+#' function. When this resulting rule function is invoked, it will try each of
+#' its constituent rule functions in order; the first validation error that is
+#' detected will be returned immediately and the remaining rules will not be
+#' tried.
+#'
+#' This function is not intended to be used by Shiny app authors (i.e. not for
+#' `InputValidator$add_rule("x", compose_rules(...))`), but for developers of
+#' reusable shinyvalidate rule functions. See examples.
+#' 
+#' @param ... Any number of shinyvalidate rule functions; earlier rules will be
+#'   attempted before later rules. Argument names are ignored. Single-sided
+#'   formulas are also accepted instead of a function, using `.` as the variable
+#'   name for the input value.
+#'   
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#' 
+#' @examples
+#' # Create a new shinyvalidate rule that is composed
+#' # of two `sv_*()` rule functions (`sv_integer()` and
+#' # `sv_gt()`, and a custom function for ensuring
+#' # a number is even)
+#' positive_even_integer <- function() {
+#'   compose_rules(
+#'     sv_integer(),
+#'     sv_gt(0),
+#'     ~ if (. %% 2 == 1) "Must be an even number"
+#'   )
+#' }
+#' 
+#' # Use the `positive_even_integer()` rule function
+#' # to check that a supplied value is an integer, greater
+#' # than zero, and even (in that order)
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#'   
+#'   iv <- InputValidator$new()
+#'   
+#'   iv$add_rule("foo", combine_rules(sv_required(), sv_numeric()))
+#'   iv$add_rule("foo", positive_even_integer())
+#' })
+#' 
+#' @export
+compose_rules <- function(...) {
+  
+  rule_fns <- lapply(rlang::list2(...), function(rule_fn) {
+    if (is.function(rule_fn)) {
+      rule_fn
+    } else if (rlang::is_formula(rule_fn)) {
+      rlang::as_function(rule_fn)
+    } else {
+      stop("All arguments to combine_rules must be functions or formulas")
+    }
+  })
   
   function(value) {
-    res <- rule1(value)
-    if (is.null(res)) {
-      res <- rule2(value)
+    for (rule_fn in rule_fns) {
+      res <- rule_fn(value)
+      if (!is.null(res)) return(res)
     }
-    res
+    NULL
   }
 }
 

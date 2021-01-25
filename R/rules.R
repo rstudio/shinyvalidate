@@ -809,7 +809,7 @@ sv_comparison <- function(rhs,
 #'   
 #'   iv <- InputValidator$new()
 #'   
-#'   iv$add_rule("foo", combine_rules(sv_required(), sv_numeric()))
+#'   iv$add_rule("foo", compose_rules(sv_required(), sv_numeric()))
 #'   iv$add_rule("foo", positive_even_integer())
 #' })
 #' 

@@ -885,5 +885,5 @@ err_condition_messages <-
     err_allow_multiple = "Must not contain multiple values.",
     err_allow_na = "Must not contain `NA` values.",
     err_allow_nan = "Must not contain `NaN` values.",
-    err_allow_inf = "Must not contain infinite values."
+    err_allow_infinite = "Must not contain infinite values."
   )

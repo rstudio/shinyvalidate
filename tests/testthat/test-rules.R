@@ -19,3 +19,265 @@ test_that("`sv_optional()` basic use cases", {
     })
   })
 })
+
+test_that("compose_rules short circuits", {
+  got_here <- FALSE
+  rule <- compose_rules(
+    ~ "error",
+    ~ { got_here <<- TRUE }
+  )
+  expect_identical(rule("check"), "error")
+  expect_false(got_here)
+})
+
+test_that("compose_rules falls through", {
+  got_here <- FALSE
+  rule <- compose_rules(
+    ~ { got_here <<- TRUE; NULL },
+    ~ "error"
+  )
+  expect_identical(rule("check"), "error")
+  expect_true(got_here)
+})
+
+test_that("compose_rules different input types", {
+  input <- "hello"
+  compose_rules(
+    function(value) {
+      expect_identical(value, input)
+      NULL
+    },
+    ~ {
+      expect_identical(., input)
+      NULL
+    }
+  )(input)
+  
+  expect_error(compose_rules("not a function"))
+})
+
+expect_sv_fail <- function(rule, ...) {
+  
+  lapply(
+    rlang::list2(...),
+    FUN = function(x) {
+      expect_type(rule(!!x), "character")
+    }
+  )
+}
+
+expect_sv_pass <- function(rule, ...) {
+  
+  lapply(
+    rlang::list2(...),
+    FUN = function(x) {
+      expect_null(rule(!!x))
+    }
+  )
+}
+
+test_that("the `sv_lt()` rule function works properly", {
+  
+  always_pass <- list(-1, 0, 0L)
+  always_fail <- list(1, 2, 2L, c(-1, 2), Inf)
+  pass_if_multiple <- list(c(-10:-1))
+  pass_if_na <- list(NA, NA_integer_, NA_real_)
+  pass_if_multiple_na <- list(c(-2, -1, NA), c(NA, NA, NA))
+  pass_if_nan <- list(NaN)
+  pass_if_inf <- list(-Inf)
+  
+  rule <- sv_lt(rhs = 1)
+  expect_sv_pass(rule, !!!always_pass)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_inf)
+  
+  rule <- sv_lt(rhs = 1, allow_multiple = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_inf)
+
+  rule <- sv_lt(rhs = 1, allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_nan, !!!pass_if_inf)
+  
+  rule <- sv_lt(rhs = 1, allow_nan = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_nan)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_inf)
+  
+  rule <- sv_lt(rhs = 1, allow_multiple = TRUE, allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_multiple_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_nan, !!!pass_if_inf)
+    
+  rule <- sv_lt(rhs = 1, allow_inf = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_inf)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple)
+})
+
+test_that("the `sv_lte()` rule function works properly", {
+  
+  always_pass <- list(-1, 0, 1, 1L)
+  always_fail <- list(2, 2L, c(-1, 2), Inf)
+  pass_if_multiple <- list(-10:1, c(-3, -5.2, 0.9))
+  pass_if_na <- list(NA, NA_integer_, NA_real_)
+  pass_if_multiple_na <- list(c(-2, -1, NA), c(NA, NA, NA))
+  pass_if_nan <- list(NaN)
+  pass_if_inf <- list(-Inf)
+  
+  rule <- sv_lte(rhs = 1)
+  expect_sv_pass(rule, !!!always_pass)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_inf)
+  
+  rule <- sv_lte(rhs = 1, allow_multiple = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_inf)
+  
+  rule <- sv_lte(rhs = 1, allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_nan, !!!pass_if_inf)
+  
+  rule <- sv_lte(rhs = 1, allow_nan = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_nan)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_inf)
+  
+  rule <- sv_lte(rhs = 1, allow_multiple = TRUE, allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_multiple_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_nan, !!!pass_if_inf)
+  
+  rule <- sv_lte(rhs = 1, allow_inf = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_inf)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple)
+})
+
+test_that("the `sv_gte()` rule function works properly", {
+  
+  always_pass <- list(1, 2, 3, 3L)
+  always_fail <- list(-2, -2L, -1, 0, c(-1, 2), -Inf)
+  pass_if_multiple <- list(1:10, c(3, 5.2, 1.0))
+  pass_if_na <- list(NA, NA_integer_, NA_real_)
+  pass_if_multiple_na <- list(c(1, 2, NA), c(NA, NA, NA))
+  pass_if_nan <- list(NaN)
+  pass_if_inf <- list(Inf)
+  
+  rule <- sv_gte(rhs = 1)
+  expect_sv_pass(rule, !!!always_pass)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_inf)
+  
+  rule <- sv_gte(rhs = 1, allow_multiple = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_inf)
+  
+  rule <- sv_gte(rhs = 1, allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_nan, !!!pass_if_inf)
+  
+  rule <- sv_gte(rhs = 1, allow_nan = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_nan)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_inf)
+  
+  rule <- sv_gte(rhs = 1, allow_multiple = TRUE, allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_multiple_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_nan, !!!pass_if_inf)
+  
+  rule <- sv_gte(rhs = 1, allow_inf = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_inf)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple)
+})
+
+test_that("the `sv_gt()` rule function works properly", {
+  
+  always_pass <- list(2, 3, 3L)
+  always_fail <- list(-2, -2L, -1, 0, c(-1, 2), -Inf)
+  pass_if_multiple <- list(2:10, c(3, 5.2, 1.1))
+  pass_if_na <- list(NA, NA_integer_, NA_real_)
+  pass_if_multiple_na <- list(c(2, 3, NA), c(NA, NA, NA))
+  pass_if_nan <- list(NaN)
+  pass_if_inf <- list(Inf)
+  
+  rule <- sv_gt(rhs = 1)
+  expect_sv_pass(rule, !!!always_pass)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_inf)
+  
+  rule <- sv_gt(rhs = 1, allow_multiple = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_inf)
+  
+  rule <- sv_gt(rhs = 1, allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_nan, !!!pass_if_inf)
+  
+  rule <- sv_gt(rhs = 1, allow_nan = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_nan)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_inf)
+  
+  rule <- sv_gt(rhs = 1, allow_multiple = TRUE, allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_multiple_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_nan, !!!pass_if_inf)
+  
+  rule <- sv_gt(rhs = 1, allow_inf = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_inf)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple)
+})
+
+test_that("the `sv_equal()` rule function works properly", {
+  
+  usually_pass <- list(1, 1L, 1.0)
+  usually_fail <- list(1.1, 0.9, -1L, 2L, c(-1, 2), -Inf, Inf)
+  pass_if_multiple <- list(rep(1, 10))
+  pass_if_na <- list(NA, NA_integer_, NA_real_)
+  pass_if_multiple_na <- list(c(1, 1, NA), c(1, NA, NA), c(NA, NA, NA))
+  pass_if_nan <- list(NaN)
+  pass_if_inf_1 <- list(Inf)
+  pass_if_inf_2 <- list(-Inf)
+  
+  rule <- sv_equal(rhs = 1)
+  expect_sv_pass(rule, !!!usually_pass)
+  expect_sv_fail(rule, !!!usually_fail, !!!pass_if_multiple, !!!pass_if_inf_1)
+  
+  rule <- sv_equal(rhs = 1, allow_multiple = TRUE)
+  expect_sv_pass(rule, !!!usually_pass, !!!pass_if_multiple)
+  expect_sv_fail(rule, !!!usually_fail, !!!pass_if_inf_1)
+  
+  rule <- sv_equal(rhs = 1, allow_na = TRUE)
+  expect_sv_pass(rule, !!!usually_pass, !!!pass_if_na)
+  expect_sv_fail(rule, !!!usually_fail, !!!pass_if_multiple, !!!pass_if_inf_1, !!!pass_if_inf_1, !!!pass_if_nan)
+  
+  rule <- sv_equal(rhs = 1, allow_nan = TRUE)
+  expect_sv_pass(rule, !!!usually_pass, !!!pass_if_nan)
+  expect_sv_fail(rule, !!!usually_fail, !!!pass_if_multiple, !!!pass_if_inf_1, !!!pass_if_inf_2, !!!pass_if_na)
+  
+  rule <- sv_equal(rhs = 1, allow_multiple = TRUE, allow_na = TRUE)
+  expect_sv_pass(rule, !!!usually_pass, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_multiple_na)
+  expect_sv_fail(rule, !!!usually_fail, !!!pass_if_inf_1, !!!pass_if_inf_2)
+  
+  rule <- sv_equal(rhs = Inf, allow_inf = TRUE)
+  expect_sv_pass(rule, !!!pass_if_inf_1)
+  expect_sv_fail(rule, !!!pass_if_inf_2)
+  
+  rule <- sv_equal(rhs = Inf, allow_inf = TRUE)
+  expect_sv_pass(rule, !!!pass_if_inf_1)
+  expect_sv_fail(rule, !!!pass_if_inf_2)
+})
+
+test_that("the `sv_between()` rule function works properly", {
+  
+  always_pass <- list(2, 3, 4L, 9, 3:5)
+  always_fail <- list(0, -1L, c(-1, 5), Inf, -Inf)
+  pass_if_na <- list(NA, NA_integer_, NA_real_, c(NA, NA, NA))
+  pass_if_nan <- list(NaN, c(NaN, NaN))
+  
+  rule <- sv_between(1, 10)
+  expect_sv_pass(rule, !!!always_pass)
+  expect_sv_fail(rule, !!!always_fail)
+  
+  rule <- sv_between(1, 10, allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_nan)
+
+  rule <- sv_between(1, 10, allow_nan = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_nan)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_na)
+  
+  expect_sv_fail(sv_between(1, 10, inclusive = c(FALSE, TRUE)), 1)
+  expect_sv_fail(sv_between(1, 10, inclusive = c(TRUE, FALSE)), 10)
+  expect_sv_fail(sv_between(1, 10, inclusive = c(FALSE, FALSE)), c(1, 10))
+  expect_sv_fail(sv_between(1, 10, inclusive = c(FALSE, FALSE)), 1:2)
+  expect_sv_fail(sv_between(1, 10, inclusive = c(FALSE, FALSE)), 9:10)
+})

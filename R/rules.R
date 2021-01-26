@@ -363,12 +363,13 @@ sv_between <- function(left,
       allow_inf = TRUE
     ),
     function(value) {
-      # TODO: perhaps check that `value` has a class where
-      # comparison operators successfully eval to a logical value,
-      # or better yet, use a `try()/tryCatch()` scheme here
-      
+
       l_of_left <- if (inclusive[1]) value < left else value <= left
       r_of_right <- if (inclusive[2]) value > right else value >= right
+      
+      # Remove NA and NaN values
+      l_of_left <- l_of_left[!is.na(l_of_left)]
+      r_of_right <- r_of_right[!is.na(r_of_right)]
       
       if (any(l_of_left, r_of_right)) {
         return(message)
@@ -761,11 +762,8 @@ sv_comparison <- function(rhs,
       # Validation test
       res <- operator(value, rhs)
       
-      # Remove NA values
+      # Remove NA and NaN values
       res <- res[!is.na(res)]
-      
-      # Remove NaN values
-      res <- res[!is.nan(res)]
       
       if (!all(res)) {
         return(message)
@@ -852,7 +850,6 @@ sv_basic <- function(allow_multiple,
   force(allow_inf)
   
   function(value) {
-
     # Validity testing of `value` within set constraints
     if (!allow_multiple && length(value) != 1) {
       return(err_condition_messages[["err_allow_multiple"]])

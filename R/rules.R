@@ -852,11 +852,12 @@ sv_basic <- function(allow_multiple,
   force(allow_inf)
   
   function(value) {
+
     # Validity testing of `value` within set constraints
     if (!allow_multiple && length(value) != 1) {
       return(err_condition_messages[["err_allow_multiple"]])
     }
-    if (!allow_na && any(is.na(value))) {
+    if (!allow_na && any(is.na(value) & !is.nan(value))) {
       return(err_condition_messages[["err_allow_na"]])
     }
     if (!allow_nan && any(is.nan(value))) {

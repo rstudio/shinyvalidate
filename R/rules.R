@@ -761,6 +761,12 @@ sv_comparison <- function(rhs,
       # Validation test
       res <- operator(value, rhs)
       
+      # Remove NA values
+      res <- res[!is.na(res)]
+      
+      # Remove NaN values
+      res <- res[!is.nan(res)]
+      
       if (!all(res)) {
         return(message)
       }

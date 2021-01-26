@@ -862,7 +862,7 @@ sv_basic <- function(allow_multiple,
     if (!allow_nan && any(is.nan(value))) {
       return(err_condition_messages[["err_allow_nan"]])
     }
-    if (!allow_inf && any(!is.finite(value))) {
+    if (!allow_inf && any(is.infinite(value))) {
       return(err_condition_messages[["err_allow_infinite"]])
     }
     NULL

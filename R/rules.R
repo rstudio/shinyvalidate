@@ -1,6 +1,3 @@
-# TODO:
-# sv_lookup - make sure value is in a list of choices
-
 # TODO: When {shiny} has a localization language set, we can finally use preset,
 # localized error messages (as gluestrings). The gluestring used in the
 # `glue::glue_data_safe()` call will be obtained via a function that obtains a
@@ -228,7 +225,7 @@ sv_numeric <- function(message = "A number is required",
     function(value) {
       
       if (length(value) == 0) {
-        return(err_condition_messages[["err_zero_length_value"]])
+        return(err_msg_zero_length_value)
       }
       
       # Validation test
@@ -287,7 +284,7 @@ sv_integer <- function(message = "An integer is required",
     function(value) {
       
       if (length(value) == 0) {
-        return(err_condition_messages[["err_zero_length_value"]])
+        return(err_msg_zero_length_value)
       }
       
       # Validation test
@@ -862,16 +859,16 @@ sv_basic <- function(allow_multiple,
   function(value) {
     # Validity testing of `value` within set constraints
     if (!allow_multiple && length(value) != 1) {
-      return(err_condition_messages[["err_allow_multiple"]])
+      return(err_msg_allow_multiple)
     }
     if (!allow_na && any(is.na(value) & !is.nan(value))) {
-      return(err_condition_messages[["err_allow_na"]])
+      return(err_msg_allow_na)
     }
     if (!allow_nan && any(is.nan(value))) {
-      return(err_condition_messages[["err_allow_nan"]])
+      return(err_msg_allow_nan)
     }
     if (!allow_inf && any(is.infinite(value))) {
-      return(err_condition_messages[["err_allow_infinite"]])
+      return(err_msg_allow_infinite)
     }
     NULL
   }
@@ -893,11 +890,9 @@ check_input_length <- function(input,
   }
 }
 
-err_condition_messages <- 
-  list(
-    err_zero_length_value = "Must not contain zero values.",
-    err_allow_multiple = "Must not contain multiple values.",
-    err_allow_na = "Must not contain `NA` values.",
-    err_allow_nan = "Must not contain `NaN` values.",
-    err_allow_infinite = "Must not contain infinite values."
-  )
+# Error messages
+err_msg_zero_length_value <- "Must not contain zero values."
+err_msg_allow_multiple <- "Must not contain multiple values."
+err_msg_allow_na <- "Must not contain `NA` values."
+err_msg_allow_nan <- "Must not contain `NaN` values."
+err_msg_allow_infinite <- "Must not contain infinite values."

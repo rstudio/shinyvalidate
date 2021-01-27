@@ -8,8 +8,7 @@ sv_integer(
   message = "An integer is required",
   allow_multiple = FALSE,
   allow_na = FALSE,
-  allow_nan = FALSE,
-  allow_inf = FALSE
+  allow_nan = FALSE
 )
 }
 \arguments{
@@ -26,19 +25,17 @@ should be required).}
 
 \item{allow_nan}{If \code{FALSE} (the default for both options), then any
 \code{NA} or \code{NaN} element will cause validation to fail.}
-
-\item{allow_inf}{If \code{FALSE} (the default), then any \code{Inf} or \code{-Inf} element
-will cause validation to fail.}
 }
 \value{
 A function suitable for using as an
 \code{\link[=InputValidator]{InputValidator$add_rule()}} rule.
 }
 \description{
-The \code{sv_integer()} function validates that a field is an integer with the
-\code{\link[base:integer]{base::is.integer()}} function. By default, only a single, finite,
-not-missing, valid integer is allowed, but each of those criteria can be
-controlled via arguments.
+The \code{sv_integer()} function validates that a field is 'integer-like' with the
+\code{{value} \%\% 1 == 0} test. Very large values (generally with absolute exponent
+values greater than 15) won't be validated correctly due to floating point
+imprecision. By default, only a single, finite, not-missing, valid numbers
+are allowed, but each of those criteria can be controlled via arguments.
 }
 \examples{
 # Ignore withReactiveDomain(), it's just required to get this example to run

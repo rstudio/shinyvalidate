@@ -219,21 +219,25 @@ sv_numeric <- function(message = "A number is required",
   force(allow_inf)
 
   compose_rules(
-    function(value) {
-      
-      if (!is.numeric(value)) {
-        return(message)
-      }
-      if (length(value) == 0) {
-        return(err_condition_messages[["err_zero_length_value"]])
-      }
-    },
     sv_basic(
       allow_multiple = allow_multiple,
       allow_na = allow_na,
       allow_nan = allow_nan,
       allow_inf = allow_inf
-    )
+    ),
+    function(value) {
+      
+      if (length(value) == 0) {
+        return(err_condition_messages[["err_zero_length_value"]])
+      }
+      
+      # Validation test
+      res <- is.numeric(value) || is.infinite(value) || is.na(value)
+      
+      if (!all(res)) {
+        return(message)
+      }
+    }
   )
 }
 
@@ -275,21 +279,25 @@ sv_integer <- function(message = "An integer is required",
   force(allow_inf)
 
   compose_rules(
-    function(value) {
-      
-      if (!is.integer(value)) {
-        return(message)
-      }
-      if (length(value) == 0) {
-        return(err_condition_messages[["err_zero_length_value"]])
-      }
-    },
     sv_basic(
       allow_multiple = allow_multiple,
       allow_na = allow_na,
       allow_nan = allow_nan,
       allow_inf = allow_inf
-    )
+    ),
+    function(value) {
+      
+      if (length(value) == 0) {
+        return(err_condition_messages[["err_zero_length_value"]])
+      }
+      
+      # Validation test
+      res <- is.integer(value) || is.infinite(value) || is.na(value)
+      
+      if (!all(res)) {
+        return(message)
+      }
+    }
   )
 }
 

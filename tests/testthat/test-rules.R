@@ -256,6 +256,46 @@ test_that("the `sv_equal()` rule function works properly", {
   expect_sv_fail(rule, !!!pass_if_inf_2)
 })
 
+test_that("the `sv_not_equal()` rule function works properly", {
+  
+  usually_pass <- list(2, 2L, 2)
+  usually_fail <- list(1, 1L, -Inf, Inf)
+  pass_if_multiple <- list(rep(2, 10))
+  pass_if_na <- list(NA, NA_integer_, NA_real_)
+  pass_if_multiple_na <- list(c(2, 2, NA), c(2, NA, NA), c(NA, NA, NA))
+  pass_if_nan <- list(NaN)
+  pass_if_inf_1 <- list(-Inf)
+  pass_if_inf_2 <- list(Inf)
+  
+  rule <- sv_not_equal(rhs = 1)
+  expect_sv_pass(rule, !!!usually_pass)
+  expect_sv_fail(rule, !!!usually_fail, !!!pass_if_multiple, !!!pass_if_inf_1)
+  
+  rule <- sv_not_equal(rhs = 1, allow_multiple = TRUE)
+  expect_sv_pass(rule, !!!usually_pass, !!!pass_if_multiple)
+  expect_sv_fail(rule, !!!usually_fail, !!!pass_if_inf_1)
+  
+  rule <- sv_not_equal(rhs = 1, allow_na = TRUE)
+  expect_sv_pass(rule, !!!usually_pass, !!!pass_if_na)
+  expect_sv_fail(rule, !!!usually_fail, !!!pass_if_multiple, !!!pass_if_inf_1, !!!pass_if_inf_1, !!!pass_if_nan)
+  
+  rule <- sv_not_equal(rhs = 1, allow_nan = TRUE)
+  expect_sv_pass(rule, !!!usually_pass, !!!pass_if_nan)
+  expect_sv_fail(rule, !!!usually_fail, !!!pass_if_multiple, !!!pass_if_inf_1, !!!pass_if_inf_2, !!!pass_if_na)
+  
+  rule <- sv_not_equal(rhs = 1, allow_multiple = TRUE, allow_na = TRUE)
+  expect_sv_pass(rule, !!!usually_pass, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_multiple_na)
+  expect_sv_fail(rule, !!!usually_fail, !!!pass_if_inf_1, !!!pass_if_inf_2)
+  
+  rule <- sv_not_equal(rhs = Inf, allow_inf = TRUE)
+  expect_sv_pass(rule, !!!pass_if_inf_1)
+  expect_sv_fail(rule, !!!pass_if_inf_2)
+  
+  rule <- sv_not_equal(rhs = Inf, allow_inf = TRUE)
+  expect_sv_pass(rule, !!!pass_if_inf_1)
+  expect_sv_fail(rule, !!!pass_if_inf_2)
+})
+
 test_that("the `sv_between()` rule function works properly", {
   
   always_pass <- list(2, 3, 4L, 9, 3:5)
@@ -406,4 +446,104 @@ test_that("the `sv_regex()` rule function works properly", {
       fixed = TRUE
     )("The {shinyvalidate} package.")
   )
+})
+
+test_that("the `sv_required()` rule function works properly", {
+  
+  always_pass <- list(3, "a", data.frame(a = 1:3))
+
+  always_fail <- list(
+    "", rep("", 3), NULL, rep(NA, 3),
+    character(0), numeric(0), logical(0)
+  )
+  
+  rule <- sv_required()
+  expect_sv_pass(rule, !!!always_pass)
+  expect_sv_fail(rule, !!!always_fail)
+})
+
+
+test_that("the `sv_basic()` rule function works properly", {
+  
+  always_pass <- list(-1, 0, 0L)
+  pass_if_multiple <- list(c(-10:-1))
+  pass_if_na <- list(NA, NA_integer_, NA_real_)
+  pass_if_multiple_na <- list(c(-2, -1, NA), c(NA, NA, NA))
+  pass_if_nan <- list(NaN)
+  pass_if_inf <- list(-Inf)
+  
+  rule <- 
+    sv_basic(
+      allow_multiple = FALSE,
+      allow_na = FALSE,
+      allow_nan = FALSE,
+      allow_inf = FALSE
+    )
+  expect_sv_pass(rule, !!!always_pass)
+  expect_sv_fail(rule, !!!pass_if_multiple, !!!pass_if_inf)
+  
+  rule <-
+    sv_basic(
+      allow_multiple = TRUE,
+      allow_na = FALSE,
+      allow_nan = FALSE,
+      allow_inf = FALSE
+    )
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple)
+  expect_sv_fail(rule, !!!pass_if_inf)
+  
+  rule <- 
+    sv_basic(
+      allow_multiple = FALSE,
+      allow_na = TRUE,
+      allow_nan = FALSE,
+      allow_inf = FALSE
+    )
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_na)
+  expect_sv_fail(rule, !!!pass_if_multiple, !!!pass_if_nan, !!!pass_if_inf)
+  
+  rule <- 
+    sv_basic(
+      allow_multiple = FALSE,
+      allow_na = FALSE,
+      allow_nan = TRUE,
+      allow_inf = FALSE
+    )
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_nan)
+  expect_sv_fail(rule, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_inf)
+  
+  rule <- 
+    sv_basic(
+      allow_multiple = TRUE,
+      allow_na = TRUE,
+      allow_nan = FALSE,
+      allow_inf = FALSE
+    )
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_multiple_na)
+  expect_sv_fail(rule, !!!pass_if_nan, !!!pass_if_inf)
+  
+  rule <-     
+    sv_basic(
+      allow_multiple = FALSE,
+      allow_na = FALSE,
+      allow_nan = FALSE,
+      allow_inf = TRUE
+    )
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_inf)
+  expect_sv_fail(rule, !!!pass_if_multiple)
+})
+
+test_that("the `prepare_values_text()` prepares the text properly", {
+  
+  expect_values_text <- function(set, limit, expected) {
+    expect_equal(prepare_values_text(set = set, limit = limit), expected = expected)
+  }
+  
+  expect_values_text(set = 1:3, limit = 3, "1, 2, 3")
+  expect_values_text(set = 1:2, limit = 3, "1, 2")
+  expect_values_text(set = 1, limit = 3, "1")
+  expect_values_text(set = 1:5, limit = 3, "1, 2, 3 (and 2 more)")
+  expect_values_text(set = 1:5, limit = 2, "1, 2 (and 3 more)")
+  expect_values_text(set = 1:5, limit = 10, "1, 2, 3, 4, 5")
+  expect_values_text(set = 1:5, limit = Inf, "1, 2, 3, 4, 5")
 })

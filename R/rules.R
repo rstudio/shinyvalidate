@@ -243,10 +243,11 @@ sv_numeric <- function(message = "A number is required",
 
 #' Validate that a field is an integer
 #'
-#' The `sv_integer()` function validates that a field is an integer with the
-#' [base::is.integer()] function. By default, only a single, finite,
-#' not-missing, valid integer is allowed, but each of those criteria can be
-#' controlled via arguments.
+#' The `sv_integer()` function validates that a field is 'integer-like' with the
+#' `{value} %% 1 == 0` test. Very large values (generally with absolute exponent
+#' values greater than 15) won't be validated correctly due to floating point
+#' imprecision. By default, only a single, finite, not-missing, valid numbers
+#' are allowed, but each of those criteria can be controlled via arguments.
 #'
 #' @param message The validation error message to use if a value is not an
 #'   integer.
@@ -270,20 +271,18 @@ sv_numeric <- function(message = "A number is required",
 sv_integer <- function(message = "An integer is required",
                        allow_multiple = FALSE,
                        allow_na = FALSE,
-                       allow_nan = FALSE,
-                       allow_inf = FALSE) {
+                       allow_nan = FALSE) {
   force(message)
   force(allow_multiple)
   force(allow_na)
   force(allow_nan)
-  force(allow_inf)
 
   compose_rules(
     sv_basic(
       allow_multiple = allow_multiple,
       allow_na = allow_na,
       allow_nan = allow_nan,
-      allow_inf = allow_inf
+      allow_inf = FALSE
     ),
     function(value) {
       
@@ -292,7 +291,10 @@ sv_integer <- function(message = "An integer is required",
       }
       
       # Validation test
-      res <- is.integer(value) | is.infinite(value) | is.na(value)
+      res <- 
+        suppressWarnings(value %% 1 == 0) |
+        is.infinite(value) |
+        is.na(value)
       
       if (!all(res)) {
         return(message)

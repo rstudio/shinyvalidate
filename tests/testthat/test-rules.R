@@ -281,3 +281,129 @@ test_that("the `sv_between()` rule function works properly", {
   expect_sv_fail(sv_between(1, 10, inclusive = c(FALSE, FALSE)), 1:2)
   expect_sv_fail(sv_between(1, 10, inclusive = c(FALSE, FALSE)), 9:10)
 })
+
+test_that("the `sv_in_set()` rule function works properly", {
+  
+  always_pass <- list(1, 2, 3, 4, 5, 5L)
+  always_fail <- list(0, -1L, c(-5, 0), Inf, -Inf, NA, c(NA, NA, NA), c(4, NA), c(4, 6, 4), NaN)
+  
+  rule <- sv_in_set(1L:5L)
+  expect_sv_pass(rule, !!!always_pass)
+  expect_sv_fail(rule, !!!always_fail)
+  
+  rule <- sv_in_set(as.numeric(1:5))
+  expect_sv_pass(rule, !!!always_pass)
+  expect_sv_fail(rule, !!!always_fail)
+})
+
+test_that("the `sv_numeric()` rule function works properly", {
+  
+  always_pass <- list(-5E6, -1, 0, 0L, 5E6)
+  always_fail <- list("text", TRUE)
+  pass_if_multiple <- list(c(-10:-1))
+  pass_if_na <- list(NA_integer_, NA_real_)
+  pass_if_multiple_na <- list(c(-2, -1, NA), c(NA_real_, NA_real_), c(NA_integer_, 2))
+  pass_if_nan <- list(NaN)
+  pass_if_inf <- list(-Inf, Inf)
+  
+  rule <- sv_numeric()
+  expect_sv_pass(rule, !!!always_pass)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_inf)
+  
+  rule <- sv_numeric(allow_multiple = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_inf)
+  
+  rule <- sv_numeric(allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_nan, !!!pass_if_inf)
+  
+  rule <- sv_numeric(allow_nan = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_nan)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_inf)
+  
+  rule <- sv_numeric(allow_multiple = TRUE, allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_multiple_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_nan, !!!pass_if_inf)
+  
+  rule <- sv_numeric(allow_inf = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_inf)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple)
+})
+
+test_that("the `sv_integer()` rule function works properly", {
+  
+  always_pass <- list(-5E6L, -1L, 0L, 0L, 5E6L)
+  always_fail <- list("text", TRUE, 5.6, as.numeric(1))
+  pass_if_multiple <- list(as.integer(-10:-1))
+  pass_if_na <- list(NA_integer_)
+  pass_if_multiple_na <- list(c(-2L, -1L, NA_integer_), c(NA_integer_, NA_integer_), c(NA_integer_, 2))
+  pass_if_nan <- list(NaN)
+  pass_if_inf <- list(-Inf, Inf)
+  
+  rule <- sv_integer()
+  expect_sv_pass(rule, !!!always_pass)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_inf)
+  
+  rule <- sv_integer(allow_multiple = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_inf)
+  
+  rule <- sv_integer(allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_nan, !!!pass_if_inf)
+  
+  rule <- sv_integer(allow_nan = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_nan)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_inf)
+  
+  rule <- sv_integer(allow_multiple = TRUE, allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_multiple_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_nan, !!!pass_if_inf)
+  
+  rule <- sv_integer(allow_inf = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_inf)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple)
+})
+
+test_that("the `sv_regex()` rule function works properly", {
+  
+  expect_null(
+    sv_regex(
+      pattern = "^T",
+      message = "message"
+    )("The shinyvalidate package.")
+  )
+  
+  expect_equal(
+    sv_regex(
+      pattern = "^t",
+      message = "message"
+    )("The shinyvalidate package."), 
+    "message"
+  )
+  
+  expect_null(
+    sv_regex(
+      pattern = "^t",
+      message = "message",
+      invert = TRUE
+    )("The shinyvalidate package.")
+  )
+  
+  expect_null(
+    sv_regex(
+      pattern = "^t",
+      message = "message",
+      ignore.case = TRUE
+    )("The shinyvalidate package.")
+  )
+  
+  expect_null(
+    sv_regex(
+      pattern = "{shinyvalidate}",
+      message = "message",
+      fixed = TRUE
+    )("The {shinyvalidate} package.")
+  )
+})

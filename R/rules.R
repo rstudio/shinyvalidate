@@ -232,7 +232,7 @@ sv_numeric <- function(message = "A number is required",
       }
       
       # Validation test
-      res <- is.numeric(value) || is.infinite(value) || is.na(value)
+      res <- is.numeric(value) | is.infinite(value) | is.na(value)
       
       if (!all(res)) {
         return(message)
@@ -292,7 +292,7 @@ sv_integer <- function(message = "An integer is required",
       }
       
       # Validation test
-      res <- is.integer(value) || is.infinite(value) || is.na(value)
+      res <- is.integer(value) | is.infinite(value) | is.na(value)
       
       if (!all(res)) {
         return(message)

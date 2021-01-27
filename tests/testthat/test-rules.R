@@ -1,3 +1,6 @@
+Sys.setenv("_R_CHECK_LENGTH_1_LOGIC2_" = "true")
+Sys.setenv("_R_CHECK_LENGTH_1_CONDITION_" = "true")
+
 test_that("`sv_optional()` basic use cases", {
   session <- shiny::MockShinySession$new()
   shiny::withReactiveDomain(session, {
@@ -374,10 +377,10 @@ test_that("the `sv_numeric()` rule function works properly", {
 test_that("the `sv_integer()` rule function works properly", {
   
   always_pass <- list(-5E6L, -1L, 0L, 0L, 5E6L)
-  always_fail <- list("text", TRUE, 5.6, as.numeric(1))
+  always_fail <- list("text", TRUE, 5.6, as.numeric(1), c(NA_integer_, 2))
   pass_if_multiple <- list(as.integer(-10:-1))
   pass_if_na <- list(NA_integer_)
-  pass_if_multiple_na <- list(c(-2L, -1L, NA_integer_), c(NA_integer_, NA_integer_), c(NA_integer_, 2))
+  pass_if_multiple_na <- list(c(-2L, -1L, NA_integer_), c(NA_integer_, NA_integer_), c(NA_integer_, 2L))
   pass_if_nan <- list(NaN)
   pass_if_inf <- list(-Inf, Inf)
   
@@ -461,7 +464,6 @@ test_that("the `sv_required()` rule function works properly", {
   expect_sv_pass(rule, !!!always_pass)
   expect_sv_fail(rule, !!!always_fail)
 })
-
 
 test_that("the `sv_basic()` rule function works properly", {
   

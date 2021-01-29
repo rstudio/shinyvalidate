@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Input validation for Shiny apps • shinyvalidate</title>
+<title>Input Validation for Shiny Apps • shinyvalidate</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="Input validation for Shiny apps">
+<script src="pkgdown.js"></script><meta property="og:title" content="Input Validation for Shiny Apps">
 <meta property="og:description" content="Improves the user experience of Shiny apps by helping to
     provide realtime feedback when required inputs are missing, or
     input values are not valid.">
@@ -116,7 +116,7 @@
 </ol>
 <p>That’s all you need to do to get validation messages to show up. Here is a simple example:</p>
 <p><img src="reference/figures/demo.gif" alt="Screencast of empty 'Name' and 'Email' fields showing error messages beneath them, and the user providing valid input that clears the errors" width="316"></p>
-<pre class="{.r}"><code><a href="http://shiny.rstudio.com">library(shiny)
+<pre class="{.r}"><code><a href="https://shiny.rstudio.com/">library(shiny)
 library(shinyvalidate)
 
 ui &lt;- fluidPage(
@@ -149,7 +149,7 @@ shinyApp(ui, server)</a></code></pre>
 <h2 class="hasAnchor">
 <a href="#prior-art" class="anchor"></a>Prior art</h2>
 <ul>
-<li><p><a href="https://shiny.rstudio.com/articles/validation.html">Shiny’s built-in validation</a>. The <code><a href="https://shiny.rstudio.com/reference/shiny/latest/validate.html">shiny::validate()</a></code> function fits naturally with Shiny’s reactive programming model, but has limited usefulness because it only shows validation feedback in downstream reactive outputs, instead of providing the feedback next to the incorrect input, where users expect it.</p></li>
+<li><p><a href="https://shiny.rstudio.com/articles/validation.html">Shiny’s built-in validation</a>. The <code><a href="https://rdrr.io/pkg/shiny/man/validate.html">shiny::validate()</a></code> function fits naturally with Shiny’s reactive programming model, but has limited usefulness because it only shows validation feedback in downstream reactive outputs, instead of providing the feedback next to the incorrect input, where users expect it.</p></li>
 <li><p><a href="https://github.com/merlinoa/shinyFeedback">shinyFeedback</a> by <a href="https://github.com/merlinoa">@merlinoa</a>, who graciously provided feedback on the design of shinyvalidate. Compared to shinyFeedback, shinyvalidate aims to have a more concise but less flexible R API; and on the UI side, shinyFeedback displays richer feedback on a hard-coded set of components, while shinyvalidate feedback is minimalist but aims to support a larger set of components and is extensible for custom inputs.</p></li>
 </ul>
 </div>
@@ -174,7 +174,7 @@ shinyApp(ui, server)</a></code></pre>
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
-<li>Rich Iannone <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Richard Iannone <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-3925-190X" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Joe Cheng <br><small class="roles"> Author </small>  </li>
 <li> RStudio <br><small class="roles"> Copyright holder, funder </small>  </li>
 </ul>
@@ -192,7 +192,7 @@ shinyApp(ui, server)</a></code></pre>
 
 
       <footer><div class="copyright">
-  <p>Developed by Rich Iannone, Joe Cheng,  RStudio.</p>
+  <p>Developed by Richard Iannone, Joe Cheng,  RStudio.</p>
 </div>
 
 <div class="pkgdown">

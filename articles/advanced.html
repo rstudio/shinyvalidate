@@ -148,7 +148,7 @@
 <span class="va">signup_iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">recalculate_iv</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
-<span class="va">recalculate_iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"sample_count"</span>, <span class="fu"><a href="../reference/sv_numeric.html">sv_integer</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="va">recalculate_iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"sample_count"</span>, <span class="fu"><a href="../reference/sv_integer.html">sv_integer</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="va">recalculate_iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"sample_count"</span>, <span class="op">~</span> <span class="kw">if</span> <span class="op">(</span><span class="va">.</span> <span class="op">&lt;=</span> <span class="fl">0</span><span class="op">)</span> <span class="st">"Must be positive"</span><span class="op">)</span></code></pre></div>
 <p>[source, live demo] TODO</p>
 <p>Now, reactives relating to signup can use <code>signup_iv</code>, and reactives relating to recalculation can use <code>recalculate_iv</code>. These two validator objects have no parent/child relationship; they’re just two independent objects that have nothing in common besides existing in the same environment.</p>
@@ -309,7 +309,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Rich Iannone, Joe Cheng,  RStudio.</p>
+  <p>Developed by Richard Iannone, Joe Cheng,  RStudio.</p>
 </div>
 
 <div class="pkgdown">

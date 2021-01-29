@@ -147,8 +147,8 @@ A value that represents an unclicked shiny::actionButton()
     <div class="ref-description">
     <p>This function takes an input value and uses heuristics to guess whether it
 represents an "empty" input vs. one that the user has provided. This will
-vary by input type; for example, a <code><a href='https://shiny.rstudio.com/reference/shiny/latest/textInput.html'>shiny::textInput()</a></code> is <code>""</code> when empty,
-while a <code><a href='https://shiny.rstudio.com/reference/shiny/latest/numericInput.html'>shiny::numericInput()</a></code> is <code>NA</code>.</p>
+vary by input type; for example, a <code><a href='https://rdrr.io/pkg/shiny/man/textInput.html'>shiny::textInput()</a></code> is <code>""</code> when empty,
+while a <code><a href='https://rdrr.io/pkg/shiny/man/numericInput.html'>shiny::numericInput()</a></code> is <code>NA</code>.</p>
 <p><code>input_provided</code> returns <code>TRUE</code> for all values except:</p><ul>
 <li><p><code>NULL</code></p></li>
 <li><p><code>""</code></p></li>
@@ -156,7 +156,7 @@ while a <code><a href='https://shiny.rstudio.com/reference/shiny/latest/numericI
 <li><p>An atomic vector that contains only missing (<code>NA</code>) values</p></li>
 <li><p>A character vector that contains only missing and/or <code>""</code> values</p></li>
 <li><p>An object of class <code>"try-error"</code></p></li>
-<li><p>A value that represents an unclicked <code><a href='https://shiny.rstudio.com/reference/shiny/latest/actionButton.html'>shiny::actionButton()</a></code></p></li>
+<li><p>A value that represents an unclicked <code><a href='https://rdrr.io/pkg/shiny/man/actionButton.html'>shiny::actionButton()</a></code></p></li>
 </ul>
 
     </div>
@@ -177,10 +177,10 @@ while a <code><a href='https://shiny.rstudio.com/reference/shiny/latest/numericI
     <p>A logical vector of length 1.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>This function is based on <code><a href='https://shiny.rstudio.com/reference/shiny/latest/req.html'>shiny::isTruthy()</a></code> but tweaked here in
+    <p>This function is based on <code><a href='https://rdrr.io/pkg/shiny/man/req.html'>shiny::isTruthy()</a></code> but tweaked here in
 shinyvalidate to change the treatment of <code>FALSE</code> values: <code>isTruthy(FALSE)</code>
 returns <code>FALSE</code>, but <code>input_provided(FALSE)</code> returns <code>TRUE</code>. This difference
-is motivated by <code><a href='https://shiny.rstudio.com/reference/shiny/latest/checkboxInput.html'>shiny::checkboxInput()</a></code>, where <code>isTruthy()</code> answers the
+is motivated by <code><a href='https://rdrr.io/pkg/shiny/man/checkboxInput.html'>shiny::checkboxInput()</a></code>, where <code>isTruthy()</code> answers the
 question of "is the input present <em>and checked</em>" while <code>input_provided</code> is
 just "is the input present".</p>
 
@@ -195,7 +195,7 @@ just "is the input present".</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Rich Iannone, Joe Cheng,  RStudio.</p>
+  <p>Developed by Richard Iannone, Joe Cheng,  RStudio.</p>
 </div>
 
 <div class="pkgdown">

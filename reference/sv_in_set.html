@@ -137,7 +137,11 @@ specified set of values." />
 specified set of values.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sv_in_set</span><span class='op'>(</span><span class='va'>set</span>, message <span class='op'>=</span> <span class='st'>"Must be in the set of {values_text}."</span>, msg_limit <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sv_in_set</span><span class='op'>(</span>
+  <span class='va'>set</span>,
+  message_fmt <span class='op'>=</span> <span class='st'>"Must be in the set of {values_text}."</span>,
+  set_limit <span class='op'>=</span> <span class='fl'>3</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -149,17 +153,20 @@ part of to pass validation. To allow an empty field, <code>NA</code> should be
 included in the <code>set</code> vector. Optionally, <code>NaN</code> can be included as well.</p></td>
     </tr>
     <tr>
-      <th>message</th>
-      <td><p>The validation error message to use if a value fails to match
-the rule. Use <code>"{values_text}"</code> within the message to include a short list
-of values based on <code>set</code>.</p></td>
+      <th>message_fmt</th>
+      <td><p>The validation error message to use if a value fails to
+match the rule. The message can be customized by using the
+<code>"{values_text}"</code> string parameter, which allows for the insertion of <code>set</code>
+values (formatted internally as a text list and controlled via the
+<code>set_limit</code> parameter). While the default message uses this string
+parameter, it is not required in a user-defined <code>message_fmt</code> string.</p></td>
     </tr>
     <tr>
-      <th>msg_limit</th>
+      <th>set_limit</th>
       <td><p>The limit of <code>set</code> values to include in the
 automatically-generated error message (i.e., when <code>message = NULL</code>, the
 default). If the number of elements provided in <code>set</code> is greater than
-<code>msg_limit</code> then only the first <code>&lt;message_limit&gt;</code> set elements will be
+<code>set_limit</code> then only the first <code>&lt;message_limit&gt;</code> set elements will be
 echoed along with text that states how many extra elements are part of the
 <code>set</code>.</p></td>
     </tr>
@@ -173,14 +180,13 @@ echoed along with text that states how many extra elements are part of the
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Ignore withReactiveDomain(), it's just required to get this example to run</span>
 <span class='co'># outside of Shiny</span>
-<span class='fu'>shiny</span><span class='fu'>::</span><span class='fu'><a href='https://shiny.rstudio.com/reference/shiny/latest/domains.html'>withReactiveDomain</a></span><span class='op'>(</span><span class='fu'>shiny</span><span class='fu'>::</span><span class='va'><a href='https://shiny.rstudio.com/reference/shiny/latest/MockShinySession.html'>MockShinySession</a></span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='op'>)</span>, <span class='op'>{</span>
+<span class='fu'>shiny</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/shiny/man/domains.html'>withReactiveDomain</a></span><span class='op'>(</span><span class='fu'>shiny</span><span class='fu'>::</span><span class='va'><a href='https://rdrr.io/pkg/shiny/man/MockShinySession.html'>MockShinySession</a></span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='op'>)</span>, <span class='op'>{</span>
 
   <span class='va'>iv</span> <span class='op'>&lt;-</span> <span class='va'><a href='InputValidator.html'>InputValidator</a></span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='op'>)</span>
 
-  <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"count"</span>, <span class='fu'>sv_in_set</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
-  <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"count"</span>, <span class='op'>~</span><span class='kw'>if</span> <span class='op'>(</span><span class='va'>.</span> <span class='op'>&lt;=</span> <span class='fl'>0</span><span class='op'>)</span> <span class='st'>"A positive value is required"</span><span class='op'>)</span>
-
+  <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"rating"</span>, <span class='fu'>sv_in_set</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>, set_limit <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span><span class='op'>)</span>
+
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -193,7 +199,7 @@ echoed along with text that states how many extra elements are part of the
 
       <footer>
       <div class="copyright">
-  <p>Developed by Rich Iannone, Joe Cheng,  RStudio.</p>
+  <p>Developed by Richard Iannone, Joe Cheng,  RStudio.</p>
 </div>
 
 <div class="pkgdown">

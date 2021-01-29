@@ -163,7 +163,8 @@ the pattern.</p></td>
     </tr>
     <tr>
       <th>ignore.case, perl, fixed, useBytes, invert</th>
-      <td><p>Passed through to <code><a href='https://rdrr.io/r/base/grep.html'>base::grepl()</a></code>.</p></td>
+      <td><p>Options passed through to
+<code><a href='https://rdrr.io/r/base/grep.html'>base::grepl()</a></code>.</p></td>
     </tr>
     </table>
 
@@ -175,7 +176,7 @@ the pattern.</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Ignore withReactiveDomain(), it's just required to get this example to run</span>
 <span class='co'># outside of Shiny</span>
-<span class='fu'>shiny</span><span class='fu'>::</span><span class='fu'><a href='https://shiny.rstudio.com/reference/shiny/latest/domains.html'>withReactiveDomain</a></span><span class='op'>(</span><span class='fu'>shiny</span><span class='fu'>::</span><span class='va'><a href='https://shiny.rstudio.com/reference/shiny/latest/MockShinySession.html'>MockShinySession</a></span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='op'>)</span>, <span class='op'>{</span>
+<span class='fu'>shiny</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/shiny/man/domains.html'>withReactiveDomain</a></span><span class='op'>(</span><span class='fu'>shiny</span><span class='fu'>::</span><span class='va'><a href='https://rdrr.io/pkg/shiny/man/MockShinySession.html'>MockShinySession</a></span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='op'>)</span>, <span class='op'>{</span>
 
   <span class='va'>iv</span> <span class='op'>&lt;-</span> <span class='va'><a href='InputValidator.html'>InputValidator</a></span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='op'>)</span>
 
@@ -190,7 +191,6 @@ the pattern.</p></td>
       ignore.case <span class='op'>=</span> <span class='cn'>TRUE</span>
     <span class='op'>)</span>
   <span class='op'>)</span>
-
 <span class='op'>}</span><span class='op'>)</span>
 
 </div></pre>
@@ -205,7 +205,7 @@ the pattern.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Rich Iannone, Joe Cheng,  RStudio.</p>
+  <p>Developed by Richard Iannone, Joe Cheng,  RStudio.</p>
 </div>
 
 <div class="pkgdown">

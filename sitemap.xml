@@ -7,6 +7,9 @@
     <loc>https://rstudio.github.io/shinyvalidate//reference/InputValidator.html</loc>
   </url>
   <url>
+    <loc>https://rstudio.github.io/shinyvalidate//reference/compose_rules.html</loc>
+  </url>
+  <url>
     <loc>https://rstudio.github.io/shinyvalidate//reference/input_provided.html</loc>
   </url>
   <url>
@@ -16,7 +19,28 @@
     <loc>https://rstudio.github.io/shinyvalidate//reference/sv_between.html</loc>
   </url>
   <url>
+    <loc>https://rstudio.github.io/shinyvalidate//reference/sv_equal.html</loc>
+  </url>
+  <url>
+    <loc>https://rstudio.github.io/shinyvalidate//reference/sv_gt.html</loc>
+  </url>
+  <url>
+    <loc>https://rstudio.github.io/shinyvalidate//reference/sv_gte.html</loc>
+  </url>
+  <url>
     <loc>https://rstudio.github.io/shinyvalidate//reference/sv_in_set.html</loc>
+  </url>
+  <url>
+    <loc>https://rstudio.github.io/shinyvalidate//reference/sv_integer.html</loc>
+  </url>
+  <url>
+    <loc>https://rstudio.github.io/shinyvalidate//reference/sv_lt.html</loc>
+  </url>
+  <url>
+    <loc>https://rstudio.github.io/shinyvalidate//reference/sv_lte.html</loc>
+  </url>
+  <url>
+    <loc>https://rstudio.github.io/shinyvalidate//reference/sv_not_equal.html</loc>
   </url>
   <url>
     <loc>https://rstudio.github.io/shinyvalidate//reference/sv_numeric.html</loc>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Validate that a field is a number bounded by minimum and maximum values — sv_between • shinyvalidate</title>
+<title>Validate that a field is greater than a specified value — sv_gt • shinyvalidate</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,9 @@
 
 
 
-<meta property="og:title" content="Validate that a field is a number bounded by minimum and maximum values — sv_between" />
-<meta property="og:description" content="The sv_between() function validates that a field has values between left
-and right boundary values. Both bounds are inclusive by default, but both can
-be set as either inclusive or exclusive with the inclusive argument. In its
-default mode, the validation check will effectively be of the form &amp;lt;left&amp;gt; &amp;lt;= &amp;lt;field&amp;gt; &amp;lt;= &amp;lt;right&amp;gt;." />
+<meta property="og:title" content="Validate that a field is greater than a specified value — sv_gt" />
+<meta property="og:description" content="The sv_gt() function compares the field value to a specified value with the
+&amp;gt; operator." />
 
 
 
@@ -129,49 +127,48 @@ default mode, the validation check will effectively be of the form &amp;lt;left&
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Validate that a field is a number bounded by minimum and maximum values</h1>
+    <h1>Validate that a field is greater than a specified value</h1>
     <small class="dont-index">Source: <a href='https://github.com/rstudio/shinyvalidate/blob/master/R/rules.R'><code>R/rules.R</code></a></small>
-    <div class="hidden name"><code>sv_between.Rd</code></div>
+    <div class="hidden name"><code>sv_gt.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The <code>sv_between()</code> function validates that a field has values between left
-and right boundary values. Both bounds are inclusive by default, but both can
-be set as either inclusive or exclusive with the <code>inclusive</code> argument. In its
-default mode, the validation check will effectively be of the form <code>&lt;left&gt; &lt;= &lt;field&gt; &lt;= &lt;right&gt;</code>.</p>
+    <p>The <code>sv_gt()</code> function compares the field value to a specified value with the
+<code>&gt;</code> operator.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sv_between</span><span class='op'>(</span>
-  <span class='va'>left</span>,
-  <span class='va'>right</span>,
-  inclusive <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>TRUE</span>, <span class='cn'>TRUE</span><span class='op'>)</span>,
-  message_fmt <span class='op'>=</span> <span class='st'>"Must be between {left} and {right}."</span>,
+    <pre class="usage"><span class='fu'>sv_gt</span><span class='op'>(</span>
+  <span class='va'>rhs</span>,
+  message_fmt <span class='op'>=</span> <span class='st'>"Must be greater than {rhs}."</span>,
+  allow_multiple <span class='op'>=</span> <span class='cn'>FALSE</span>,
   allow_na <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  allow_nan <span class='op'>=</span> <span class='cn'>FALSE</span>
+  allow_nan <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  allow_inf <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>left, right</th>
-      <td><p>The left and right boundary values. Inclusively for each of
-the boundaries is set with the <code>inclusive</code> argument; the defaults are set
-for inclusive bounds.</p></td>
-    </tr>
-    <tr>
-      <th>inclusive</th>
-      <td><p>A two-element logical vector that indicates whether the
-<code>left</code> and <code>right</code> bounds, respectively, should be inclusive. Both bounds
-are by default are inclusive, using <code><a href='https://rdrr.io/r/base/c.html'>c(TRUE, TRUE)</a></code>.</p></td>
+      <th>rhs</th>
+      <td><p>The right hand side (RHS) value is to be used for the comparison
+with the field value. The validation check will effectively be of the form
+<code>&lt;field&gt; &gt; &lt;rhs&gt;</code>.</p></td>
     </tr>
     <tr>
       <th>message_fmt</th>
-      <td><p>The validation error message to use if a value fails to
-match the rule. The message can be customized by using the <code>"{left}"</code> and
-<code>"{right}"</code> string parameters, which allows for the insertion of the <code>left</code>
-and <code>right</code> values. While the default message uses both of these string
-parameters, they are not required in a user-defined <code>message_fmt</code> string.</p></td>
+      <td><p>The validation error message to use if the field fails the
+validation test. Use the <code>"{rhs}"</code> string parameter to customize the
+message, including what was set in <code>rhs</code>. While the default message uses
+this string parameter, it is not required in a user-defined <code>message_fmt</code>
+string.</p></td>
+    </tr>
+    <tr>
+      <th>allow_multiple</th>
+      <td><p>If <code>FALSE</code> (the default), then the length of the input
+vector must be exactly one; if <code>TRUE</code>, then any length is allowed
+(including a length of zero; use <code><a href='sv_required.html'>sv_required()</a></code> if one or more values
+should be required).</p></td>
     </tr>
     <tr>
       <th>allow_na</th>
@@ -182,6 +179,11 @@ parameters, they are not required in a user-defined <code>message_fmt</code> str
       <th>allow_nan</th>
       <td><p>If <code>FALSE</code> (the default for both options), then any
 <code>NA</code> or <code>NaN</code> element will cause validation to fail.</p></td>
+    </tr>
+    <tr>
+      <th>allow_inf</th>
+      <td><p>If <code>FALSE</code> (the default), then any <code>Inf</code> or <code>-Inf</code> element
+will cause validation to fail.</p></td>
     </tr>
     </table>
 
@@ -197,8 +199,7 @@ parameters, they are not required in a user-defined <code>message_fmt</code> str
 
   <span class='va'>iv</span> <span class='op'>&lt;-</span> <span class='va'><a href='InputValidator.html'>InputValidator</a></span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='op'>)</span>
 
-  <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"count"</span>, <span class='fu'>sv_between</span><span class='op'>(</span><span class='fl'>10</span>, <span class='fl'>10000</span><span class='op'>)</span><span class='op'>)</span>
-  <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"count"</span>, <span class='op'>~</span><span class='kw'>if</span> <span class='op'>(</span><span class='va'>.</span> <span class='op'>&lt;=</span> <span class='fl'>0</span><span class='op'>)</span> <span class='st'>"A positive value is required"</span><span class='op'>)</span>
+  <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span><span class='st'>"number"</span>, <span class='fu'>sv_gt</span><span class='op'>(</span><span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span><span class='op'>)</span>
 
 </div></pre>

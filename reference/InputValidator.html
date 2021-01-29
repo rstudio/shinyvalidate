@@ -199,13 +199,13 @@ that are completely unrelated to each other; each form would have its own
 <p>Create a new validator object.</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
 <p><div class="r"></p><pre><span class='va'>InputValidator</span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span>
   priority <span class='op'>=</span> <span class='fl'>1000</span>,
-  session <span class='op'>=</span> <span class='fu'>shiny</span><span class='fu'>::</span><span class='fu'><a href='https://shiny.rstudio.com/reference/shiny/latest/domains.html'>getDefaultReactiveDomain</a></span><span class='op'>(</span><span class='op'>)</span>
+  session <span class='op'>=</span> <span class='fu'>shiny</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/shiny/man/domains.html'>getDefaultReactiveDomain</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='op'>)</span></pre><p></div></p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
 <p><div class="arguments"></p><dl>
 <dt><code>priority</code></dt><dd><p>When a validator object is enabled, it creates an
-internal <code><a href='https://shiny.rstudio.com/reference/shiny/latest/observe.html'>shiny::observe()</a></code> to keep validation feedback in the UI
+internal <code><a href='https://rdrr.io/pkg/shiny/man/observe.html'>shiny::observe()</a></code> to keep validation feedback in the UI
 up-to-date. This parameter controls the priority of that observer. It's
 highly recommended to keep this value higher than the priorities of any
 observers that do actual work, so users see validation updates quickly.</p></dd>
@@ -274,7 +274,7 @@ subsequent rules for that input from executing.</p><h4 class='hasAnchor' id='arg
   <span class='va'>inputId</span>,
   <span class='va'>rule</span>,
   <span class='va'>...</span>,
-  session. <span class='op'>=</span> <span class='fu'>shiny</span><span class='fu'>::</span><span class='fu'><a href='https://shiny.rstudio.com/reference/shiny/latest/domains.html'>getDefaultReactiveDomain</a></span><span class='op'>(</span><span class='op'>)</span>
+  session. <span class='op'>=</span> <span class='fu'>shiny</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/shiny/man/domains.html'>getDefaultReactiveDomain</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='op'>)</span></pre><p></div></p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
@@ -352,7 +352,7 @@ character vector describing a validation problem.</p><h4 class='hasAnchor' id='a
 
       <footer>
       <div class="copyright">
-  <p>Developed by Rich Iannone, Joe Cheng,  RStudio.</p>
+  <p>Developed by Richard Iannone, Joe Cheng,  RStudio.</p>
 </div>
 
 <div class="pkgdown">

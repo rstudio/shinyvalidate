@@ -8,9 +8,9 @@ sv_between(
   left,
   right,
   inclusive = c(TRUE, TRUE),
+  message_fmt = "Must be between {left} and {right}.",
   allow_na = FALSE,
-  allow_nan = FALSE,
-  message = NULL
+  allow_nan = FALSE
 )
 }
 \arguments{
@@ -22,22 +22,27 @@ for inclusive bounds.}
 \code{left} and \code{right} bounds, respectively, should be inclusive. Both bounds
 are by default are inclusive, using \code{c(TRUE, TRUE)}.}
 
-\item{allow_na, allow_nan}{If \code{FALSE} (the default for both options), then any
+\item{message_fmt}{The validation error message to use if a value fails to
+match the rule. The message can be customized by using the \code{"{left}"} and
+\code{"{right}"} string parameters, which allows for the insertion of the \code{left}
+and \code{right} values. While the default message uses both of these string
+parameters, they are not required in a user-defined \code{message_fmt} string.}
+
+\item{allow_na}{If \code{FALSE} (the default for both options), then any
 \code{NA} or \code{NaN} element will cause validation to fail.}
 
-\item{message}{The validation error message to use if a value fails to match
-the rule. By default, this is generic message provided by shinyvalidate
-but a custom message can be provided here.}
+\item{allow_nan}{If \code{FALSE} (the default for both options), then any
+\code{NA} or \code{NaN} element will cause validation to fail.}
 }
 \value{
 A function suitable for using as an
 \code{\link[=InputValidator]{InputValidator$add_rule()}} rule.
 }
 \description{
-\code{sv_numeric} and \code{sv_integer} validate that a field \code{is.numeric} and
-\code{is.integer}, respectively. By default, only a single, finite, not-missing,
-valid number/integer is allowed, but each of those criteria can be controlled
-via arguments.
+The \code{sv_between()} function validates that a field has values between left
+and right boundary values. Both bounds are inclusive by default, but both can
+be set as either inclusive or exclusive with the \code{inclusive} argument. In its
+default mode, the validation check will effectively be of the form \verb{<left> <= <field> <= <right>}.
 }
 \examples{
 # Ignore withReactiveDomain(), it's just required to get this example to run
@@ -48,6 +53,6 @@ shiny::withReactiveDomain(shiny::MockShinySession$new(), {
 
   iv$add_rule("count", sv_between(10, 10000))
   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
-
 })
+
 }

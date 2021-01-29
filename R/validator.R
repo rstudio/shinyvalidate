@@ -134,7 +134,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   return that object to the caller.
     #'
     #' @param validator An `InputValidator` object.
-    add_validator = function(validator) {
+    add_validator = function(validator, label = rlang::as_label(substitute(validator))) {
       if (!inherits(validator, "InputValidator")) {
         stop("add_validator was called with an invalid `validator` argument; InputValidator object expected")
       }
@@ -248,13 +248,25 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   character vector describing a validation problem.
     validate = function() {
       verbose <- getOption("shinyvalidate.verbose", FALSE)
+      if (isTRUE(verbose)) {
+        message("[shinyvalidate] \U25BC InputValidator$validate() starting (",
+          timestamp_str(), ")")
+      }
+      result <- self$validate_impl(if (isTRUE(verbose)) "" else FALSE)
+      if (isTRUE(verbose)) {
+        message("[shinyvalidate] \U25B2 InputValidator$validate() complete (",
+          timestamp_str(), ")")
+      }
+      result
+    },
+    # indent is character() if logging, FALSE if not
+    validate_impl = function(indent) {
       console_log <- function(...) {
-        if (verbose) {
-          message("[shinyvalidate] ", ...)
+        if (is.character(indent)) {
+          message("[shinyvalidate] ", indent, ...)
         }
       }
-      
-      console_log("InputValidator$validate() starting")
+      child_indent <- if (is.character(indent)) paste0(indent, "  ") else FALSE
       
       condition <- private$condition_()
       skip_all <- is.function(condition) && !isTRUE(condition())
@@ -267,7 +279,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       dependency_results <- list()
       for (validator in private$validators()) {
         console_log("Running child validator")
-        child_results <- validator$validate()
+        child_results <- validator$validate_impl(child_indent)
         dependency_results <- merge_results(dependency_results, child_results)
       }
 
@@ -310,18 +322,18 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         # Note that if there's an error in rule(), we won't get to the next
         # line
         if (is.null(result)) {
-          console_log("...Passed")
+          console_log("  ...Passed")
           if (!fullname %in% names(results)) {
             # Can't do results[[fullname]] <<- NULL, that just removes the element
             results <<- c(results, stats::setNames(list(NULL), fullname))
           }
         } else if (identical(skip_validation(), result)) {
-          console_log("...Skipping remaining rules")
+          console_log("  ...Skipping remaining rules")
           # Put a non-NULL, non-error value here to prevent remaining rules
           # from executing (i.e., skipping validation steps)
           results[[fullname]] <<- TRUE
         } else {
-          console_log("...Failed")
+          console_log("  ...Failed")
           results[[fullname]] <<- list(type = "error", message = result)
         }
       })
@@ -331,7 +343,6 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       # and not list(NULL) entries.
       results[vapply(results, isTRUE, logical(1), USE.NAMES = FALSE)] <- list(NULL)
       
-      console_log("InputValidator$validate() complete")
       merge_results(dependency_results, results)
     }
   )
@@ -429,4 +440,8 @@ input_provided <- function(val) {
     return(FALSE)
   
   TRUE
+}
+
+timestamp_str <- function(time = Sys.time()) {
+  format(time, "%Y-%m-%d %H:%M:%OS3", usetz = TRUE)
 }

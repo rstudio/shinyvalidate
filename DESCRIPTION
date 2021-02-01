@@ -1,8 +1,9 @@
 Package: shinyvalidate
-Title: Input validation for Shiny apps
+Title: Input Validation for Shiny Apps
 Version: 0.0.0.9002
 Authors@R: c(
-    person("Rich", "Iannone", , "rich@rstudio.com", c("aut", "cre")),
+    person("Richard", "Iannone", , "rich@rstudio.com", c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-3925-190X")),
     person("Joe", "Cheng", , "joe@rstudio.com", c("aut")),
     person(family = "RStudio", role = c("cph", "fnd"))
     )

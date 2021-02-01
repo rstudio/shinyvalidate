@@ -2,8 +2,15 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^\.github$
+^\.nvmrc$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
 ^doc$
 ^Meta$
+^node_modules$
+^srcjs$
+^scripts$
+^package-lock.json$
+^package.json$
+^babel.config.json$

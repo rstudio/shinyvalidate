@@ -524,8 +524,24 @@ test_that("the `sv_email()` rule function works properly", {
       # "tr119037jskc_ihndkdoz@d.aakctgajathzffcsuqyjhgjuxnuulgnhxtnbquwtgxljfayeestsjdbalthtddy.lgtmsdhywswlameglunsaplsblljavswxrltovagexhtttodqedmicsekvpmpuu.pgjvdmvzyltpixvalfbktnnpjyjqswbfvtpbfsngqtmhgamhrbqqvyvlhqigggv.nxqglspfbwdhtfpibcrccvctmoxuxwlunghhwacjtrclgirrgppvshxvrzkoifl"
     )
   
+  pass_if_multiple <- list(c("single-character-in-sld@x.org", "local@dash-in-sld.com"))
+  pass_if_na <- list(NA_integer_)
+  pass_if_multiple_na <- list(c("single-character-in-sld@x.org", NA))
+  
   rule <- sv_email()
   expect_sv_pass(rule, !!!always_pass)
+  expect_sv_fail(rule, !!!always_fail)
+  
+  rule <- sv_email(allow_multiple = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple)
+  expect_sv_fail(rule, !!!always_fail)
+  
+  rule <- sv_email(allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple)
+  
+  rule <- sv_email(allow_multiple = TRUE, allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_multiple_na)
   expect_sv_fail(rule, !!!always_fail)
 })
 

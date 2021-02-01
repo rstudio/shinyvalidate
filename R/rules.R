@@ -212,17 +212,26 @@ sv_email <- function(message = "Not a valid email address",
       allow_inf = FALSE
     ),
     function(value) {
-      
+ 
       # Regular expression taken from
       # https://www.nicebread.de/validating-email-adresses-in-r/
-      result <- 
-        grepl(
-          "^\\s*[A-Z0-9._%&'*+`/=?^{}~-]+@[A-Z0-9.-]+\\.[A-Z0-9]{2,}\\s*$",
-          as.character(value),
-          ignore.case = TRUE
+      res <-
+        vapply(
+          value,
+          FUN.VALUE = logical(1),
+          USE.NAMES = FALSE,
+          FUN = function(x) {
+            grepl(
+              "^\\s*[A-Z0-9._%&'*+`/=?^{}~-]+@[A-Z0-9.-]+\\.[A-Z0-9]{2,}\\s*$",
+              as.character(x),
+              ignore.case = TRUE
+            )
+          }
         )
+
+      res <- res | is.na(value)
       
-      if (!result) {
+      if (!all(res)) {
         return(message)
       }
     }

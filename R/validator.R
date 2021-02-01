@@ -256,12 +256,12 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     validate = function() {
       verbose <- getOption("shinyvalidate.verbose", FALSE)
       if (isTRUE(verbose)) {
-        message("[shinyvalidate] \U25BC InputValidator$validate() starting (",
+        message(verbose_prefix, "\U25BC InputValidator$validate() starting (",
           timestamp_str(), ")")
       }
-      result <- self$validate_impl(if (isTRUE(verbose)) "  " else FALSE)
+      result <- self$validate_impl(if (isTRUE(verbose)) verbose_indent else FALSE)
       if (isTRUE(verbose)) {
-        message("[shinyvalidate] \U25B2 InputValidator$validate() complete (",
+        message(verbose_prefix, "\U25B2 InputValidator$validate() complete (",
           timestamp_str(), ")")
       }
       result
@@ -269,14 +269,14 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     # indent is character() if logging, FALSE if not
     validate_impl = function(indent) {
       console_log <- function(...) {
-        prefix <- paste0("[shinyvalidate] ", indent)
         if (is.character(indent)) {
+          prefix <- paste0(verbose_prefix, indent)
           msg <- paste0(...)
           msg <- gsub("(^|\\n)", paste0("\\1", prefix), msg)
           message(msg)
         }
       }
-      child_indent <- if (is.character(indent)) paste0(indent, "  ") else FALSE
+      child_indent <- if (is.character(indent)) paste0(indent, verbose_indent) else FALSE
       
       condition <- private$condition_()
       skip_all <- is.function(condition) && !isTRUE(condition())
@@ -455,3 +455,6 @@ input_provided <- function(val) {
 timestamp_str <- function(time = Sys.time()) {
   format(time, "%Y-%m-%d %H:%M:%OS3", usetz = TRUE)
 }
+
+verbose_prefix <- "[shinyvalidate] "
+verbose_indent <- "  "

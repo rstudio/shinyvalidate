@@ -134,6 +134,8 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   return that object to the caller.
     #'
     #' @param validator An `InputValidator` object.
+    #' @param label An optional label for the `InputValidator` object. By
+    #'   default, a label will be automatically generated.
     add_validator = function(validator, label = deparse(substitute(validator))) {
       if (!inherits(validator, "InputValidator")) {
         stop("add_validator was called with an invalid `validator` argument; InputValidator object expected")
@@ -267,6 +269,10 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       result
     },
     # indent is character() if logging, FALSE if not
+    #' @description Generate validation logs which are visible in the R Console
+    #'   if the option `shinyvalidate.verbose` is `TRUE`.
+    #' @param indent The indentation string to be used when printing log
+    #'   entries.
     validate_impl = function(indent) {
       console_log <- function(...) {
         if (is.character(indent)) {

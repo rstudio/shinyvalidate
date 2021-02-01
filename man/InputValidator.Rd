@@ -42,6 +42,7 @@ that are completely unrelated to each other; each form would have its own
 \item \href{#method-fields}{\code{InputValidator$fields()}}
 \item \href{#method-is_valid}{\code{InputValidator$is_valid()}}
 \item \href{#method-validate}{\code{InputValidator$validate()}}
+\item \href{#method-validate_impl}{\code{InputValidator$validate_impl()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -132,13 +133,16 @@ This is intended to help with validating Shiny modules. Each module can
 create its own \code{InputValidator} object and populate it with rules, then
 return that object to the caller.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{InputValidator$add_validator(validator)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{InputValidator$add_validator(validator, label = deparse(substitute(validator)))}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{validator}}{An \code{InputValidator} object.}
+
+\item{\code{label}}{An optional label for the \code{InputValidator} object. By
+default, a label will be automatically generated.}
 }
 \if{html}{\out{</div>}}
 }
@@ -249,5 +253,24 @@ character vector describing a validation problem.
 \if{html}{\out{<div class="r">}}\preformatted{InputValidator$validate()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-validate_impl"></a>}}
+\if{latex}{\out{\hypertarget{method-validate_impl}{}}}
+\subsection{Method \code{validate_impl()}}{
+Generate validation logs which are visible in the R Console
+if the option \code{shinyvalidate.verbose} is \code{TRUE}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{InputValidator$validate_impl(indent)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{indent}}{The indentation string to be used when printing log
+entries.}
+}
+\if{html}{\out{</div>}}
+}
 }
 }

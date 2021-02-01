@@ -89,7 +89,7 @@ sv_required <- function(message = "Required",
 #'
 #'   # An email is not required, but if present, it must be valid
 #'   iv$add_rule("email", sv_optional())
-#'   iv$add_rule("email", ~ if (!is_valid_email(.)) "Please provide a valid email")
+#'   iv$add_rule("email", sv_email())
 #' })
 #' @export
 sv_optional <- function(test = input_provided) {
@@ -170,6 +170,72 @@ sv_regex <- function(pattern,
       return(message)
     }
   }
+}
+
+#' Validate that a field contains an email address
+#'
+#' A validation function, suitable for use with `InputValidator$add_rule()`,
+#' that checks whether an input value looks like a valid email address.
+#'
+#' @param message The validation error message to use if a value doesn't match a
+#'   regex pattern for email address detection.
+#' @inheritParams sv_numeric
+#'
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#'
+#'   iv <- InputValidator$new()
+#'
+#'   # An email is not required, but if present, it must be valid
+#'   iv$add_rule("email", sv_optional())
+#'   iv$add_rule("email", sv_email())
+#' })
+#'
+#' @export
+sv_email <- function(message = "Not a valid email address",
+                     allow_multiple = FALSE,
+                     allow_na = FALSE) {
+  force(message)
+  force(allow_multiple)
+  force(allow_na)
+  
+  compose_rules(
+    sv_basic(
+      allow_multiple = allow_multiple,
+      allow_na = allow_na,
+      allow_nan = FALSE,
+      allow_inf = FALSE
+    ),
+    function(value) {
+ 
+      # Regular expression taken from
+      # https://www.nicebread.de/validating-email-adresses-in-r/
+      res <-
+        vapply(
+          value,
+          FUN.VALUE = logical(1),
+          USE.NAMES = FALSE,
+          FUN = function(x) {
+            grepl(
+              "^\\s*[A-Z0-9._%&'*+`/=?^{}~-]+@[A-Z0-9.-]+\\.[A-Z0-9]{2,}\\s*$",
+              as.character(x),
+              ignore.case = TRUE
+            )
+          }
+        )
+
+      res <- res | is.na(value)
+      
+      if (!all(res)) {
+        return(message)
+      }
+    }
+  )
 }
 
 #' Validate that a field is a number

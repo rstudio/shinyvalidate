@@ -179,6 +179,7 @@ sv_regex <- function(pattern,
 #'
 #' @param message The validation error message to use if a value doesn't match a
 #'   regex pattern for email address detection.
+#' @inheritParams sv_numeric
 #'
 #' @return A function suitable for using as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.

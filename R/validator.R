@@ -58,7 +58,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     priority = numeric(0),
     condition_ = NULL,
     rules = NULL,
-    validators = NULL,
+    validator_infos = NULL,
     is_child = FALSE
   ),
   public = list(
@@ -80,7 +80,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       private$priority <- priority
       private$condition_ <- shiny::reactiveVal(NULL, label = "validator_condition")
       private$rules <- shiny::reactiveVal(list(), label = "validation_rules")
-      private$validators <- shiny::reactiveVal(list(), label = "child_validators")
+      private$validator_infos <- shiny::reactiveVal(list(), label = "child_validators")
       
       # Inject shinyvalidate dependencies (just once)
       if (!isTRUE(session$userData[["shinyvalidate-initialized"]])) {
@@ -134,13 +134,19 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   return that object to the caller.
     #'
     #' @param validator An `InputValidator` object.
-    add_validator = function(validator, label = rlang::as_label(substitute(validator))) {
+    add_validator = function(validator, label = deparse(substitute(validator))) {
       if (!inherits(validator, "InputValidator")) {
         stop("add_validator was called with an invalid `validator` argument; InputValidator object expected")
       }
+
+      label <- paste0(label, collapse = "\n")
       
       validator$parent(self)
-      private$validators(c(shiny::isolate(private$validators()), list(validator)))
+      private$validator_infos(c(shiny::isolate(private$validator_infos()),
+        list(
+          list(validator = validator, label = label)
+        )
+      ))
       invisible(self)
     },
     #' @description Add an input validation rule. Each input validation rule
@@ -167,6 +173,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       args <- rlang::list2(...)
       
       label <- deparse(substitute(rule))
+      label <- paste0(label, collapse = "\n")
 
       if (inherits(rule, "formula")) {
         rule <- rlang::as_function(rule)
@@ -224,8 +231,8 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #' @description Returns `TRUE` if all input validation rules currently pass,
     #'   `FALSE` if not.
     fields = function() {
-      fieldslist <- unlist(lapply(private$validators(), function(validator) {
-        validator$fields()
+      fieldslist <- unlist(lapply(private$validator_infos(), function(validator_info) {
+        validator_info$validator$fields()
       }))
       
       fullnames <- mapply(names(private$rules()), private$rules(), FUN = function(name, rule) {
@@ -252,7 +259,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         message("[shinyvalidate] \U25BC InputValidator$validate() starting (",
           timestamp_str(), ")")
       }
-      result <- self$validate_impl(if (isTRUE(verbose)) "" else FALSE)
+      result <- self$validate_impl(if (isTRUE(verbose)) "  " else FALSE)
       if (isTRUE(verbose)) {
         message("[shinyvalidate] \U25B2 InputValidator$validate() complete (",
           timestamp_str(), ")")
@@ -262,8 +269,11 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     # indent is character() if logging, FALSE if not
     validate_impl = function(indent) {
       console_log <- function(...) {
+        prefix <- paste0("[shinyvalidate] ", indent)
         if (is.character(indent)) {
-          message("[shinyvalidate] ", indent, ...)
+          msg <- paste0(...)
+          msg <- gsub("(^|\\n)", paste0("\\1", prefix), msg)
+          message(msg)
         }
       }
       child_indent <- if (is.character(indent)) paste0(indent, "  ") else FALSE
@@ -277,9 +287,9 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       }
       
       dependency_results <- list()
-      for (validator in private$validators()) {
-        console_log("Running child validator")
-        child_results <- validator$validate_impl(child_indent)
+      for (validator_info in private$validator_infos()) {
+        console_log("Running child validator '", validator_info$label, "'")
+        child_results <- validator_info$validator$validate_impl(child_indent)
         dependency_results <- merge_results(dependency_results, child_results)
       }
 

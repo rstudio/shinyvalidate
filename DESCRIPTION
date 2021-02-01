@@ -16,14 +16,10 @@ URL: https://rstudio.github.io/shinyvalidate/,
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    shiny (>= 1.5.0.9004),
-    utils,
-    htmltools,
-    rlang,
+    shiny (>= 1.6),
+    htmltools (>= 0.5.1.1),
+    rlang (>= 0.4.10),
     glue (>= 1.4.2)
-Remotes: 
-    rstudio/shiny,
-    rstudio/htmltools
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 Suggests: 

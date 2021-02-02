@@ -238,6 +238,73 @@ sv_email <- function(message = "Not a valid email address",
   )
 }
 
+#' Validate that a field contains a URL
+#'
+#' A validation function, suitable for use with `InputValidator$add_rule()`,
+#' that checks whether an input value is a valid URL.
+#'
+#' @param message The validation error message to use if a value doesn't match a
+#'   regex pattern for URL detection.
+#' @inheritParams sv_numeric
+#'
+#' @return A function suitable for using as an
+#'   [`InputValidator$add_rule()`][InputValidator] rule.
+#'
+#' @examples
+#' # Ignore withReactiveDomain(), it's just required to get this example to run
+#' # outside of Shiny
+#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#'
+#'   iv <- InputValidator$new()
+#'
+#'   # A URL is not required, but if present, it must be valid
+#'   iv$add_rule("url", sv_optional())
+#'   iv$add_rule("url", sv_url())
+#' })
+#'
+#' @export
+sv_url <- function(message = "Not a valid URL",
+                   allow_multiple = FALSE,
+                   allow_na = FALSE) {
+  force(message)
+  force(allow_multiple)
+  force(allow_na)
+  
+  compose_rules(
+    sv_basic(
+      allow_multiple = allow_multiple,
+      allow_na = allow_na,
+      allow_nan = FALSE,
+      allow_inf = FALSE
+    ),
+    function(value) {
+      
+      # Regular expression taken from
+      # https://gist.github.com/dperini/729294
+      res <-
+        vapply(
+          value,
+          FUN.VALUE = logical(1),
+          USE.NAMES = FALSE,
+          FUN = function(x) {
+            grepl(
+              "^(?:(?:http(?:s)?|ftp)://)(?:\\S+(?::(?:\\S)*)?@)?(?:(?:[a-z0-9\u00a1-\uffff](?:-)*)*(?:[a-z0-9\u00a1-\uffff])+)(?:\\.(?:[a-z0-9\u00a1-\uffff](?:-)*)*(?:[a-z0-9\u00a1-\uffff])+)*(?:\\.(?:[a-z0-9\u00a1-\uffff]){2,})(?::(?:\\d){2,5})?(?:/(?:\\S)*)?$",
+              as.character(x),
+              ignore.case = TRUE,
+              perl = TRUE
+            )
+          }
+        )
+      
+      res <- res | is.na(value)
+      
+      if (!all(res)) {
+        return(message)
+      }
+    }
+  )
+}
+
 #' Validate that a field is a number
 #'
 #' The `sv_numeric()` function validates that a field is numeric with the

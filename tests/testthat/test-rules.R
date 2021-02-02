@@ -545,6 +545,93 @@ test_that("the `sv_email()` rule function works properly", {
   expect_sv_fail(rule, !!!always_fail)
 })
 
+test_that("the `sv_url()` rule function works properly", {
+  
+  always_pass <-
+    c(
+      "http://foo.com/blah_blah",
+      "http://foo.com/blah_blah/",
+      "http://foo.com/blah_blah_(wikipedia)",
+      "http://foo.com/blah_blah_(wikipedia)_(again)",
+      "http://www.example.com/wpstyle/?p=364",
+      "https://www.example.com/foo/?bar=baz&inga=42&quux",
+      "http://userid:password@example.com:8080",
+      "http://userid:password@example.com:8080/",
+      "http://userid@example.com",
+      "http://userid@example.com/",
+      "http://userid@example.com:8080",
+      "http://userid@example.com:8080/",
+      "http://userid:password@example.com",
+      "http://userid:password@example.com/",
+      "http://foo.com/blah_(wikipedia)#cite-1",
+      "http://foo.com/blah_(wikipedia)_blah#cite-1",
+      "http://foo.com/(something)?after=parens",
+      "http://code.google.com/events/#&product=browser",
+      "http://j.mp",
+      "ftp://foo.bar/baz",
+      "http://foo.bar/?q=Test%20URL-encoded%20stuff",
+      "http://-.~_!$&'()*+,;=:%40:80%2f::::::@example.com",
+      "http://1337.net",
+      "http://a.b-c.de",
+      "http://223.255.255.254"
+    )
+  
+  always_fail <- 
+    c(
+      "http://",
+      "http://.",
+      "http://..",
+      "http://../",
+      "http://?",
+      "http://??",
+      "http://??/",
+      "http://#",
+      "http://##",
+      "http://##/",
+      "http://foo.bar?q=Spaces should be encoded",
+      "//",
+      "//a",
+      "///a",
+      "///",
+      "http:///a",
+      "foo.com",
+      "rdar://1234",
+      "h://test",
+      "http:// shouldfail.com",
+      ":// should fail",
+      "http://foo.bar/foo(bar)baz quux",
+      "ftps://foo.bar/",
+      "http://-error-.invalid/",
+      "http://-a.b.co",
+      "http://a.b-.co",
+      "http://0.0.0.0",
+      "http://3628126748",
+      "http://.www.foo.bar/",
+      "http://www.foo.bar./",
+      "http://.www.foo.bar./"
+    )
+  
+  pass_if_multiple <- list(c("http://foo.com/blah_blah", "http://foo.com/blah_blah/"))
+  pass_if_na <- list(NA_integer_)
+  pass_if_multiple_na <- list(c("http://foo.com/blah_blah", NA))
+  
+  rule <- sv_url()
+  expect_sv_pass(rule, !!!always_pass)
+  expect_sv_fail(rule, !!!always_fail)
+  
+  rule <- sv_url(allow_multiple = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple)
+  expect_sv_fail(rule, !!!always_fail)
+  
+  rule <- sv_url(allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_na)
+  expect_sv_fail(rule, !!!always_fail, !!!pass_if_multiple)
+  
+  rule <- sv_url(allow_multiple = TRUE, allow_na = TRUE)
+  expect_sv_pass(rule, !!!always_pass, !!!pass_if_multiple, !!!pass_if_na, !!!pass_if_multiple_na)
+  expect_sv_fail(rule, !!!always_fail)
+})
+
 test_that("the `sv_required()` rule function works properly", {
   
   always_pass <- list(3, "a", data.frame(a = 1:3))

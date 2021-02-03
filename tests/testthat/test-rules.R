@@ -552,7 +552,7 @@ test_that("the `sv_url()` rule function works properly", {
       "http://foo.com/blah_blah",
       "http://foo.com/blah_blah/",
       "http://foo.com/blah_blah_(wikipedia)",
-      "http://foo.com/blah_blah_(wikipedia)_(again)",
+      "http://\u2605foo.com/blah_blah_(wikipedia)_(again)",
       "http://www.example.com/wpstyle/?p=364",
       "https://www.example.com/foo/?bar=baz&inga=42&quux",
       "http://userid:password@example.com:8080",

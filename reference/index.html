@@ -71,20 +71,14 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyvalidate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9002</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9002</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
-  <a href="../articles/shinyvalidate.html">Get started</a>
+  <a href="../articles/shinyvalidate.html">Get Started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -97,12 +91,15 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/advanced.html">Advanced validation</a>
+      <a href="../articles/displaying.html">Displaying Validation Errors</a>
     </li>
     <li>
-      <a href="../articles/displaying.html">Displaying validation errors</a>
+      <a href="../articles/advanced.html">Advanced Validation</a>
     </li>
   </ul>
+</li>
+<li>
+  <a href="../news/index.html">News</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -139,8 +136,8 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
+          <h2 id="section-creation-of-input-validator-objects" class="hasAnchor"><a href="#section-creation-of-input-validator-objects" class="anchor"></a>Creation of Input Validator Objects</h2>
+          <p class="section-desc"><p>The <strong>shinyvalidate</strong> package offers an <code>InputValidator</code> R6 class for adding realtime input validation to Shiny apps. The Shiny app author can then add validation rules for each input field in their UI, using the <code>InputValidator$add_rule()</code> method. If an app contains multiple, independant forms then multiple <code>InputValidator</code> instances (with their own rules) can be created.</p></p>
         </th>
       </tr>
       
@@ -157,12 +154,6 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="compose_rules.html">compose_rules()</a></code> </p>
-        </td>
-        <td><p>Combine shinyvalidate rule functions</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="input_provided.html">input_provided()</a></code> </p>
         </td>
         <td><p>Check whether an input value has been provided</p></td>
@@ -172,6 +163,31 @@
           <p><code><a href="skip_validation.html">skip_validation()</a></code> </p>
         </td>
         <td><p>Skip any normal validation performed by a rule</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-rule-functions" class="hasAnchor"><a href="#section-rule-functions" class="anchor"></a>Rule Functions</h2>
+          <p class="section-desc"><p>The <strong>shinyvalidate</strong> rule functions are used to perform the checking of input fields and they are assigned to and managed by a Validator object. This variety of <code>sv_*()</code> functions can be used to make comparison-type validations (e.g., is the input less than <code>10</code>?), verify that an email address has a valid construction, or check whether a value is even present. The <code><a href="../reference/compose_rules.html">compose_rules()</a></code> gives us the opportunity to combine multiple <code>sv_*()</code> and even custom validation functions such that the first failing validation will issue the failure message.</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="sv_numeric.html">sv_numeric()</a></code> </p>
+        </td>
+        <td><p>Validate that a field is a number</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sv_integer.html">sv_integer()</a></code> </p>
+        </td>
+        <td><p>Validate that a field is an integer</p></td>
       </tr><tr>
         
         <td>
@@ -181,15 +197,15 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="sv_email.html">sv_email()</a></code> </p>
+          <p><code><a href="sv_regex.html">sv_regex()</a></code> </p>
         </td>
-        <td><p>Validate that a field contains an email address</p></td>
+        <td><p>Validate that a field matches a regular expression</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="sv_equal.html">sv_equal()</a></code> </p>
+          <p><code><a href="sv_email.html">sv_email()</a></code> </p>
         </td>
-        <td><p>Validate that a field is equal to a specified value</p></td>
+        <td><p>Validate that a field contains an email address</p></td>
       </tr><tr>
         
         <td>
@@ -205,15 +221,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="sv_in_set.html">sv_in_set()</a></code> </p>
+          <p><code><a href="sv_lte.html">sv_lte()</a></code> </p>
         </td>
-        <td><p>Validate that a field is part of a defined set</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sv_integer.html">sv_integer()</a></code> </p>
-        </td>
-        <td><p>Validate that a field is an integer</p></td>
+        <td><p>Validate that a field is less than or equal to a specified value</p></td>
       </tr><tr>
         
         <td>
@@ -223,9 +233,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="sv_lte.html">sv_lte()</a></code> </p>
+          <p><code><a href="sv_equal.html">sv_equal()</a></code> </p>
         </td>
-        <td><p>Validate that a field is less than or equal to a specified value</p></td>
+        <td><p>Validate that a field is equal to a specified value</p></td>
       </tr><tr>
         
         <td>
@@ -235,9 +245,15 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="sv_numeric.html">sv_numeric()</a></code> </p>
+          <p><code><a href="sv_in_set.html">sv_in_set()</a></code> </p>
         </td>
-        <td><p>Validate that a field is a number</p></td>
+        <td><p>Validate that a field is part of a defined set</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sv_required.html">sv_required()</a></code> </p>
+        </td>
+        <td><p>Validate that the field is present</p></td>
       </tr><tr>
         
         <td>
@@ -247,15 +263,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="sv_regex.html">sv_regex()</a></code> </p>
+          <p><code><a href="compose_rules.html">compose_rules()</a></code> </p>
         </td>
-        <td><p>Validate that a field matches a regular expression</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sv_required.html">sv_required()</a></code> </p>
-        </td>
-        <td><p>Validate that the field is present</p></td>
+        <td><p>Combine shinyvalidate rule functions</p></td>
       </tr>
     </tbody>
     </table>

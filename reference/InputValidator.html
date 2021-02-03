@@ -190,6 +190,7 @@ that are completely unrelated to each other; each form would have its own
 <li><p><a href='#method-fields'><code>InputValidator$fields()</code></a></p></li>
 <li><p><a href='#method-is_valid'><code>InputValidator$is_valid()</code></a></p></li>
 <li><p><a href='#method-validate'><code>InputValidator$validate()</code></a></p></li>
+<li><p><a href='#method-_validate_impl'><code>InputValidator$_validate_impl()</code></a></p></li>
 </ul>
 <p><hr>
 <a id="method-new"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>new()</code></h3>
@@ -253,11 +254,14 @@ its child validators are enabled (or disabled) as well.</p>
 <p>This is intended to help with validating Shiny modules. Each module can
 create its own <code>InputValidator</code> object and populate it with rules, then
 return that object to the caller.</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='va'>InputValidator</span><span class='op'>$</span><span class='fu'>add_validator</span><span class='op'>(</span><span class='va'>validator</span><span class='op'>)</span></pre><p></div></p>
+<p><div class="r"></p><pre><span class='va'>InputValidator</span><span class='op'>$</span><span class='fu'>add_validator</span><span class='op'>(</span><span class='va'>validator</span>, label <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/deparse.html'>deparse</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>substitute</a></span><span class='op'>(</span><span class='va'>validator</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></pre><p></div></p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
 <p><div class="arguments"></p><dl>
 <dt><code>validator</code></dt><dd><p>An <code>InputValidator</code> object.</p></dd>
+
+<dt><code>label</code></dt><dd><p>An optional label for the <code>InputValidator</code> object. By
+default, a label will be automatically generated.</p></dd>
 
 </dl><p></div></p>
 <p><hr>
@@ -335,6 +339,16 @@ either <code>NULL</code> (if the input value is passing) or a single-element
 character vector describing a validation problem.</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
 <p><div class="r"></p><pre><span class='va'>InputValidator</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='op'>)</span></pre><p></div></p>
 
+<p><hr>
+<a id="method-_validate_impl"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>_validate_impl()</code></h3>
+<p>For internal use only.</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
+<p><div class="r"></p><pre>InputValidator$_validate_impl(indent)</pre><p></div></p>
+
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
+<p><div class="arguments"></p><dl>
+<dt><code>indent</code></dt><dd><p>For internal use only.</p></dd>
+
+</dl><p></div></p>
 
 
 

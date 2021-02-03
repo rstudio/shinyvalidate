@@ -216,19 +216,12 @@ sv_email <- function(message = "Not a valid email address",
       # Regular expression taken from
       # https://www.nicebread.de/validating-email-adresses-in-r/
       res <-
-        vapply(
-          value,
-          FUN.VALUE = logical(1),
-          USE.NAMES = FALSE,
-          FUN = function(x) {
-            grepl(
-              "^\\s*[A-Z0-9._%&'*+`/=?^{}~-]+@[A-Z0-9.-]+\\.[A-Z0-9]{2,}\\s*$",
-              as.character(x),
-              ignore.case = TRUE
-            )
-          }
+        grepl(
+          "^\\s*[A-Z0-9._%&'*+`/=?^{}~-]+@[A-Z0-9.-]+\\.[A-Z0-9]{2,}\\s*$",
+          as.character(value),
+          ignore.case = TRUE
         )
-
+        
       res <- res | is.na(value)
       
       if (!all(res)) {
@@ -282,18 +275,11 @@ sv_url <- function(message = "Not a valid URL",
       # Regular expression taken from
       # https://gist.github.com/dperini/729294
       res <-
-        vapply(
-          value,
-          FUN.VALUE = logical(1),
-          USE.NAMES = FALSE,
-          FUN = function(x) {
-            grepl(
-              "^(?:(?:http(?:s)?|ftp)://)(?:\\S+(?::(?:\\S)*)?@)?(?:(?:[a-z0-9\u00a1-\uffff](?:-)*)*(?:[a-z0-9\u00a1-\uffff])+)(?:\\.(?:[a-z0-9\u00a1-\uffff](?:-)*)*(?:[a-z0-9\u00a1-\uffff])+)*(?:\\.(?:[a-z0-9\u00a1-\uffff]){2,})(?::(?:\\d){2,5})?(?:/(?:\\S)*)?$",
-              as.character(x),
-              ignore.case = TRUE,
-              perl = TRUE
-            )
-          }
+        grepl(
+          "^(?:(?:http(?:s)?|ftp)://)(?:\\S+(?::(?:\\S)*)?@)?(?:(?:[a-z0-9\u00a1-\uffff](?:-)*)*(?:[a-z0-9\u00a1-\uffff])+)(?:\\.(?:[a-z0-9\u00a1-\uffff](?:-)*)*(?:[a-z0-9\u00a1-\uffff])+)*(?:\\.(?:[a-z0-9\u00a1-\uffff]){2,})(?::(?:\\d){2,5})?(?:/(?:\\S)*)?$",
+          as.character(value),
+          ignore.case = TRUE,
+          perl = TRUE
         )
       
       res <- res | is.na(value)

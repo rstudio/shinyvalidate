@@ -1,1 +1,64 @@
 url: https://rstudio.github.io/shinyvalidate/
+
+development:
+  mode: auto
+
+home:
+  strip_header: true
+
+navbar:
+  type: default
+  left:
+  - text: Get Started
+    href: articles/shinyvalidate.html
+  - text: Reference
+    href: reference/index.html
+  - text: Articles
+    menu:
+    - text: Displaying Validation Errors
+      href: articles/displaying.html
+    - text: Advanced Validation
+      href: articles/advanced.html
+  - text: News
+    href: news/index.html
+
+reference:
+  - title: Creation of Input Validator Objects
+    desc: >
+      The **shinyvalidate** package offers an `InputValidator` R6 class for
+      adding realtime input validation to Shiny apps. The Shiny app author
+      can then add validation rules for each input field in their UI, using
+      the `InputValidator$add_rule()` method. If an app contains multiple,
+      independant forms then multiple `InputValidator` instances (with their
+      own rules) can be created.
+    contents:
+    - InputValidator
+    - input_provided
+    - skip_validation
+
+  - title: Rule Functions
+    desc: >
+      The **shinyvalidate** rule functions are used to perform the checking of
+      input fields and they are assigned to and managed by a Validator object.
+      This variety of `sv_*()` functions can be used to make comparison-type
+      validations (e.g., is the input less than `10`?), verify that an email
+      address has a valid construction, or check whether a value is even
+      present. The `compose_rules()` gives us the opportunity to combine
+      multiple `sv_*()` and even custom validation functions such that the first
+      failing validation will issue the failure message.
+    contents:
+    - sv_numeric
+    - sv_integer
+    - sv_between
+    - sv_regex
+    - sv_email
+    - sv_gt
+    - sv_gte
+    - sv_lte
+    - sv_lt
+    - sv_equal
+    - sv_not_equal
+    - sv_in_set
+    - sv_required
+    - sv_optional
+    - compose_rules

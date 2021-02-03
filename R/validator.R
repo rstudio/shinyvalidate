@@ -58,7 +58,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     priority = numeric(0),
     condition_ = NULL,
     rules = NULL,
-    validators = NULL,
+    validator_infos = NULL,
     is_child = FALSE
   ),
   public = list(
@@ -80,7 +80,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       private$priority <- priority
       private$condition_ <- shiny::reactiveVal(NULL, label = "validator_condition")
       private$rules <- shiny::reactiveVal(list(), label = "validation_rules")
-      private$validators <- shiny::reactiveVal(list(), label = "child_validators")
+      private$validator_infos <- shiny::reactiveVal(list(), label = "child_validators")
       
       # Inject shinyvalidate dependencies (just once)
       if (!isTRUE(session$userData[["shinyvalidate-initialized"]])) {
@@ -134,13 +134,21 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   return that object to the caller.
     #'
     #' @param validator An `InputValidator` object.
-    add_validator = function(validator) {
+    #' @param label An optional label for the `InputValidator` object. By
+    #'   default, a label will be automatically generated.
+    add_validator = function(validator, label = deparse(substitute(validator))) {
       if (!inherits(validator, "InputValidator")) {
         stop("add_validator was called with an invalid `validator` argument; InputValidator object expected")
       }
+
+      label <- paste0(label, collapse = "\n")
       
       validator$parent(self)
-      private$validators(c(shiny::isolate(private$validators()), list(validator)))
+      private$validator_infos(c(shiny::isolate(private$validator_infos()),
+        list(
+          list(validator = validator, label = label)
+        )
+      ))
       invisible(self)
     },
     #' @description Add an input validation rule. Each input validation rule
@@ -165,6 +173,9 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   almost never a reason to change this from the default.)
     add_rule = function(inputId, rule, ..., session. = shiny::getDefaultReactiveDomain()) {
       args <- rlang::list2(...)
+      
+      label <- deparse(substitute(rule))
+      label <- paste0(label, collapse = "\n")
 
       if (inherits(rule, "formula")) {
         rule <- rlang::as_function(rule)
@@ -177,7 +188,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         # support leaving a "hole" for the first argument
         do.call(rule, c(list(value), args))
       }
-      rule_info <- list(rule = applied_rule, session = session.)
+      rule_info <- list(rule = applied_rule, label = label, session = session.)
       private$rules(c(shiny::isolate(private$rules()), stats::setNames(list(rule_info), inputId)))
       invisible(self)
     },
@@ -222,8 +233,8 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #' @description Returns `TRUE` if all input validation rules currently pass,
     #'   `FALSE` if not.
     fields = function() {
-      fieldslist <- unlist(lapply(private$validators(), function(validator) {
-        validator$fields()
+      fieldslist <- unlist(lapply(private$validator_infos(), function(validator_info) {
+        validator_info$validator$fields()
       }))
       
       fullnames <- mapply(names(private$rules()), private$rules(), FUN = function(name, rule) {
@@ -245,16 +256,46 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   either `NULL` (if the input value is passing) or a single-element
     #'   character vector describing a validation problem.
     validate = function() {
+      verbose <- getOption("shinyvalidate.verbose", FALSE)
+      if (isTRUE(verbose)) {
+        message(verbose_prefix, "\U25BC InputValidator$validate() starting (",
+          timestamp_str(), ")")
+      }
+      result <- self$`_validate_impl`(if (isTRUE(verbose)) verbose_indent else FALSE)
+      if (isTRUE(verbose)) {
+        message(verbose_prefix, "\U25B2 InputValidator$validate() complete (",
+          timestamp_str(), ")")
+      }
+      result
+    },
+    # indent is character() if logging, FALSE if not.
+    # Sadly this method cannot be private, because we need parent InputValidator
+    # instances to call their childrens' _validate_impl methods.
+    #' @description For internal use only.
+    #' @param indent For internal use only.
+    `_validate_impl` = function(indent) {
+      console_log <- function(...) {
+        if (is.character(indent)) {
+          prefix <- paste0(verbose_prefix, indent)
+          msg <- paste0(...)
+          msg <- gsub("(^|\\n)", paste0("\\1", prefix), msg)
+          message(msg)
+        }
+      }
+      child_indent <- if (is.character(indent)) paste0(indent, verbose_indent) else FALSE
+      
       condition <- private$condition_()
       skip_all <- is.function(condition) && !isTRUE(condition())
       if (skip_all) {
+        console_log("condition() is FALSE, skipping validation")
         fields <- self$fields()
         return(setNames(rep_len(list(), length(fields)), fields))
       }
       
       dependency_results <- list()
-      for (validator in private$validators()) {
-        child_results <- validator$validate()
+      for (validator_info in private$validator_infos()) {
+        console_log("Running child validator '", validator_info$label, "'")
+        child_results <- validator_info$validator$`_validate_impl`(child_indent)
         dependency_results <- merge_results(dependency_results, child_results)
       }
 
@@ -263,8 +304,12 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         fullname <- rule$session$ns(name)
         # Short-circuit if already errored or if skip_validation() was returned
         # by an earlier rule for this input
-        if (!is.null(results[[fullname]])) return()
+        if (!is.null(results[[fullname]])) {
+          console_log("Skipping `", name, "`: ", rule$label)
+          return()
+        }
         
+        console_log("Trying `", name, "`: ", rule$label)
         result <- tryCatch(
           shiny::withLogErrors(rule$rule(rule$session$input[[name]])),
           shiny.silent.error = function(e) {
@@ -293,15 +338,18 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         # Note that if there's an error in rule(), we won't get to the next
         # line
         if (is.null(result)) {
+          console_log("  ...Passed")
           if (!fullname %in% names(results)) {
             # Can't do results[[fullname]] <<- NULL, that just removes the element
             results <<- c(results, stats::setNames(list(NULL), fullname))
           }
         } else if (identical(skip_validation(), result)) {
+          console_log("  ...Skipping remaining rules")
           # Put a non-NULL, non-error value here to prevent remaining rules
           # from executing (i.e., skipping validation steps)
           results[[fullname]] <<- TRUE
         } else {
+          console_log("  ...Failed")
           results[[fullname]] <<- list(type = "error", message = result)
         }
       })
@@ -409,3 +457,10 @@ input_provided <- function(val) {
   
   TRUE
 }
+
+timestamp_str <- function(time = Sys.time()) {
+  format(time, "%Y-%m-%d %H:%M:%OS3", usetz = TRUE)
+}
+
+verbose_prefix <- "[shinyvalidate] "
+verbose_indent <- "  "

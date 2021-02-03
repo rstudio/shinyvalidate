@@ -52,6 +52,7 @@ reference:
     - sv_between
     - sv_regex
     - sv_email
+    - sv_url
     - sv_gt
     - sv_gte
     - sv_lte

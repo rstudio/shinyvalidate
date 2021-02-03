@@ -261,19 +261,19 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
         message(verbose_prefix, "\U25BC InputValidator$validate() starting (",
           timestamp_str(), ")")
       }
-      result <- self$validate_impl(if (isTRUE(verbose)) verbose_indent else FALSE)
+      result <- self$`_validate_impl`(if (isTRUE(verbose)) verbose_indent else FALSE)
       if (isTRUE(verbose)) {
         message(verbose_prefix, "\U25B2 InputValidator$validate() complete (",
           timestamp_str(), ")")
       }
       result
     },
-    # indent is character() if logging, FALSE if not
-    #' @description Generate validation logs which are visible in the R Console
-    #'   if the option `shinyvalidate.verbose` is `TRUE`.
-    #' @param indent The indentation string to be used when printing log
-    #'   entries.
-    validate_impl = function(indent) {
+    # indent is character() if logging, FALSE if not.
+    # Sadly this method cannot be private, because we need parent InputValidator
+    # instances to call their childrens' _validate_impl methods.
+    #' @description For internal use only.
+    #' @param indent For internal use only.
+    `_validate_impl` = function(indent) {
       console_log <- function(...) {
         if (is.character(indent)) {
           prefix <- paste0(verbose_prefix, indent)
@@ -295,7 +295,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
       dependency_results <- list()
       for (validator_info in private$validator_infos()) {
         console_log("Running child validator '", validator_info$label, "'")
-        child_results <- validator_info$validator$validate_impl(child_indent)
+        child_results <- validator_info$validator$`_validate_impl`(child_indent)
         dependency_results <- merge_results(dependency_results, child_results)
       }
 

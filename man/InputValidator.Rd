@@ -42,7 +42,7 @@ that are completely unrelated to each other; each form would have its own
 \item \href{#method-fields}{\code{InputValidator$fields()}}
 \item \href{#method-is_valid}{\code{InputValidator$is_valid()}}
 \item \href{#method-validate}{\code{InputValidator$validate()}}
-\item \href{#method-validate_impl}{\code{InputValidator$validate_impl()}}
+\item \href{#method-_validate_impl}{\code{InputValidator$_validate_impl()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -255,20 +255,18 @@ character vector describing a validation problem.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-validate_impl"></a>}}
-\if{latex}{\out{\hypertarget{method-validate_impl}{}}}
-\subsection{Method \code{validate_impl()}}{
-Generate validation logs which are visible in the R Console
-if the option \code{shinyvalidate.verbose} is \code{TRUE}.
+\if{html}{\out{<a id="method-_validate_impl"></a>}}
+\if{latex}{\out{\hypertarget{method-_validate_impl}{}}}
+\subsection{Method \code{_validate_impl()}}{
+For internal use only.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{InputValidator$validate_impl(indent)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{InputValidator$_validate_impl(indent)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{indent}}{The indentation string to be used when printing log
-entries.}
+\item{\code{indent}}{For internal use only.}
 }
 \if{html}{\out{</div>}}
 }

@@ -19,7 +19,7 @@
 #'   access the value to test), that returns `TRUE` for success and `FALSE` for
 #'   failure.
 #' 
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
@@ -108,7 +108,7 @@ sv_required <- function(message = "Required",
 #'   access the value to test), that returns `TRUE` for success and `FALSE` for
 #'   failure.
 #'   
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
@@ -122,6 +122,12 @@ sv_required <- function(message = "Required",
 #'   iv$add_rule("email", sv_optional())
 #'   iv$add_rule("email", sv_email())
 #' })
+#' 
+#' @family rule functions
+#' 
+#' @seealso The [sv_required()] function, which takes a different approach to
+#'   field presence.
+#' 
 #' @export
 sv_optional <- function(test = input_provided) {
   force(test)
@@ -150,7 +156,7 @@ sv_optional <- function(test = input_provided) {
 #' @param ignore.case,perl,fixed,useBytes,invert Options passed through to
 #'   [base::grepl()].
 #'
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
@@ -172,6 +178,11 @@ sv_optional <- function(test = input_provided) {
 #'     )
 #'   )
 #' })
+#' 
+#' @family rule functions
+#' 
+#' @seealso The [sv_email()] and [sv_url()] functions, which are specialized
+#'   regex-based functions for validating email addresses and URLs.
 #'
 #' @export
 sv_regex <- function(pattern,
@@ -212,7 +223,7 @@ sv_regex <- function(pattern,
 #'   regex pattern for email address detection.
 #' @inheritParams sv_numeric
 #'
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
@@ -226,6 +237,12 @@ sv_regex <- function(pattern,
 #'   iv$add_rule("email", sv_optional())
 #'   iv$add_rule("email", sv_email())
 #' })
+#' 
+#' @family rule functions
+#' 
+#' @seealso The [sv_url()] function, another specialized regex-based function
+#'   for validating URLs. For general regex-based validation the [sv_regex()]
+#'   function is useful.
 #'
 #' @export
 sv_email <- function(message = "Not a valid email address",
@@ -271,7 +288,7 @@ sv_email <- function(message = "Not a valid email address",
 #'   regex pattern for URL detection.
 #' @inheritParams sv_numeric
 #'
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
@@ -285,6 +302,12 @@ sv_email <- function(message = "Not a valid email address",
 #'   iv$add_rule("url", sv_optional())
 #'   iv$add_rule("url", sv_url())
 #' })
+#' 
+#' @family rule functions
+#' 
+#' @seealso The [sv_email()] function, another specialized regex-based function
+#'   for validating email addresses. For general regex-based validation the
+#'   [sv_regex()] function is useful.
 #'
 #' @export
 sv_url <- function(message = "Not a valid URL",
@@ -339,7 +362,7 @@ sv_url <- function(message = "Not a valid URL",
 #' @param allow_inf If `FALSE` (the default), then any `Inf` or `-Inf` element
 #'   will cause validation to fail.
 #' 
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
@@ -352,6 +375,11 @@ sv_url <- function(message = "Not a valid URL",
 #'   iv$add_rule("count", sv_numeric())
 #'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
 #' })
+#' 
+#' @family rule functions
+#' 
+#' @seealso The [sv_integer()] function, which tests whether a field value is a
+#'   number that is integer-like.
 #'
 #' @export
 sv_numeric <- function(message = "A number is required",
@@ -388,7 +416,7 @@ sv_numeric <- function(message = "A number is required",
   )
 }
 
-#' Validate that a field is an integer
+#' Validate that a field is a number that is integer-like
 #'
 #' The `sv_integer()` function validates that a field is 'integer-like' with the
 #' `{value} %% 1 == 0` test. Very large values (generally with absolute exponent
@@ -400,7 +428,7 @@ sv_numeric <- function(message = "A number is required",
 #'   integer.
 #' @inheritParams sv_numeric
 #' 
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
@@ -413,6 +441,11 @@ sv_numeric <- function(message = "A number is required",
 #'   iv$add_rule("count", sv_integer())
 #'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
 #' })
+#' 
+#' @family rule functions
+#' 
+#' @seealso The [sv_numeric()] function, which tests whether a field value is
+#'   simply numeric.
 #'
 #' @export
 sv_integer <- function(message = "An integer is required",
@@ -471,7 +504,7 @@ sv_integer <- function(message = "An integer is required",
 #'   parameters, they are not required in a user-defined `message_fmt` string.
 #' @inheritParams sv_numeric
 #'
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
@@ -484,6 +517,11 @@ sv_integer <- function(message = "An integer is required",
 #'   iv$add_rule("count", sv_between(10, 10000))
 #'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
 #' })
+#' 
+#' @family rule functions
+#' 
+#' @seealso The [sv_in_set()] function, which tests whether a field values are
+#'   part of a specified set.
 #'
 #' @export
 sv_between <- function(left,
@@ -556,7 +594,7 @@ sv_between <- function(left,
 #'   echoed along with text that states how many extra elements are part of the
 #'   `set`.
 #'
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
@@ -568,6 +606,11 @@ sv_between <- function(left,
 #'
 #'   iv$add_rule("rating", sv_in_set(1:5, set_limit = 5))
 #' })
+#' 
+#' @family rule functions
+#' 
+#' @seealso The [sv_between()] function, which tests whether a field values
+#'   between two boundary values.
 #'
 #' @export
 sv_in_set <- function(set,
@@ -642,7 +685,7 @@ prepare_values_text <- function(set,
 #'   should be required).
 #' @inheritParams sv_numeric
 #'
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'   
 #' @examples
@@ -654,6 +697,13 @@ prepare_values_text <- function(set,
 #'
 #'   iv$add_rule("number", sv_gt(3))
 #' })
+#' 
+#' @family rule functions
+#' 
+#' @seealso The other comparison-based rule functions: [sv_gte()], [sv_lt()],
+#' [sv_lte()], [sv_equal()], and [sv_not_equal()]. The [sv_gte()] function may
+#' be needed if the field value should also pass validation when equal to the
+#' comparison value.
 #'
 #' @export
 sv_gt <- function(rhs,
@@ -674,7 +724,6 @@ sv_gt <- function(rhs,
   )
 }
 
-
 #' Validate that a field is greater than or equal to a specified value
 #'
 #' The `sv_gte()` function compares the field value to a specified value with
@@ -685,7 +734,7 @@ sv_gt <- function(rhs,
 #'   `<field> >= <rhs>`.
 #' @inheritParams sv_gt
 #'
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'   
 #' @examples
@@ -697,6 +746,13 @@ sv_gt <- function(rhs,
 #'
 #'   iv$add_rule("number", sv_gte(4))
 #' })
+#' 
+#' @family rule functions
+#' 
+#' @seealso The other comparison-based rule functions: [sv_gt()], [sv_lt()],
+#' [sv_lte()], [sv_equal()], and [sv_not_equal()]. The [sv_gt()] function may
+#' be needed if the field value should not pass validation when it is equal to
+#' the comparison value.
 #'
 #' @export
 sv_gte <- function(rhs,
@@ -727,7 +783,7 @@ sv_gte <- function(rhs,
 #'   `<field> < <rhs>`.
 #' @inheritParams sv_gt
 #'
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'   
 #' @examples
@@ -739,6 +795,13 @@ sv_gte <- function(rhs,
 #'
 #'   iv$add_rule("number", sv_lt(8))
 #' })
+#' 
+#' @family rule functions
+#' 
+#' @seealso The other comparison-based rule functions: [sv_gt()], [sv_gte()],
+#' [sv_lte()], [sv_equal()], and [sv_not_equal()]. The [sv_lte()] function may
+#' be needed if the field value should also pass validation when equal to the
+#' comparison value.
 #'
 #' @export
 sv_lt <- function(rhs,
@@ -769,7 +832,7 @@ sv_lt <- function(rhs,
 #'   `<field> <= <rhs>`.
 #' @inheritParams sv_gt
 #'
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'   
 #' @examples
@@ -781,6 +844,13 @@ sv_lt <- function(rhs,
 #'
 #'   iv$add_rule("number", sv_lte(7))
 #' })
+#' 
+#' @family rule functions
+#' 
+#' @seealso The other comparison-based rule functions: [sv_gt()], [sv_gte()],
+#' [sv_lt()], [sv_equal()], and [sv_not_equal()]. The [sv_lt()] function may
+#' be needed if the field value should not pass validation when it is equal to
+#' the comparison value.
 #'
 #' @export
 sv_lte <- function(rhs,
@@ -811,7 +881,7 @@ sv_lte <- function(rhs,
 #'   `<field> == <rhs>`.
 #' @inheritParams sv_gt
 #'
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'   
 #' @examples
@@ -823,6 +893,12 @@ sv_lte <- function(rhs,
 #'
 #'   iv$add_rule("sum", sv_equal(10))
 #' })
+#' 
+#' @family rule functions
+#' 
+#' @seealso The other comparison-based rule functions: [sv_gt()], [sv_gte()],
+#'   [sv_lt()], [sv_lte()], and [sv_not_equal()] (which serves as the opposite
+#'   function to `sv_equal()`).
 #'
 #' @export
 sv_equal <- function(rhs,
@@ -853,7 +929,7 @@ sv_equal <- function(rhs,
 #'   `<field> != <rhs>`.
 #' @inheritParams sv_gt
 #'
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'   
 #' @examples
@@ -865,6 +941,12 @@ sv_equal <- function(rhs,
 #'
 #'   iv$add_rule("score", sv_not_equal(0))
 #' })
+#' 
+#' @family rule functions
+#' 
+#' @seealso The other comparison-based rule functions: [sv_gt()], [sv_gte()],
+#'   [sv_lt()], [sv_lte()], and [sv_equal()] (which serves as the opposite
+#'   function to `sv_not_equal()`).
 #'
 #' @export
 sv_not_equal <- function(rhs,
@@ -947,7 +1029,7 @@ sv_comparison <- function(rhs,
 #'   formulas are also accepted instead of a function, using `.` as the variable
 #'   name for the input value.
 #'   
-#' @return A function suitable for using as an
+#' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #' 
 #' @examples
@@ -973,6 +1055,8 @@ sv_comparison <- function(rhs,
 #'   iv$add_rule("foo", compose_rules(sv_required(), sv_numeric()))
 #'   iv$add_rule("foo", positive_even_integer())
 #' })
+#' 
+#' @family rule functions
 #' 
 #' @export
 compose_rules <- function(...) {

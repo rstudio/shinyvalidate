@@ -15,7 +15,7 @@ access the value to test), that returns \code{TRUE} for success and \code{FALSE}
 failure.}
 }
 \value{
-A function suitable for using as an
+A function suitable for use as an
 \code{\link[=InputValidator]{InputValidator$add_rule()}} rule.
 }
 \description{
@@ -24,22 +24,70 @@ value is present. By default, the definition of "is present" is based on
 \code{\link[=input_provided]{input_provided()}}.
 }
 \examples{
-# Ignore withReactiveDomain(), it's just required to get this example to run
-# outside of Shiny
-shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+## Only run examples in interactive R sessions
+if (interactive()) {
 
+library(shiny)
+library(shinyvalidate)
+
+ui <- fluidPage(
+  textInput("name", "Name")
+)
+
+server <- function(input, output, session) {
+  
+  # Validation rules are set in the server, start by
+  # making a new instance of an `InputValidator()`
   iv <- InputValidator$new()
 
-  # Basic usage: ensure that `input$title` is present, and return a terse
-  # validation message if not
-  iv$add_rule("title", sv_required())
+  # Basic usage: ensure that `input$name` is present,
+  # and return a terse validation message if not
+  iv$add_rule("name", sv_required())
 
-  # You can easily provide a custom message to display
-  iv$add_rule("email", sv_required("An email is required"))
+  # Finally, `enable()` the validation rules
+  iv$enable()
+}
 
-  # Provide a `test` argument to change the definition of "is present";
-  # in this example, any non-NULL value will be accepted.
-  iv$add_rule("choices", sv_required(test = is.null))
-})
+shinyApp(ui, server)
 
 }
+
+# There are some alternatives to above example, and
+# the following snippets can serve to replace the
+# `iv$add_rule(...)` line
+
+# (1) Providing a custom message to display
+# when validation fails:
+
+# iv$add_rule("email", sv_required("An email is required"))
+
+# (2) Providing a `test` argument to change
+# the definition of "is present"; in this
+# snippet, any non-NULL value will be accepted:
+
+# iv$add_rule("choices", sv_required(test = is.null))
+
+
+}
+\seealso{
+The \code{\link[=sv_optional]{sv_optional()}} function, which takes a different approach to
+field presence.
+
+Other rule functions: 
+\code{\link{compose_rules}()},
+\code{\link{sv_between}()},
+\code{\link{sv_email}()},
+\code{\link{sv_equal}()},
+\code{\link{sv_gte}()},
+\code{\link{sv_gt}()},
+\code{\link{sv_in_set}()},
+\code{\link{sv_integer}()},
+\code{\link{sv_lte}()},
+\code{\link{sv_lt}()},
+\code{\link{sv_not_equal}()},
+\code{\link{sv_numeric}()},
+\code{\link{sv_optional}()},
+\code{\link{sv_regex}()},
+\code{\link{sv_url}()}
+}
+\concept{rule functions}

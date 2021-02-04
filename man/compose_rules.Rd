@@ -13,7 +13,7 @@ formulas are also accepted instead of a function, using \code{.} as the variable
 name for the input value.}
 }
 \value{
-A function suitable for using as an
+A function suitable for use as an
 \code{\link[=InputValidator]{InputValidator$add_rule()}} rule.
 }
 \description{
@@ -52,3 +52,22 @@ shiny::withReactiveDomain(shiny::MockShinySession$new(), {
 })
 
 }
+\seealso{
+Other rule functions: 
+\code{\link{sv_between}()},
+\code{\link{sv_email}()},
+\code{\link{sv_equal}()},
+\code{\link{sv_gte}()},
+\code{\link{sv_gt}()},
+\code{\link{sv_in_set}()},
+\code{\link{sv_integer}()},
+\code{\link{sv_lte}()},
+\code{\link{sv_lt}()},
+\code{\link{sv_not_equal}()},
+\code{\link{sv_numeric}()},
+\code{\link{sv_optional}()},
+\code{\link{sv_regex}()},
+\code{\link{sv_required}()},
+\code{\link{sv_url}()}
+}
+\concept{rule functions}

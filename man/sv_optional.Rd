@@ -12,7 +12,7 @@ access the value to test), that returns \code{TRUE} for success and \code{FALSE}
 failure.}
 }
 \value{
-A function suitable for using as an
+A function suitable for use as an
 \code{\link[=InputValidator]{InputValidator$add_rule()}} rule.
 }
 \description{
@@ -39,4 +39,27 @@ shiny::withReactiveDomain(shiny::MockShinySession$new(), {
   iv$add_rule("email", sv_optional())
   iv$add_rule("email", sv_email())
 })
+
 }
+\seealso{
+The \code{\link[=sv_required]{sv_required()}} function, which takes a different approach to
+field presence.
+
+Other rule functions: 
+\code{\link{compose_rules}()},
+\code{\link{sv_between}()},
+\code{\link{sv_email}()},
+\code{\link{sv_equal}()},
+\code{\link{sv_gte}()},
+\code{\link{sv_gt}()},
+\code{\link{sv_in_set}()},
+\code{\link{sv_integer}()},
+\code{\link{sv_lte}()},
+\code{\link{sv_lt}()},
+\code{\link{sv_not_equal}()},
+\code{\link{sv_numeric}()},
+\code{\link{sv_regex}()},
+\code{\link{sv_required}()},
+\code{\link{sv_url}()}
+}
+\concept{rule functions}

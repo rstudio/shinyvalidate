@@ -23,24 +23,55 @@
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("name", "Name")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
+#' 
+#'   # Basic usage: ensure that `input$name` is present,
+#'   # and return a terse validation message if not
+#'   iv$add_rule("name", sv_required())
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
+#' 
+#' # There are some alternatives to above example, and
+#' # the following snippets can serve to replace the
+#' # `iv$add_rule(...)` line
+#' 
+#' # (1) Providing a custom message to display
+#' # when validation fails:
+#' 
+#' # iv$add_rule("email", sv_required("An email is required"))
 #'
-#'   # Basic usage: ensure that `input$title` is present, and return a terse
-#'   # validation message if not
-#'   iv$add_rule("title", sv_required())
-#'
-#'   # You can easily provide a custom message to display
-#'   iv$add_rule("email", sv_required("An email is required"))
-#'
-#'   # Provide a `test` argument to change the definition of "is present";
-#'   # in this example, any non-NULL value will be accepted.
-#'   iv$add_rule("choices", sv_required(test = is.null))
-#' })
-#'
+#' # (2) Providing a `test` argument to change
+#' # the definition of "is present"; in this
+#' # snippet, any non-NULL value will be accepted:
+#' 
+#' # iv$add_rule("choices", sv_required(test = is.null))
+#' 
+#' 
+#' @family rule functions
+#' 
+#' @seealso The [sv_optional()] function, which takes a different approach to
+#'   field presence.
+#' 
 #' @export
 sv_required <- function(message = "Required", 
                         test = input_provided) {

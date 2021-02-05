@@ -51,9 +51,9 @@
 #' 
 #' }
 #' 
-#' # There are some alternatives to above example, and
-#' # the following snippets can serve to replace the
-#' # `iv$add_rule(...)` line
+#' # There are some alternatives to the above example,
+#' # and the following snippets can serve to replace
+#' # the `iv$add_rule(...)` statement
 #' 
 #' # (1) Providing a custom message to display
 #' # when validation fails:
@@ -65,7 +65,6 @@
 #' # snippet, any non-NULL value will be accepted:
 #' 
 #' # iv$add_rule("choices", sv_required(test = is.null))
-#' 
 #' 
 #' @family rule functions
 #' 
@@ -112,16 +111,36 @@ sv_required <- function(message = "Required",
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("email", "Email")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
-#'
-#'   # An email is not required, but if present, it must be valid
+#' 
+#'   # Basic usage: `sv_optional()` is often paired with
+#'   # another `sv_*()` function; below, an email in
+#'   # `input$email` is not required, but if present, it
+#'   # must be valid
 #'   iv$add_rule("email", sv_optional())
 #'   iv$add_rule("email", sv_email())
-#' })
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
 #' 
 #' @family rule functions
 #' 
@@ -160,24 +179,54 @@ sv_optional <- function(test = input_provided) {
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("lookup_id", "Lookup ID")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
-#'
-#'   iv$add_rule("lookup_id",
-#'     sv_regex("^[a-zA-Z0-9]$", "Only alphanumeric characters are allowed")
+#' 
+#'   # Basic usage: `sv_regex()` requires both a regex
+#'   # pattern and message to display if the validation
+#'   # of `input$lookup_id` fails
+#'   iv$add_rule(
+#'     "lookup_id",
+#'     sv_regex("^[a-zA-Z0-9]$", "Only alphanumeric characters allowed")
 #'   )
-#'
-#'   # If you're more comfortable with wildcards than regex, use glob2rx
-#'   iv$add_rule("image_filename",
-#'     sv_regex(glob2rx("*.png"),
-#'       message = "A filename ending in png was expected",
-#'       ignore.case = TRUE
-#'     )
-#'   )
-#' })
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
+#' 
+#' # As an alternative to the above example, the
+#' # following snippet can serve to replace the
+#' # `iv$add_rule(...)` statement
+#' 
+#' # If you're more comfortable with wildcards
+#' # (i.e., globbing) than with regular expressions,
+#' # use `glob2rx()` in `pattern`
+#' 
+#' # iv$add_rule(
+#' #   "lookup_id",
+#' #   sv_regex(
+#' #     pattern = glob2rx("*.png"),
+#' #     message = "A filename ending in 'png' was expected",
+#' #     ignore.case = TRUE
+#' #   )
+#' # )
 #' 
 #' @family rule functions
 #' 
@@ -227,16 +276,51 @@ sv_regex <- function(pattern,
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("email", "Email")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
-#'
-#'   # An email is not required, but if present, it must be valid
-#'   iv$add_rule("email", sv_optional())
+#' 
+#'   # Basic usage: `sv_email()` works well with its
+#'   # defaults; a message will be displayed if the
+#'   # validation of `input$email` fails
 #'   iv$add_rule("email", sv_email())
-#' })
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
+#' 
+#' # As an alternative to the above example, the
+#' # following snippet can serve to replace the
+#' # `iv$add_rule(...)` statement
+#' 
+#' # If you're more comfortable with wildcards
+#' # (i.e., globbing) than with regular expressions,
+#' # use `glob2rx()` in `pattern`
+#' 
+#' # iv$add_rule(
+#' #   "lookup_id",
+#' #   sv_regex(
+#' #     pattern = glob2rx("*.png"),
+#' #     message = "A filename ending in 'png' was expected",
+#' #     ignore.case = TRUE
+#' #   )
+#' # )
 #' 
 #' @family rule functions
 #' 

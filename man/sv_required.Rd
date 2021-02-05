@@ -52,9 +52,9 @@ shinyApp(ui, server)
 
 }
 
-# There are some alternatives to above example, and
-# the following snippets can serve to replace the
-# `iv$add_rule(...)` line
+# There are some alternatives to the above example,
+# and the following snippets can serve to replace
+# the `iv$add_rule(...)` statement
 
 # (1) Providing a custom message to display
 # when validation fails:
@@ -66,7 +66,6 @@ shinyApp(ui, server)
 # snippet, any non-NULL value will be accepted:
 
 # iv$add_rule("choices", sv_required(test = is.null))
-
 
 }
 \seealso{

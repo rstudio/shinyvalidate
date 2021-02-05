@@ -31,16 +31,51 @@ A validation function, suitable for use with \code{InputValidator$add_rule()},
 that checks whether an input value looks like a valid email address.
 }
 \examples{
-# Ignore withReactiveDomain(), it's just required to get this example to run
-# outside of Shiny
-shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+## Only run examples in interactive R sessions
+if (interactive()) {
 
+library(shiny)
+library(shinyvalidate)
+
+ui <- fluidPage(
+  textInput("email", "Email")
+)
+
+server <- function(input, output, session) {
+  
+  # Validation rules are set in the server, start by
+  # making a new instance of an `InputValidator()`
   iv <- InputValidator$new()
 
-  # An email is not required, but if present, it must be valid
-  iv$add_rule("email", sv_optional())
+  # Basic usage: `sv_email()` works well with its
+  # defaults; a message will be displayed if the
+  # validation of `input$email` fails
   iv$add_rule("email", sv_email())
-})
+
+  # Finally, `enable()` the validation rules
+  iv$enable()
+}
+
+shinyApp(ui, server)
+
+}
+
+# As an alternative to the above example, the
+# following snippet can serve to replace the
+# `iv$add_rule(...)` statement
+
+# If you're more comfortable with wildcards
+# (i.e., globbing) than with regular expressions,
+# use `glob2rx()` in `pattern`
+
+# iv$add_rule(
+#   "lookup_id",
+#   sv_regex(
+#     pattern = glob2rx("*.png"),
+#     message = "A filename ending in 'png' was expected",
+#     ignore.case = TRUE
+#   )
+# )
 
 }
 \seealso{

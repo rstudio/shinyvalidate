@@ -29,16 +29,36 @@ not affected by \code{sv_optional()} rules in parent validators; only rules in t
 same validator instance as the \code{sv_optional()} will be skipped.
 }
 \examples{
-# Ignore withReactiveDomain(), it's just required to get this example to run
-# outside of Shiny
-shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+## Only run examples in interactive R sessions
+if (interactive()) {
 
+library(shiny)
+library(shinyvalidate)
+
+ui <- fluidPage(
+  textInput("email", "Email")
+)
+
+server <- function(input, output, session) {
+  
+  # Validation rules are set in the server, start by
+  # making a new instance of an `InputValidator()`
   iv <- InputValidator$new()
 
-  # An email is not required, but if present, it must be valid
+  # Basic usage: `sv_optional()` is often paired with
+  # another `sv_*()` function; below, an email in
+  # `input$email` is not required, but if present, it
+  # must be valid
   iv$add_rule("email", sv_optional())
   iv$add_rule("email", sv_email())
-})
+
+  # Finally, `enable()` the validation rules
+  iv$enable()
+}
+
+shinyApp(ui, server)
+
+}
 
 }
 \seealso{

@@ -67,20 +67,6 @@ shinyApp(ui, server)
 
 }
 
-# In addition to a check for whether a value is
-# integer-like, the following snippets can serve as
-# useful next validations after the
-# `iv$add_rule(...)` statement
-
-# (1) Determining if the integer value is
-# between two fixed values with `sv_between()`
-
-# iv$add_rule("count", sv_between(0, 10))
-
-# (2) Checking whether the number is positive
-
-# iv$add_rule("count", sv_gte(0))
-
 }
 \seealso{
 The \code{\link[=sv_numeric]{sv_numeric()}} function, which tests whether a field value is

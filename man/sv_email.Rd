@@ -60,23 +60,6 @@ shinyApp(ui, server)
 
 }
 
-# As an alternative to the above example, the
-# following snippet can serve to replace the
-# `iv$add_rule(...)` statement
-
-# If you're more comfortable with wildcards
-# (i.e., globbing) than with regular expressions,
-# use `glob2rx()` in `pattern`
-
-# iv$add_rule(
-#   "lookup_id",
-#   sv_regex(
-#     pattern = glob2rx("*.png"),
-#     message = "A filename ending in 'png' was expected",
-#     ignore.case = TRUE
-#   )
-# )
-
 }
 \seealso{
 The \code{\link[=sv_url]{sv_url()}} function, another specialized regex-based function

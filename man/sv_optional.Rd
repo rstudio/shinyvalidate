@@ -12,7 +12,7 @@ access the value to test), that returns \code{TRUE} for success and \code{FALSE}
 failure.}
 }
 \value{
-A function suitable for using as an
+A function suitable for use as an
 \code{\link[=InputValidator]{InputValidator$add_rule()}} rule.
 }
 \description{
@@ -29,14 +29,57 @@ not affected by \code{sv_optional()} rules in parent validators; only rules in t
 same validator instance as the \code{sv_optional()} will be skipped.
 }
 \examples{
-# Ignore withReactiveDomain(), it's just required to get this example to run
-# outside of Shiny
-shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+## Only run examples in interactive R sessions
+if (interactive()) {
 
+library(shiny)
+library(shinyvalidate)
+
+ui <- fluidPage(
+  textInput("email", "Email")
+)
+
+server <- function(input, output, session) {
+  
+  # Validation rules are set in the server, start by
+  # making a new instance of an `InputValidator()`
   iv <- InputValidator$new()
 
-  # An email is not required, but if present, it must be valid
+  # Basic usage: `sv_optional()` is often paired with
+  # another `sv_*()` function; below, an email in
+  # `input$email` is not required, but if present, it
+  # must be valid
   iv$add_rule("email", sv_optional())
   iv$add_rule("email", sv_email())
-})
+
+  # Finally, `enable()` the validation rules
+  iv$enable()
 }
+
+shinyApp(ui, server)
+
+}
+
+}
+\seealso{
+The \code{\link[=sv_required]{sv_required()}} function, which takes a different approach to
+field presence.
+
+Other rule functions: 
+\code{\link{compose_rules}()},
+\code{\link{sv_between}()},
+\code{\link{sv_email}()},
+\code{\link{sv_equal}()},
+\code{\link{sv_gte}()},
+\code{\link{sv_gt}()},
+\code{\link{sv_in_set}()},
+\code{\link{sv_integer}()},
+\code{\link{sv_lte}()},
+\code{\link{sv_lt}()},
+\code{\link{sv_not_equal}()},
+\code{\link{sv_numeric}()},
+\code{\link{sv_regex}()},
+\code{\link{sv_required}()},
+\code{\link{sv_url}()}
+}
+\concept{rule functions}

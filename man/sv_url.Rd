@@ -19,7 +19,7 @@ should be required).}
 \code{NA} or \code{NaN} element will cause validation to fail.}
 }
 \value{
-A function suitable for using as an
+A function suitable for use as an
 \code{\link[=InputValidator]{InputValidator$add_rule()}} rule.
 }
 \description{
@@ -27,15 +27,56 @@ A validation function, suitable for use with \code{InputValidator$add_rule()},
 that checks whether an input value is a valid URL.
 }
 \examples{
-# Ignore withReactiveDomain(), it's just required to get this example to run
-# outside of Shiny
-shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+## Only run examples in interactive R sessions
+if (interactive()) {
 
+library(shiny)
+library(shinyvalidate)
+
+ui <- fluidPage(
+  textInput("url", "URL")
+)
+
+server <- function(input, output, session) {
+  
+  # Validation rules are set in the server, start by
+  # making a new instance of an `InputValidator()`
   iv <- InputValidator$new()
 
-  # A URL is not required, but if present, it must be valid
-  iv$add_rule("url", sv_optional())
+  # Basic usage: `sv_url()` works well with its
+  # defaults; a message will be displayed if the
+  # validation of `input$address` fails
   iv$add_rule("url", sv_url())
-})
+
+  # Finally, `enable()` the validation rules
+  iv$enable()
+}
+
+shinyApp(ui, server)
 
 }
+
+}
+\seealso{
+The \code{\link[=sv_email]{sv_email()}} function, another specialized regex-based function
+for validating email addresses. For general regex-based validation the
+\code{\link[=sv_regex]{sv_regex()}} function is useful.
+
+Other rule functions: 
+\code{\link{compose_rules}()},
+\code{\link{sv_between}()},
+\code{\link{sv_email}()},
+\code{\link{sv_equal}()},
+\code{\link{sv_gte}()},
+\code{\link{sv_gt}()},
+\code{\link{sv_in_set}()},
+\code{\link{sv_integer}()},
+\code{\link{sv_lte}()},
+\code{\link{sv_lt}()},
+\code{\link{sv_not_equal}()},
+\code{\link{sv_numeric}()},
+\code{\link{sv_optional}()},
+\code{\link{sv_regex}()},
+\code{\link{sv_required}()}
+}
+\concept{rule functions}

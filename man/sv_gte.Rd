@@ -39,7 +39,7 @@ should be required).}
 will cause validation to fail.}
 }
 \value{
-A function suitable for using as an
+A function suitable for use as an
 \code{\link[=InputValidator]{InputValidator$add_rule()}} rule.
 }
 \description{
@@ -47,13 +47,58 @@ The \code{sv_gte()} function compares the field value to a specified value with
 the \code{>=} operator.
 }
 \examples{
-# Ignore withReactiveDomain(), it's just required to get this example to run
-# outside of Shiny
-shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+## Only run examples in interactive R sessions
+if (interactive()) {
 
+library(shiny)
+library(shinyvalidate)
+
+ui <- fluidPage(
+  textInput("number", "Number")
+)
+
+server <- function(input, output, session) {
+  
+  # Validation rules are set in the server, start by
+  # making a new instance of an `InputValidator()`
   iv <- InputValidator$new()
 
-  iv$add_rule("number", sv_gte(4))
-})
+  # Basic usage: `sv_gte()` requires a value
+  # to compare against the field value; a message
+  # will be shown if the validation of
+  # `input$number` fails
+  iv$add_rule("number", sv_gte(1))
+
+  # Finally, `enable()` the validation rules
+  iv$enable()
+}
+
+shinyApp(ui, server)
 
 }
+
+}
+\seealso{
+The other comparison-based rule functions: \code{\link[=sv_gt]{sv_gt()}}, \code{\link[=sv_lt]{sv_lt()}},
+\code{\link[=sv_lte]{sv_lte()}}, \code{\link[=sv_equal]{sv_equal()}}, and \code{\link[=sv_not_equal]{sv_not_equal()}}. The \code{\link[=sv_gt]{sv_gt()}} function may
+be needed if the field value should not pass validation when it is equal to
+the comparison value.
+
+Other rule functions: 
+\code{\link{compose_rules}()},
+\code{\link{sv_between}()},
+\code{\link{sv_email}()},
+\code{\link{sv_equal}()},
+\code{\link{sv_gt}()},
+\code{\link{sv_in_set}()},
+\code{\link{sv_integer}()},
+\code{\link{sv_lte}()},
+\code{\link{sv_lt}()},
+\code{\link{sv_not_equal}()},
+\code{\link{sv_numeric}()},
+\code{\link{sv_optional}()},
+\code{\link{sv_regex}()},
+\code{\link{sv_required}()},
+\code{\link{sv_url}()}
+}
+\concept{rule functions}

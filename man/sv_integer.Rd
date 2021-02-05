@@ -2,7 +2,7 @@
 % Please edit documentation in R/rules.R
 \name{sv_integer}
 \alias{sv_integer}
-\title{Validate that a field is an integer}
+\title{Validate that a field is a number that is integer-like}
 \usage{
 sv_integer(
   message = "An integer is required",
@@ -27,7 +27,7 @@ should be required).}
 \code{NA} or \code{NaN} element will cause validation to fail.}
 }
 \value{
-A function suitable for using as an
+A function suitable for use as an
 \code{\link[=InputValidator]{InputValidator$add_rule()}} rule.
 }
 \description{
@@ -38,14 +38,55 @@ imprecision. By default, only a single, finite, not-missing, valid numbers
 are allowed, but each of those criteria can be controlled via arguments.
 }
 \examples{
-# Ignore withReactiveDomain(), it's just required to get this example to run
-# outside of Shiny
-shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+## Only run examples in interactive R sessions
+if (interactive()) {
 
+library(shiny)
+library(shinyvalidate)
+
+ui <- fluidPage(
+  textInput("count", "Count")
+)
+
+server <- function(input, output, session) {
+  
+  # Validation rules are set in the server, start by
+  # making a new instance of an `InputValidator()`
   iv <- InputValidator$new()
 
+  # Basic usage: `sv_integer()` works well with its
+  # defaults; a message will be displayed if the
+  # validation of `input$count` fails
   iv$add_rule("count", sv_integer())
-  iv$add_rule("count", ~if (. <= 0) "A positive value is required")
-})
+
+  # Finally, `enable()` the validation rules
+  iv$enable()
+}
+
+shinyApp(ui, server)
 
 }
+
+}
+\seealso{
+The \code{\link[=sv_numeric]{sv_numeric()}} function, which tests whether a field value is
+simply numeric.
+
+Other rule functions: 
+\code{\link{compose_rules}()},
+\code{\link{sv_between}()},
+\code{\link{sv_email}()},
+\code{\link{sv_equal}()},
+\code{\link{sv_gte}()},
+\code{\link{sv_gt}()},
+\code{\link{sv_in_set}()},
+\code{\link{sv_lte}()},
+\code{\link{sv_lt}()},
+\code{\link{sv_not_equal}()},
+\code{\link{sv_numeric}()},
+\code{\link{sv_optional}()},
+\code{\link{sv_regex}()},
+\code{\link{sv_required}()},
+\code{\link{sv_url}()}
+}
+\concept{rule functions}

@@ -12,8 +12,9 @@ sv_in_set(
 }
 \arguments{
 \item{set}{A vector or list of elements for which the field value must be a
-part of to pass validation. To allow an empty field, \code{NA} should be
-included in the \code{set} vector. Optionally, \code{NaN} can be included as well.}
+part of (\code{value \%in\% set} must be \code{TRUE}) to pass validation. To allow an
+empty field, \code{NA} should be included in the \code{set} vector. Optionally, \code{NaN}
+can be included as well.}
 
 \item{message_fmt}{The validation error message to use if a value fails to
 match the rule. The message can be customized by using the
@@ -34,7 +35,7 @@ A function suitable for use as an
 \code{\link[=InputValidator]{InputValidator$add_rule()}} rule.
 }
 \description{
-The \code{sv_in_set()} function checks whether the field value is part of a
+The \code{sv_in_set()} function checks whether the field value is a member of a
 specified set of values.
 }
 \examples{

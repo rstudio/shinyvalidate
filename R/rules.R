@@ -717,12 +717,13 @@ sv_between <- function(left,
 
 #' Validate that a field is part of a defined set
 #'
-#' The `sv_in_set()` function checks whether the field value is part of a
+#' The `sv_in_set()` function checks whether the field value is a member of a
 #' specified set of values.
 #'
 #' @param set A vector or list of elements for which the field value must be a
-#'   part of to pass validation. To allow an empty field, `NA` should be
-#'   included in the `set` vector. Optionally, `NaN` can be included as well.
+#'   part of (`value %in% set` must be `TRUE`) to pass validation. To allow an
+#'   empty field, `NA` should be included in the `set` vector. Optionally, `NaN`
+#'   can be included as well.
 #' @param message_fmt The validation error message to use if a value fails to
 #'   match the rule. The message can be customized by using the
 #'   `"{values_text}"` string parameter, which allows for the insertion of `set`
@@ -781,6 +782,11 @@ sv_in_set <- function(set,
   force(set)
   force(message_fmt)
   force(set_limit)
+  
+  # Allows passing in of factors directly; if we don't call `unique` here, then
+  # the validation message will contain duplicates ("Must be in the set of
+  # setosa, setosa, setosa...").
+  set <- unique(set)
 
   # Prechecking of inputs; this stops the function immediately (not entering
   # the validation phase) since failures here are recognized as usage errors

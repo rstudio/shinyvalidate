@@ -137,7 +137,71 @@ Imagine a Shiny module that contains an entire form, submission button and all. 
 
 In this case, the module server function can create its own local `InputValidator` object and use it internally.
 
-[TODO: example?]
+``` {.r}
+library(shiny)
+
+contact_us_ui <- function(id) {
+  ns <- NS(id)
+  tagList(
+    textInput(ns("email"), "Your email"),
+    textAreaInput(ns("message"), "Message", rows = 4),
+    helpText("Maximum 140 characters"),
+    div(class = "text-right",
+      actionButton(ns("cancel"), "Cancel"),
+      actionButton(ns("send"), "Send email", class = "btn-primary")
+    )
+  )
+}
+
+contact_us <- function(id) {
+  moduleServer(id, function(input, output, session) {
+    iv <- InputValidator$new()
+    
+    iv$add_rule("email", sv_required())
+    iv$add_rule("email", sv_email())
+    
+    iv$add_rule("message", sv_required())
+    iv$add_rule("message",
+      ~ if (nchar(.) > 140) paste("Maximum length exceeded by", nchar(.) - 140))
+    
+    close <- function() {
+      removeModal()
+      obs_send$destroy()
+      obs_cancel$destroy()
+    }
+    
+    obs_send <- observeEvent(input$send, {
+      iv$enable()
+      if (iv$is_valid()) {
+        close()
+        showNotification("Message sent (not really)", type = "message")
+      }
+    }, ignoreInit = TRUE)
+    
+    obs_cancel <- observeEvent(input$cancel, {
+      close()
+    }, ignoreInit = TRUE)
+  })
+}
+
+ui <- fluidPage(
+  actionButton("contact_us", "Contact Us", class = "btn-sm")
+)
+
+server <- function(input, output, session) {
+  observeEvent(input$contact_us, {
+    showModal(
+      modalDialog(size = "s", easyClose = FALSE, title = "Contact Us",
+        footer = NULL,
+        contact_us_ui("contact")
+      )
+    )
+    contact_us("contact")
+  })
+}
+
+shinyApp(ui, server)
+```
 
 #### Module as sub-form
 

@@ -47,14 +47,35 @@ The \code{sv_not_equal()} function compares the field value to a specified value
 with the \code{!=} operator.
 }
 \examples{
-# Ignore withReactiveDomain(), it's just required to get this example to run
-# outside of Shiny
-shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+## Only run examples in interactive R sessions
+if (interactive()) {
 
+library(shiny)
+library(shinyvalidate)
+
+ui <- fluidPage(
+  textInput("score", "Number")
+)
+
+server <- function(input, output, session) {
+  
+  # Validation rules are set in the server, start by
+  # making a new instance of an `InputValidator()`
   iv <- InputValidator$new()
 
+  # Basic usage: `sv_not_equal()` requires a value
+  # to compare against the field value; a message
+  # will be shown if the validation of
+  # `input$score` fails
   iv$add_rule("score", sv_not_equal(0))
-})
+
+  # Finally, `enable()` the validation rules
+  iv$enable()
+}
+
+shinyApp(ui, server)
+
+}
 
 }
 \seealso{

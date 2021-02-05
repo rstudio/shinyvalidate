@@ -38,15 +38,48 @@ imprecision. By default, only a single, finite, not-missing, valid numbers
 are allowed, but each of those criteria can be controlled via arguments.
 }
 \examples{
-# Ignore withReactiveDomain(), it's just required to get this example to run
-# outside of Shiny
-shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+## Only run examples in interactive R sessions
+if (interactive()) {
 
+library(shiny)
+library(shinyvalidate)
+
+ui <- fluidPage(
+  textInput("count", "Count")
+)
+
+server <- function(input, output, session) {
+  
+  # Validation rules are set in the server, start by
+  # making a new instance of an `InputValidator()`
   iv <- InputValidator$new()
 
+  # Basic usage: `sv_integer()` works well with its
+  # defaults; a message will be displayed if the
+  # validation of `input$count` fails
   iv$add_rule("count", sv_integer())
-  iv$add_rule("count", ~if (. <= 0) "A positive value is required")
-})
+
+  # Finally, `enable()` the validation rules
+  iv$enable()
+}
+
+shinyApp(ui, server)
+
+}
+
+# In addition to a check for whether a value is
+# integer-like, the following snippets can serve as
+# useful next validations after the
+# `iv$add_rule(...)` statement
+
+# (1) Determining if the integer value is
+# between two fixed values with `sv_between()`
+
+# iv$add_rule("count", sv_between(0, 10))
+
+# (2) Checking whether the number is positive
+
+# iv$add_rule("count", sv_gte(0))
 
 }
 \seealso{

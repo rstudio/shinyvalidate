@@ -38,14 +38,34 @@ The \code{sv_in_set()} function checks whether the field value is part of a
 specified set of values.
 }
 \examples{
-# Ignore withReactiveDomain(), it's just required to get this example to run
-# outside of Shiny
-shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+## Only run examples in interactive R sessions
+if (interactive()) {
 
+library(shiny)
+library(shinyvalidate)
+
+ui <- fluidPage(
+  textInput("rating", "Rating")
+)
+
+server <- function(input, output, session) {
+  
+  # Validation rules are set in the server, start by
+  # making a new instance of an `InputValidator()`
   iv <- InputValidator$new()
 
-  iv$add_rule("rating", sv_in_set(1:5, set_limit = 5))
-})
+  # Basic usage: `sv_in_set()` requires a value
+  # set given as a vector; a message will be
+  # shown if the validation of `input$rating` fails
+  iv$add_rule("rating", sv_in_set(1:5))
+
+  # Finally, `enable()` the validation rules
+  iv$enable()
+}
+
+shinyApp(ui, server)
+
+}
 
 }
 \seealso{

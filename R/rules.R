@@ -376,16 +376,34 @@ sv_email <- function(message = "Not a valid email address",
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("url", "URL")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
-#'
-#'   # A URL is not required, but if present, it must be valid
-#'   iv$add_rule("url", sv_optional())
+#' 
+#'   # Basic usage: `sv_url()` works well with its
+#'   # defaults; a message will be displayed if the
+#'   # validation of `input$address` fails
 #'   iv$add_rule("url", sv_url())
-#' })
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
 #' 
 #' @family rule functions
 #' 
@@ -448,17 +466,50 @@ sv_url <- function(message = "Not a valid URL",
 #' 
 #' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
-#'
+#' 
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("rating", "Rating")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
+#' 
+#'   # Basic usage: `sv_numeric()` works well with its
+#'   # defaults; a message will be displayed if the
+#'   # validation of `input$rating` fails
+#'   iv$add_rule("rating", sv_numeric())
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
+#' 
+#' # In addition to a check for whether a value is
+#' # numeric, the following snippets can serve as
+#' # useful next validations after the
+#' # `iv$add_rule(...)` statement
+#' 
+#' # (1) Determining if a numeric value is
+#' # between two fixed values with `sv_between()`
+#' 
+#' # iv$add_rule("rating", sv_between(0, 10))
 #'
-#'   iv$add_rule("count", sv_numeric())
-#'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
-#' })
+#' # (2) Checking whether the number is positive
+#' 
+#' # iv$add_rule("rating", sv_gte(0))
 #' 
 #' @family rule functions
 #' 
@@ -516,15 +567,48 @@ sv_numeric <- function(message = "A number is required",
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("count", "Count")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
-#'
+#' 
+#'   # Basic usage: `sv_integer()` works well with its
+#'   # defaults; a message will be displayed if the
+#'   # validation of `input$count` fails
 #'   iv$add_rule("count", sv_integer())
-#'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
-#' })
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
+#' 
+#' # In addition to a check for whether a value is
+#' # integer-like, the following snippets can serve as
+#' # useful next validations after the
+#' # `iv$add_rule(...)` statement
+#' 
+#' # (1) Determining if the integer value is
+#' # between two fixed values with `sv_between()`
+#' 
+#' # iv$add_rule("count", sv_between(0, 10))
+#'
+#' # (2) Checking whether the number is positive
+#' 
+#' # iv$add_rule("count", sv_gte(0))
 #' 
 #' @family rule functions
 #' 
@@ -590,17 +674,36 @@ sv_integer <- function(message = "An integer is required",
 #'
 #' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
-#'
+#' 
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("count", "Count")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
-#'
-#'   iv$add_rule("count", sv_between(10, 10000))
-#'   iv$add_rule("count", ~if (. <= 0) "A positive value is required")
-#' })
+#' 
+#'   # Basic usage: `sv_between()` requires `left` and
+#'   # `right` boundary values; a message will be
+#'   # displayed if the validation of `input$count` fails
+#'   iv$add_rule("count", sv_between(10, 100))
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
 #' 
 #' @family rule functions
 #' 
@@ -680,16 +783,36 @@ sv_between <- function(left,
 #'
 #' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
-#'
+#' 
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("rating", "Rating")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
-#'
-#'   iv$add_rule("rating", sv_in_set(1:5, set_limit = 5))
-#' })
+#' 
+#'   # Basic usage: `sv_in_set()` requires a value
+#'   # set given as a vector; a message will be
+#'   # shown if the validation of `input$rating` fails
+#'   iv$add_rule("rating", sv_in_set(1:5))
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
 #' 
 #' @family rule functions
 #' 
@@ -771,16 +894,37 @@ prepare_values_text <- function(set,
 #'
 #' @return A function suitable for use as an
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
-#'   
+#' 
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("number", "Number")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
-#'
-#'   iv$add_rule("number", sv_gt(3))
-#' })
+#' 
+#'   # Basic usage: `sv_gt()` requires a value
+#'   # to compare against the field value; a message
+#'   # will be shown if the validation of
+#'   # `input$number` fails
+#'   iv$add_rule("number", sv_gt(0))
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
 #' 
 #' @family rule functions
 #' 
@@ -822,14 +966,35 @@ sv_gt <- function(rhs,
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'   
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("number", "Number")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
-#'
-#'   iv$add_rule("number", sv_gte(4))
-#' })
+#' 
+#'   # Basic usage: `sv_gte()` requires a value
+#'   # to compare against the field value; a message
+#'   # will be shown if the validation of
+#'   # `input$number` fails
+#'   iv$add_rule("number", sv_gte(1))
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
 #' 
 #' @family rule functions
 #' 
@@ -871,14 +1036,35 @@ sv_gte <- function(rhs,
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'   
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("number", "Number")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
-#'
-#'   iv$add_rule("number", sv_lt(8))
-#' })
+#' 
+#'   # Basic usage: `sv_lt()` requires a value
+#'   # to compare against the field value; a message
+#'   # will be shown if the validation of
+#'   # `input$number` fails
+#'   iv$add_rule("number", sv_lt(10))
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
 #' 
 #' @family rule functions
 #' 
@@ -920,14 +1106,35 @@ sv_lt <- function(rhs,
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'   
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("number", "Number")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
-#'
-#'   iv$add_rule("number", sv_lte(7))
-#' })
+#' 
+#'   # Basic usage: `sv_lte()` requires a value
+#'   # to compare against the field value; a message
+#'   # will be shown if the validation of
+#'   # `input$number` fails
+#'   iv$add_rule("number", sv_lte(0))
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
 #' 
 #' @family rule functions
 #' 
@@ -969,14 +1176,35 @@ sv_lte <- function(rhs,
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'   
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("number", "Number")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
-#'
-#'   iv$add_rule("sum", sv_equal(10))
-#' })
+#' 
+#'   # Basic usage: `sv_equal()` requires a value
+#'   # to compare against the field value; a message
+#'   # will be shown if the validation of
+#'   # `input$number` fails
+#'   iv$add_rule("number", sv_equal(1))
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
 #' 
 #' @family rule functions
 #' 
@@ -1017,14 +1245,35 @@ sv_equal <- function(rhs,
 #'   [`InputValidator$add_rule()`][InputValidator] rule.
 #'   
 #' @examples
-#' # Ignore withReactiveDomain(), it's just required to get this example to run
-#' # outside of Shiny
-#' shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+#' ## Only run examples in interactive R sessions
+#' if (interactive()) {
 #'
+#' library(shiny)
+#' library(shinyvalidate)
+#' 
+#' ui <- fluidPage(
+#'   textInput("score", "Number")
+#' )
+#' 
+#' server <- function(input, output, session) {
+#'   
+#'   # Validation rules are set in the server, start by
+#'   # making a new instance of an `InputValidator()`
 #'   iv <- InputValidator$new()
-#'
+#' 
+#'   # Basic usage: `sv_not_equal()` requires a value
+#'   # to compare against the field value; a message
+#'   # will be shown if the validation of
+#'   # `input$score` fails
 #'   iv$add_rule("score", sv_not_equal(0))
-#' })
+#' 
+#'   # Finally, `enable()` the validation rules
+#'   iv$enable()
+#' }
+#' 
+#' shinyApp(ui, server)
+#' 
+#' }
 #' 
 #' @family rule functions
 #' 

@@ -43,13 +43,37 @@ positive_even_integer <- function() {
 # Use the `positive_even_integer()` rule function
 # to check that a supplied value is an integer, greater
 # than zero, and even (in that order)
-shiny::withReactiveDomain(shiny::MockShinySession$new(), {
+
+## Only run examples in interactive R sessions
+if (interactive()) {
+
+library(shiny)
+library(shinyvalidate)
+
+ui <- fluidPage(
+  textInput("value", "Value")
+)
+
+server <- function(input, output, session) {
   
+  # Validation rules are set in the server, start by
+  # making a new instance of an `InputValidator()`
   iv <- InputValidator$new()
-  
-  iv$add_rule("foo", compose_rules(sv_required(), sv_numeric()))
-  iv$add_rule("foo", positive_even_integer())
-})
+
+  # Add two `add_rule()` statements: one that
+  # combines `sv_required()` and `sv_numeric()` in
+  # single rule, and another that is defined
+  # through the use of `compose_rules()`
+  iv$add_rule("value", compose_rules(sv_required(), sv_numeric()))
+  iv$add_rule("value", positive_even_integer())
+
+  # Finally, `enable()` the validation rules
+  iv$enable()
+}
+
+shinyApp(ui, server)
+
+}
 
 }
 \seealso{

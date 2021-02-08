@@ -139,22 +139,19 @@ In this case, the module server function can create its own local `InputValidato
 
 ``` {.r}
 library(shiny)
+library(shinyvalidate)
 
+# Module UI
 contact_us_ui <- function(id) {
   ns <- NS(id)
-  tagList(
-    textInput(ns("email"), "Your email"),
-    textAreaInput(ns("message"), "Message", rows = 4),
-    helpText("Maximum 140 characters"),
-    div(class = "text-right",
-      actionButton(ns("cancel"), "Cancel"),
-      actionButton(ns("send"), "Send email", class = "btn-primary")
-    )
-  )
+  actionButton(ns("contact_us"), "Contact Us", class = "btn-sm")
 }
 
+# Module server
 contact_us <- function(id) {
   moduleServer(id, function(input, output, session) {
+    ns <- session$ns
+
     iv <- InputValidator$new()
     
     iv$add_rule("email", sv_required())
@@ -164,13 +161,29 @@ contact_us <- function(id) {
     iv$add_rule("message",
       ~ if (nchar(.) > 140) paste("Maximum length exceeded by", nchar(.) - 140))
     
+    observeEvent(input$contact_us, {
+      showModal(
+        modalDialog(size = "s", easyClose = FALSE, title = "Contact Us",
+          footer = NULL,
+          tagList(
+            textInput(ns("email"), "Your email"),
+            textAreaInput(ns("message"), "Message", rows = 4),
+            helpText("Maximum 140 characters"),
+            div(class = "text-right",
+              actionButton(ns("cancel"), "Cancel"),
+              actionButton(ns("send"), "Send email", class = "btn-primary")
+            )
+          )
+        )
+      )
+    })
+    
     close <- function() {
       removeModal()
-      obs_send$destroy()
-      obs_cancel$destroy()
+      iv$disable()
     }
     
-    obs_send <- observeEvent(input$send, {
+    observeEvent(input$send, {
       iv$enable()
       if (iv$is_valid()) {
         close()
@@ -178,26 +191,18 @@ contact_us <- function(id) {
       }
     }, ignoreInit = TRUE)
     
-    obs_cancel <- observeEvent(input$cancel, {
+    observeEvent(input$cancel, {
       close()
     }, ignoreInit = TRUE)
   })
 }
 
 ui <- fluidPage(
-  actionButton("contact_us", "Contact Us", class = "btn-sm")
+  contact_us_ui("contact")
 )
 
 server <- function(input, output, session) {
-  observeEvent(input$contact_us, {
-    showModal(
-      modalDialog(size = "s", easyClose = FALSE, title = "Contact Us",
-        footer = NULL,
-        contact_us_ui("contact")
-      )
-    )
-    contact_us("contact")
-  })
+  contact_us("contact")
 }
 
 shinyApp(ui, server)
@@ -210,6 +215,9 @@ Other Shiny modules may have a more transparent relationship with a surrounding 
 What this means, concretely, is that a Shiny module that contains an input (or multiple inputs) that need to be consumed by the caller, should call `iv$add_rule()` for its own inputs but generally leave `iv$enable()` or `iv$condition()` to the caller.
 
 ``` {.r}
+library(shiny)
+library(shinyvalidate)
+
 # Module UI
 email_ui <- function(id, label = "Email", value = NULL) {
   ns <- NS(id)
@@ -225,7 +233,7 @@ email <- function(id, required = TRUE) {
     if (required) {
       iv$add_rule("email_address", sv_required())
     }
-    iv$add_rule("email_address", ~ if (!is_valid_email(.)) "Invalid email address")
+    iv$add_rule("email_address", sv_email())
 
     # Allow caller to reset the input
     reset <- function() {
@@ -251,6 +259,8 @@ server <- function(input, output, session) {
   email_result <- email("email")
   email_result$iv$enable()
 }
+
+shinyApp(ui, server)
 ```
 
 [TODO: source code, live demo - 04_module_1]

@@ -200,7 +200,7 @@ sv_optional <- function(test = input_provided) {
 #'   # of `input$lookup_id` fails
 #'   iv$add_rule(
 #'     "lookup_id",
-#'     sv_regex("^[a-zA-Z0-9]$", "Only alphanumeric characters allowed")
+#'     sv_regex("^[a-zA-Z0-9]*$", "Only alphanumeric characters allowed")
 #'   )
 #' 
 #'   # Finally, `enable()` the validation rules

@@ -212,7 +212,7 @@ regex-based functions for validating email addresses and URLs.</p>
   <span class='co'># of `input$lookup_id` fails</span>
   <span class='va'>iv</span><span class='op'>$</span><span class='fu'>add_rule</span><span class='op'>(</span>
     <span class='st'>"lookup_id"</span>,
-    <span class='fu'>sv_regex</span><span class='op'>(</span><span class='st'>"^[a-zA-Z0-9]$"</span>, <span class='st'>"Only alphanumeric characters allowed"</span><span class='op'>)</span>
+    <span class='fu'>sv_regex</span><span class='op'>(</span><span class='st'>"^[a-zA-Z0-9]*$"</span>, <span class='st'>"Only alphanumeric characters allowed"</span><span class='op'>)</span>
   <span class='op'>)</span>
 
   <span class='co'># Finally, `enable()` the validation rules</span>

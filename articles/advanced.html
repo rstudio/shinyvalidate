@@ -184,15 +184,86 @@
 <a href="#self-contained-validation" class="anchor"></a>Self-contained validation</h4>
 <p>Imagine a Shiny module that contains an entire form, submission button and all. The module’s inputs need to be validated and display feedback, and the module’s reactives and outputs need to check <code>is_valid()</code>. Code <em>outside</em> the module, however, doesn’t need to influence the validation in any way, nor query <code>is_valid()</code>.</p>
 <p>In this case, the module server function can create its own local <code>InputValidator</code> object and use it internally.</p>
-<p>[TODO: example?]</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.rstudio.com/">shiny</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyvalidate/">shinyvalidate</a></span><span class="op">)</span>
+
+<span class="co"># Module UI</span>
+<span class="va">contact_us_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/NS.html">NS</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/actionButton.html">actionButton</a></span><span class="op">(</span><span class="fu">ns</span><span class="op">(</span><span class="st">"contact_us"</span><span class="op">)</span>, <span class="st">"Contact Us"</span>, class <span class="op">=</span> <span class="st">"btn-sm"</span><span class="op">)</span>
+<span class="op">}</span>
+
+<span class="co"># Module server</span>
+<span class="va">contact_us</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/moduleServer.html">moduleServer</a></span><span class="op">(</span><span class="va">id</span>, <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
+    <span class="va">ns</span> <span class="op">&lt;-</span> <span class="va">session</span><span class="op">$</span><span class="va">ns</span>
+
+    <span class="va">iv</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
+    
+    <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email"</span>, <span class="fu"><a href="../reference/sv_email.html">sv_email</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+    
+    <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"message"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"message"</span>,
+      <span class="op">~</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html">nchar</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">140</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"Maximum length exceeded by"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nchar.html">nchar</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op">-</span> <span class="fl">140</span><span class="op">)</span><span class="op">)</span>
+    
+    <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/observeEvent.html">observeEvent</a></span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">contact_us</span>, <span class="op">{</span>
+      <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/showModal.html">showModal</a></span><span class="op">(</span>
+        <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/modalDialog.html">modalDialog</a></span><span class="op">(</span>size <span class="op">=</span> <span class="st">"s"</span>, easyClose <span class="op">=</span> <span class="cn">FALSE</span>, title <span class="op">=</span> <span class="st">"Contact Us"</span>,
+          footer <span class="op">=</span> <span class="cn">NULL</span>,
+          <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/tag.html">tagList</a></span><span class="op">(</span>
+            <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/textInput.html">textInput</a></span><span class="op">(</span><span class="fu">ns</span><span class="op">(</span><span class="st">"email"</span><span class="op">)</span>, <span class="st">"Your email"</span><span class="op">)</span>,
+            <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/textAreaInput.html">textAreaInput</a></span><span class="op">(</span><span class="fu">ns</span><span class="op">(</span><span class="st">"message"</span><span class="op">)</span>, <span class="st">"Message"</span>, rows <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,
+            <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/helpText.html">helpText</a></span><span class="op">(</span><span class="st">"Maximum 140 characters"</span><span class="op">)</span>,
+            <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/builder.html">div</a></span><span class="op">(</span>class <span class="op">=</span> <span class="st">"text-right"</span>,
+              <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/actionButton.html">actionButton</a></span><span class="op">(</span><span class="fu">ns</span><span class="op">(</span><span class="st">"cancel"</span><span class="op">)</span>, <span class="st">"Cancel"</span><span class="op">)</span>,
+              <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/actionButton.html">actionButton</a></span><span class="op">(</span><span class="fu">ns</span><span class="op">(</span><span class="st">"send"</span><span class="op">)</span>, <span class="st">"Send email"</span>, class <span class="op">=</span> <span class="st">"btn-primary"</span><span class="op">)</span>
+            <span class="op">)</span>
+          <span class="op">)</span>
+        <span class="op">)</span>
+      <span class="op">)</span>
+    <span class="op">}</span><span class="op">)</span>
+    
+    <span class="va">close</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
+      <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/showModal.html">removeModal</a></span><span class="op">(</span><span class="op">)</span>
+      <span class="va">iv</span><span class="op">$</span><span class="fu">disable</span><span class="op">(</span><span class="op">)</span>
+    <span class="op">}</span>
+    
+    <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/observeEvent.html">observeEvent</a></span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">send</span>, <span class="op">{</span>
+      <span class="va">iv</span><span class="op">$</span><span class="fu">enable</span><span class="op">(</span><span class="op">)</span>
+      <span class="kw">if</span> <span class="op">(</span><span class="va">iv</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+        <span class="fu"><a href="https://rdrr.io/r/base/connections.html">close</a></span><span class="op">(</span><span class="op">)</span>
+        <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/showNotification.html">showNotification</a></span><span class="op">(</span><span class="st">"Message sent (not really)"</span>, type <span class="op">=</span> <span class="st">"message"</span><span class="op">)</span>
+      <span class="op">}</span>
+    <span class="op">}</span>, ignoreInit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+    
+    <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/observeEvent.html">observeEvent</a></span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">cancel</span>, <span class="op">{</span>
+      <span class="fu"><a href="https://rdrr.io/r/base/connections.html">close</a></span><span class="op">(</span><span class="op">)</span>
+    <span class="op">}</span>, ignoreInit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+  <span class="op">}</span><span class="op">)</span>
+<span class="op">}</span>
+
+<span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/fluidPage.html">fluidPage</a></span><span class="op">(</span>
+  <span class="fu">contact_us_ui</span><span class="op">(</span><span class="st">"contact"</span><span class="op">)</span>
+<span class="op">)</span>
+
+<span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu">contact_us</span><span class="op">(</span><span class="st">"contact"</span><span class="op">)</span>
+<span class="op">}</span>
+
+<span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="module-as-sub-form" class="section level4">
 <h4 class="hasAnchor">
 <a href="#module-as-sub-form" class="anchor"></a>Module as sub-form</h4>
 <p>Other Shiny modules may have a more transparent relationship with a surrounding form. Consider a Shiny module representing a single input, that returns the value of that input to the caller. It’s reasonable to expect the Shiny module to know how to determine whether the user’s input is valid, but the module shouldn’t need to know anything about the <em>context</em> in which that validation happens. Should validation errors be shown right away, or deferred until a Submit button is pressed—and if so, what button is that? Are there downstream reactive expressions and observers that need to guard against invalid data? These kinds of questions need to be concerns of the caller of the module, not the caller itself.</p>
 <p>What this means, concretely, is that a Shiny module that contains an input (or multiple inputs) that need to be consumed by the caller, should call <code>iv$add_rule()</code> for its own inputs but generally leave <code>iv$enable()</code> or <code>iv$condition()</code> to the caller.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Module UI</span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.rstudio.com/">shiny</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyvalidate/">shinyvalidate</a></span><span class="op">)</span>
+
+<span class="co"># Module UI</span>
 <span class="va">email_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">label</span> <span class="op">=</span> <span class="st">"Email"</span>, <span class="va">value</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/NS.html">NS</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/textInput.html">textInput</a></span><span class="op">(</span><span class="fu">ns</span><span class="op">(</span><span class="st">"email_address"</span><span class="op">)</span>, label <span class="op">=</span> <span class="va">label</span>, value <span class="op">=</span> <span class="va">value</span><span class="op">)</span>
@@ -207,7 +278,7 @@
     <span class="kw">if</span> <span class="op">(</span><span class="va">required</span><span class="op">)</span> <span class="op">{</span>
       <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email_address"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
     <span class="op">}</span>
-    <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email_address"</span>, <span class="op">~</span> <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu">is_valid_email</span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span> <span class="st">"Invalid email address"</span><span class="op">)</span>
+    <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email_address"</span>, <span class="fu"><a href="../reference/sv_email.html">sv_email</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 
     <span class="co"># Allow caller to reset the input</span>
     <span class="va">reset</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
@@ -232,7 +303,9 @@
 <span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">email_result</span> <span class="op">&lt;-</span> <span class="fu">email</span><span class="op">(</span><span class="st">"email"</span><span class="op">)</span>
   <span class="va">email_result</span><span class="op">$</span><span class="va">iv</span><span class="op">$</span><span class="fu">enable</span><span class="op">(</span><span class="op">)</span>
-<span class="op">}</span></code></pre></div>
+<span class="op">}</span>
+
+<span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></code></pre></div>
 <p>[TODO: source code, live demo - 04_module_1]</p>
 </div>
 <div id="caller-provided-validation-rules-for-module-inputs" class="section level4">
@@ -243,7 +316,7 @@
 <p>[screenshot: two password fields]</p>
 <p>This Shiny module can and should include validation rules to ensure that the “Password” and “Password (confirm)” fields always match. But there are other possible validation rules that might or might not be important for any particular app: Is there a minimum/maximum password length? Are passwords required to contain at least one number, uppercase letter, and/or special character? What special characters are allowed? These all feel like the responsibility of the module <em>caller</em> to decide, not the module <em>implementation</em>.</p>
 <p>One bad but obvious way to do it would be for the caller to add its own rules directly to the <code>InputValidator</code> object returned by <code>password_input</code>:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">password_result</span> <span class="op">&lt;-</span> <span class="fu">password_input</span><span class="op">(</span><span class="st">"password"</span><span class="op">)</span>
 
@@ -260,7 +333,7 @@
 <span class="op">}</span></code></pre></div>
 <p>The reason this is bad is because it requires the caller to know the input IDs used within the module (<code><a href="https://rdrr.io/pkg/shiny/man/NS.html">NS("password", "pw1")</a></code> in this case). This violates a module boundary that we should try hard to keep sacred!</p>
 <p>Instead, the module should take a validation rule—i.e., the second argument to <code>add_rule</code>—as a parameter. (If multiple inputs need to be validated, then one such parameter should be created for each input.)</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">password_input</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">password_rule</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/moduleServer.html">moduleServer</a></span><span class="op">(</span><span class="va">id</span>, <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
     <span class="va">iv</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>

@@ -25,6 +25,7 @@ Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    covr
 VignetteBuilder: knitr
 Config/testthat/edition: 3

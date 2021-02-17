@@ -1,11 +1,6 @@
 library(shiny)
 library(shinyvalidate)
 
-# From https://www.nicebread.de/validating-email-adresses-in-r/
-is_valid_email <- function(x) {
-  grepl("^\\s*[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\s*$", as.character(x), ignore.case=TRUE)
-}
-
 # Module UI
 email_ui <- function(id, label = "Email", value = NULL) {
   ns <- NS(id)
@@ -21,7 +16,7 @@ email <- function(id, required = TRUE) {
     if (required) {
       iv$add_rule("email_address", sv_required())
     }
-    iv$add_rule("email_address", ~ if (!is_valid_email(.)) "Invalid email address")
+    iv$add_rule("email_address", sv_email())
 
     # Allow caller to reset the input
     reset <- function() {

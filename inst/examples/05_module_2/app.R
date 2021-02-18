@@ -1,88 +1,46 @@
 library(shiny)
 library(shinyvalidate)
 
-#' A Shiny module UI function that pairs with password_input().
-#' 
-#' @param id Module instance ID. The same value must be passed to the matching
-#'   password_input() call.
-#' @param value The default value.
-password_input_ui <- function(id, value = NULL) {
+# Module UI
+email_ui <- function(id, label = "Email", value = NULL) {
   ns <- NS(id)
-  
-  tagList(
-    passwordInput(ns("pw1"), "Password", value = value),
-    passwordInput(ns("pw2"), "Password (confirm)", value = value)
-  )
+  textInput(ns("email_address"), label = label, value = value)
 }
 
-#' A Shiny module server function that pairs with password_input_ui().
-#' 
-#' Includes
-#' 
-#' @param id Module instance ID. The same value must be passed to the matching
-#'   password_input_ui() call.
-#' @param required If `TRUE` (the default), the returned validator will include
-#'   a rule that ensures a password is provided.
-#' @param password_rule Optional validation function or formula that can impose
-#'   further validation rules on the password. Like all validation functions and
-#'   formulas, the return value should be either a string describing an error,
-#'   or `NULL` if the input value is acceptable.
-password_input <- function(id, required = TRUE, password_rule = NULL) {
+# Module server
+email <- function(id, required = TRUE) {
   moduleServer(id, function(input, output, session) {
+    
+    # Create and populate InputValidator object
     iv <- InputValidator$new()
-    if (isTRUE(required)) {
-      iv$add_rule("pw1", sv_required())
+    if (required) {
+      iv$add_rule("email_address", sv_required())
     }
-    iv$add_rule("pw2", ~ if (!identical(., input$pw1)) "Passwords do not match")
-    
-    # Add custom rule passed in by caller
-    if (!is.null(password_rule)) {
-      iv$add_rule("pw1", password_rule)
+    iv$add_rule("email_address", sv_email())
+
+    # Allow caller to reset the input
+    reset <- function() {
+      updateTextInput(session, "email_address", value = "")
     }
-    
+
+    # Return value accessor, InputValidator, and reset function to the caller
     list(
-      value = reactive({
-        if (iv$is_valid()) {
-          input$pw1
-        }
-      }),
-      reset = function() {
-        updateTextInput(session, "pw1", value = "")
-        updateTextInput(session, "pw2", value = "")
-      },
-      iv = iv
+      value = reactive(input$email_address),
+      iv = iv,
+      reset = reset
     )
   })
 }
 
+# App UI
 ui <- fluidPage(
-  password_input_ui("password"),
-  actionButton("continue", "Continue")
+  email_ui("email", "Email address")
 )
 
+# App server
 server <- function(input, output, session) {
-  # Initialize the module, passing custom validation logic via password_rule
-  password_result <- password_input("password", password_rule = function(pw) {
-    if (!grepl("[0-9]", pw) || !grepl("[A-Z]", pw)) {
-      "Must include a number and an upper-case character"
-    } else if (nchar(pw) < 8) {
-      "Must be at least 8 characters"
-    }
-  })
-  
-  iv <- InputValidator$new()
-  iv$add_validator(password_result$iv)
-  iv$enable()
-  
-  observeEvent(input$continue, {
-    if (iv$is_valid()) {
-      showModal(modalDialog(
-        "Success, password hash is ",
-        tags$code(digest::digest(password_result$value(), "sha256"))
-      ))
-      password_result$reset()
-    }
-  })
+  email_result <- email("email")
+  email_result$iv$enable()
 }
 
 shinyApp(ui, server)

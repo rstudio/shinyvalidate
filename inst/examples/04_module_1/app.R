@@ -2,45 +2,67 @@ library(shiny)
 library(shinyvalidate)
 
 # Module UI
-email_ui <- function(id, label = "Email", value = NULL) {
+contact_us_ui <- function(id) {
   ns <- NS(id)
-  textInput(ns("email_address"), label = label, value = value)
+  actionButton(ns("contact_us"), "Contact Us", class = "btn-sm")
 }
 
 # Module server
-email <- function(id, required = TRUE) {
+contact_us <- function(id) {
   moduleServer(id, function(input, output, session) {
+    ns <- session$ns
     
-    # Create and populate InputValidator object
     iv <- InputValidator$new()
-    if (required) {
-      iv$add_rule("email_address", sv_required())
+    
+    iv$add_rule("email", sv_required())
+    iv$add_rule("email", sv_email())
+    
+    iv$add_rule("message", sv_required())
+    iv$add_rule("message",
+      ~ if (nchar(.) > 140) paste("Maximum length exceeded by", nchar(.) - 140))
+    
+    observeEvent(input$contact_us, {
+      showModal(
+        modalDialog(size = "s", easyClose = FALSE, title = "Contact Us",
+          footer = NULL,
+          tagList(
+            textInput(ns("email"), "Your email"),
+            textAreaInput(ns("message"), "Message", rows = 4),
+            helpText("Maximum 140 characters"),
+            div(class = "text-right",
+              actionButton(ns("cancel"), "Cancel"),
+              actionButton(ns("send"), "Send email", class = "btn-primary")
+            )
+          )
+        )
+      )
+    })
+    
+    close <- function() {
+      removeModal()
+      iv$disable()
     }
-    iv$add_rule("email_address", sv_email())
-
-    # Allow caller to reset the input
-    reset <- function() {
-      updateTextInput(session, "email_address", value = "")
-    }
-
-    # Return value accessor, InputValidator, and reset function to the caller
-    list(
-      value = reactive(input$email_address),
-      iv = iv,
-      reset = reset
-    )
+    
+    observeEvent(input$send, {
+      iv$enable()
+      if (iv$is_valid()) {
+        close()
+        showNotification("Message sent (not really)", type = "message")
+      }
+    }, ignoreInit = TRUE)
+    
+    observeEvent(input$cancel, {
+      close()
+    }, ignoreInit = TRUE)
   })
 }
 
-# App UI
-ui <- fluidPage(
-  email_ui("email", "Email address")
+ui <- fluidPage(style = "padding-top: 12px; padding-bottom: 120px;",
+  contact_us_ui("contact")
 )
 
-# App server
 server <- function(input, output, session) {
-  email_result <- email("email")
-  email_result$iv$enable()
+  contact_us("contact")
 }
 
 shinyApp(ui, server)

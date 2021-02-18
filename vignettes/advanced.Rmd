@@ -8,13 +8,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  prompt = TRUE,
-  comment = NULL
-)
-```
-
 The [Introduction to shinyvalidate](shinyvalidate.html) only talks about creating a single `InputValidator` object per app[^1]. That may suffice for simpler apps, but more complex apps have multiple reasons for wanting to create multiple input validators.
 
 [^1]: To be precise, it's actually one `InputValidator` object per session, not per app.
@@ -137,76 +130,10 @@ Imagine a Shiny module that contains an entire form, submission button and all. 
 
 In this case, the module server function can create its own local `InputValidator` object and use it internally.
 
-``` {.r}
-library(shiny)
-library(shinyvalidate)
-
-# Module UI
-contact_us_ui <- function(id) {
-  ns <- NS(id)
-  actionButton(ns("contact_us"), "Contact Us", class = "btn-sm")
-}
-
-# Module server
-contact_us <- function(id) {
-  moduleServer(id, function(input, output, session) {
-    ns <- session$ns
-
-    iv <- InputValidator$new()
-    
-    iv$add_rule("email", sv_required())
-    iv$add_rule("email", sv_email())
-    
-    iv$add_rule("message", sv_required())
-    iv$add_rule("message",
-      ~ if (nchar(.) > 140) paste("Maximum length exceeded by", nchar(.) - 140))
-    
-    observeEvent(input$contact_us, {
-      showModal(
-        modalDialog(size = "s", easyClose = FALSE, title = "Contact Us",
-          footer = NULL,
-          tagList(
-            textInput(ns("email"), "Your email"),
-            textAreaInput(ns("message"), "Message", rows = 4),
-            helpText("Maximum 140 characters"),
-            div(class = "text-right",
-              actionButton(ns("cancel"), "Cancel"),
-              actionButton(ns("send"), "Send email", class = "btn-primary")
-            )
-          )
-        )
-      )
-    })
-    
-    close <- function() {
-      removeModal()
-      iv$disable()
-    }
-    
-    observeEvent(input$send, {
-      iv$enable()
-      if (iv$is_valid()) {
-        close()
-        showNotification("Message sent (not really)", type = "message")
-      }
-    }, ignoreInit = TRUE)
-    
-    observeEvent(input$cancel, {
-      close()
-    }, ignoreInit = TRUE)
-  })
-}
-
-ui <- fluidPage(
-  contact_us_ui("contact")
-)
-
-server <- function(input, output, session) {
-  contact_us("contact")
-}
-
-shinyApp(ui, server)
+``` {r code=readLines(system.file("examples/04_module_1/app.R", package = "shinyvalidate")), eval = FALSE, results = 'hide'}
 ```
+
+[Source](https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/04_module_1/app.R), [Live demo](TODO)
 
 #### Module as sub-form
 
@@ -214,56 +141,10 @@ Other Shiny modules may have a more transparent relationship with a surrounding 
 
 What this means, concretely, is that a Shiny module that contains an input (or multiple inputs) that need to be consumed by the caller, should call `iv$add_rule()` for its own inputs but generally leave `iv$enable()` or `iv$condition()` to the caller.
 
-``` {.r}
-library(shiny)
-library(shinyvalidate)
-
-# Module UI
-email_ui <- function(id, label = "Email", value = NULL) {
-  ns <- NS(id)
-  textInput(ns("email_address"), label = label, value = value)
-}
-
-# Module server
-email <- function(id, required = TRUE) {
-  moduleServer(id, function(input, output, session) {
-    
-    # Create and populate InputValidator object
-    iv <- InputValidator$new()
-    if (required) {
-      iv$add_rule("email_address", sv_required())
-    }
-    iv$add_rule("email_address", sv_email())
-
-    # Allow caller to reset the input
-    reset <- function() {
-      updateTextInput(session, "email_address", value = "")
-    }
-
-    # Return value accessor, InputValidator, and reset function to the caller
-    list(
-      value = reactive(input$email_address),
-      iv = iv,
-      reset = reset
-    )
-  })
-}
-
-# App UI
-ui <- fluidPage(
-  email_ui("email", "Email address")
-)
-
-# App server
-server <- function(input, output, session) {
-  email_result <- email("email")
-  email_result$iv$enable()
-}
-
-shinyApp(ui, server)
+``` {r code=readLines(system.file("examples/05_module_2/app.R", package = "shinyvalidate")), eval = FALSE, results = 'hide'}
 ```
 
-[TODO: source code, live demo - 04_module_1]
+[Source](https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/05_module_2/app.R), [Live demo](TODO)
 
 #### Caller-provided validation rules for module inputs
 
@@ -302,6 +183,8 @@ Instead, the module should take a validation rule---i.e., the second argument to
 password_input <- function(id, password_rule = NULL) {
   moduleServer(id, function(input, output, session) {
     iv <- InputValidator$new()
+    iv$add_rule("pw1", sv_required())
+    iv$add_rule("pw2", sv_required())
     iv$add_rule("pw2", ~ if (!identical(., input$pw1)) "Passwords do not match")
     
     # Add custom rule passed in by caller
@@ -323,4 +206,9 @@ server <- function(input, output, session) {
 }
 ```
 
-[TODO: source link, live demo - 05_module_2]
+Here is a complete example that illustrates this technique.
+
+``` {r code=readLines(system.file("examples/06_module_3/app.R", package = "shinyvalidate")), eval = FALSE, results = 'hide'}
+```
+
+[Source](https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/06_module_3/app.R), [Live demo](TODO)

@@ -198,7 +198,7 @@
 <span class="va">contact_us</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/moduleServer.html">moduleServer</a></span><span class="op">(</span><span class="va">id</span>, <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
     <span class="va">ns</span> <span class="op">&lt;-</span> <span class="va">session</span><span class="op">$</span><span class="va">ns</span>
-
+    
     <span class="va">iv</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
     
     <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
@@ -244,7 +244,7 @@
   <span class="op">}</span><span class="op">)</span>
 <span class="op">}</span>
 
-<span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/fluidPage.html">fluidPage</a></span><span class="op">(</span>
+<span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/fluidPage.html">fluidPage</a></span><span class="op">(</span>style <span class="op">=</span> <span class="st">"padding-top: 12px; padding-bottom: 120px;"</span>,
   <span class="fu">contact_us_ui</span><span class="op">(</span><span class="st">"contact"</span><span class="op">)</span>
 <span class="op">)</span>
 
@@ -253,6 +253,7 @@
 <span class="op">}</span>
 
 <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></code></pre></div>
+<p><a href="https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/04_module_1/app.R">Source</a>, <a href="TODO">Live demo</a></p>
 </div>
 <div id="module-as-sub-form" class="section level4">
 <h4 class="hasAnchor">
@@ -306,7 +307,7 @@
 <span class="op">}</span>
 
 <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></code></pre></div>
-<p>[TODO: source code, live demo - 04_module_1]</p>
+<p><a href="https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/05_module_2/app.R">Source</a>, <a href="TODO">Live demo</a></p>
 </div>
 <div id="caller-provided-validation-rules-for-module-inputs" class="section level4">
 <h4 class="hasAnchor">
@@ -337,6 +338,8 @@
 <code class="sourceCode R"><span class="va">password_input</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">password_rule</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/moduleServer.html">moduleServer</a></span><span class="op">(</span><span class="va">id</span>, <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
     <span class="va">iv</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
+    <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"pw1"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"pw2"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
     <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"pw2"</span>, <span class="op">~</span> <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html">identical</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">input</span><span class="op">$</span><span class="va">pw1</span><span class="op">)</span><span class="op">)</span> <span class="st">"Passwords do not match"</span><span class="op">)</span>
     
     <span class="co"># Add custom rule passed in by caller</span>
@@ -356,7 +359,97 @@
     <span class="op">}</span>
   <span class="op">}</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<p>[TODO: source link, live demo - 05_module_2]</p>
+<p>Here is a complete example that illustrates this technique.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.rstudio.com/">shiny</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyvalidate/">shinyvalidate</a></span><span class="op">)</span>
+
+<span class="co">#' A Shiny module UI function that pairs with password_input().</span>
+<span class="co">#' </span>
+<span class="co">#' @param id Module instance ID. The same value must be passed to the matching</span>
+<span class="co">#'   password_input() call.</span>
+<span class="co">#' @param value The default value.</span>
+<span class="va">password_input_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">value</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/NS.html">NS</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span>
+  
+  <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/tag.html">tagList</a></span><span class="op">(</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/passwordInput.html">passwordInput</a></span><span class="op">(</span><span class="fu">ns</span><span class="op">(</span><span class="st">"pw1"</span><span class="op">)</span>, <span class="st">"Password"</span>, value <span class="op">=</span> <span class="va">value</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/passwordInput.html">passwordInput</a></span><span class="op">(</span><span class="fu">ns</span><span class="op">(</span><span class="st">"pw2"</span><span class="op">)</span>, <span class="st">"Password (confirm)"</span>, value <span class="op">=</span> <span class="va">value</span><span class="op">)</span>
+  <span class="op">)</span>
+<span class="op">}</span>
+
+<span class="co">#' A Shiny module server function that pairs with password_input_ui().</span>
+<span class="co">#' </span>
+<span class="co">#' Includes</span>
+<span class="co">#' </span>
+<span class="co">#' @param id Module instance ID. The same value must be passed to the matching</span>
+<span class="co">#'   password_input_ui() call.</span>
+<span class="co">#' @param required If `TRUE` (the default), the returned validator will include</span>
+<span class="co">#'   a rule that ensures a password is provided.</span>
+<span class="co">#' @param password_rule Optional validation function or formula that can impose</span>
+<span class="co">#'   further validation rules on the password. Like all validation functions and</span>
+<span class="co">#'   formulas, the return value should be either a string describing an error,</span>
+<span class="co">#'   or `NULL` if the input value is acceptable.</span>
+<span class="va">password_input</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">required</span> <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">password_rule</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/moduleServer.html">moduleServer</a></span><span class="op">(</span><span class="va">id</span>, <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
+    <span class="va">iv</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
+    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html">isTRUE</a></span><span class="op">(</span><span class="va">required</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+      <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"pw1"</span>, <span class="fu"><a href="../reference/sv_required.html">sv_required</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+    <span class="op">}</span>
+    <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"pw2"</span>, <span class="op">~</span> <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html">identical</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">input</span><span class="op">$</span><span class="va">pw1</span><span class="op">)</span><span class="op">)</span> <span class="st">"Passwords do not match"</span><span class="op">)</span>
+    
+    <span class="co"># Add custom rule passed in by caller</span>
+    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html">is.null</a></span><span class="op">(</span><span class="va">password_rule</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+      <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"pw1"</span>, <span class="va">password_rule</span><span class="op">)</span>
+    <span class="op">}</span>
+    
+    <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+      value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/reactive.html">reactive</a></span><span class="op">(</span><span class="op">{</span>
+        <span class="kw">if</span> <span class="op">(</span><span class="va">iv</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+          <span class="va">input</span><span class="op">$</span><span class="va">pw1</span>
+        <span class="op">}</span>
+      <span class="op">}</span><span class="op">)</span>,
+      reset <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
+        <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/updateTextInput.html">updateTextInput</a></span><span class="op">(</span><span class="va">session</span>, <span class="st">"pw1"</span>, value <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
+        <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/updateTextInput.html">updateTextInput</a></span><span class="op">(</span><span class="va">session</span>, <span class="st">"pw2"</span>, value <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
+      <span class="op">}</span>,
+      iv <span class="op">=</span> <span class="va">iv</span>
+    <span class="op">)</span>
+  <span class="op">}</span><span class="op">)</span>
+<span class="op">}</span>
+
+<span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/fluidPage.html">fluidPage</a></span><span class="op">(</span>
+  <span class="fu">password_input_ui</span><span class="op">(</span><span class="st">"password"</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/actionButton.html">actionButton</a></span><span class="op">(</span><span class="st">"continue"</span>, <span class="st">"Continue"</span><span class="op">)</span>
+<span class="op">)</span>
+
+<span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
+  <span class="co"># Initialize the module, passing custom validation logic via password_rule</span>
+  <span class="va">password_result</span> <span class="op">&lt;-</span> <span class="fu">password_input</span><span class="op">(</span><span class="st">"password"</span>, password_rule <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">pw</span><span class="op">)</span> <span class="op">{</span>
+    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"[0-9]"</span>, <span class="va">pw</span><span class="op">)</span> <span class="op">||</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"[A-Z]"</span>, <span class="va">pw</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+      <span class="st">"Must include a number and an upper-case character"</span>
+    <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html">nchar</a></span><span class="op">(</span><span class="va">pw</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">8</span><span class="op">)</span> <span class="op">{</span>
+      <span class="st">"Must be at least 8 characters"</span>
+    <span class="op">}</span>
+  <span class="op">}</span><span class="op">)</span>
+  
+  <span class="va">iv</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
+  <span class="va">iv</span><span class="op">$</span><span class="fu">add_validator</span><span class="op">(</span><span class="va">password_result</span><span class="op">$</span><span class="va">iv</span><span class="op">)</span>
+  <span class="va">iv</span><span class="op">$</span><span class="fu">enable</span><span class="op">(</span><span class="op">)</span>
+  
+  <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/observeEvent.html">observeEvent</a></span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">continue</span>, <span class="op">{</span>
+    <span class="kw">if</span> <span class="op">(</span><span class="va">iv</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+      <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/showModal.html">showModal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/modalDialog.html">modalDialog</a></span><span class="op">(</span>
+        <span class="st">"Success, password hash is "</span>,
+        <span class="va">tags</span><span class="op">$</span><span class="fu">code</span><span class="op">(</span><span class="fu">digest</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/digest/man/digest.html">digest</a></span><span class="op">(</span><span class="va">password_result</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>, <span class="st">"sha256"</span><span class="op">)</span><span class="op">)</span>
+      <span class="op">)</span><span class="op">)</span>
+      <span class="va">password_result</span><span class="op">$</span><span class="fu">reset</span><span class="op">(</span><span class="op">)</span>
+    <span class="op">}</span>
+  <span class="op">}</span><span class="op">)</span>
+<span class="op">}</span>
+
+<span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></code></pre></div>
+<p><a href="https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/06_module_3/app.R">Source</a>, <a href="TODO">Live demo</a></p>
 </div>
 </div>
 </div>

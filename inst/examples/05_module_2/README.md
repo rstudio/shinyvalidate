@@ -1,5 +1,3 @@
-# Passing validation rule to Shiny module
+## Validation within Shiny module
 
-In this example, the `password_input` module server function allows the caller to customize the module's validation logic by providing a `password_rule` argument.
-
-In this case, the customize rule enforces the presence of a number and upper-case letter, as well as a minimum password length of 8.
+This example demonstrates how `InputValidator` is used within a Shiny module. The module server function creates an `InputValidator` and populates it with rules, then returns it to the caller (the app server function in this case). The caller then calls `enable()`.

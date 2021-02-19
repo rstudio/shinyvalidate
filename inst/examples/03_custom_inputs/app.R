@@ -44,7 +44,7 @@ server <- function(input, output, session) {
   
   gravatar_iv <- InputValidator$new()
   gravatar_iv$add_rule("email", sv_required())
-  gravatar_iv$add_rule("email", ~ if (!is_valid_email(.)) "Please provide a valid email")
+  gravatar_iv$add_rule("email", sv_email())
   gravatar_iv$condition(~ input$type == "gravatar")
   iv$add_validator(gravatar_iv)
   
@@ -59,8 +59,7 @@ server <- function(input, output, session) {
   })
   
   output$gravatar_preview <- renderUI({
-    req(input$email)
-    req(is_valid_email(input$email))
+    req(gravatar_iv$is_valid())
     
     email <- gsub("^\\s*(.*?)\\s*$", "\\1", input$email)
     email <- tolower(email)
@@ -80,11 +79,6 @@ server <- function(input, output, session) {
       iv$enable() # Start showing validation feedback
     }
   })
-}
-
-# From https://www.nicebread.de/validating-email-adresses-in-r/
-is_valid_email <- function(x) {
-  grepl("^\\s*[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\s*$", as.character(x), ignore.case=TRUE)
 }
 
 shinyApp(ui, server)

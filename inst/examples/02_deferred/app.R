@@ -22,9 +22,11 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   iv <- InputValidator$new()
   iv$add_rule("name", sv_required())
-  iv$add_rule("email", ~ if (input_provided(.) && !is_valid_email(.)) "Please provide a valid email")
+  iv$add_rule("email", sv_required())
+  iv$add_rule("email", sv_email())
   iv$add_rule("topics", ~ if (length(.) < 2) "Please choose two or more topics")
-  iv$add_rule("accept_terms", sv_required(message = "The terms and conditions must be accepted in order to proceed"))
+  iv$add_rule("accept_terms", sv_required())
+  iv$add_rule("accept_terms", ~ if (!isTRUE(.)) "The terms and conditions must be accepted in order to proceed")
   
   observeEvent(input$submit, {
     if (iv$is_valid()) {
@@ -56,11 +58,6 @@ server <- function(input, output, session) {
     updateCheckboxGroupInput(session, "topics", selected = character(0))
     updateCheckboxInput(session, "accept_terms", value = FALSE)
   }
-}
-
-# From https://www.nicebread.de/validating-email-adresses-in-r/
-is_valid_email <- function(x) {
-  grepl("^\\s*[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\s*$", as.character(x), ignore.case=TRUE)
 }
 
 shinyApp(ui, server)

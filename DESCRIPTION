@@ -8,8 +8,8 @@ Authors@R: c(
     person(family = "RStudio", role = c("cph", "fnd"))
     )
 Description: Improves the user experience of Shiny apps by helping to
-    provide realtime feedback when required inputs are missing, or
-    input values are not valid.
+    provide feedback when required inputs are missing, or input values
+    are not valid.
 License: MIT + file LICENSE
 URL: https://rstudio.github.io/shinyvalidate/,
     https://github.com/rstudio/shinyvalidate

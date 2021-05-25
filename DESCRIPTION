@@ -14,7 +14,6 @@ License: MIT + file LICENSE
 URL: https://rstudio.github.io/shinyvalidate/,
     https://github.com/rstudio/shinyvalidate
 Encoding: UTF-8
-LazyData: true
 Imports: 
     shiny (>= 1.6),
     htmltools (>= 0.5.1.1),

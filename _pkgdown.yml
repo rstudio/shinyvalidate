@@ -26,7 +26,7 @@ reference:
   - title: Creation of Input Validator Objects
     desc: >
       The **shinyvalidate** package offers an `InputValidator` R6 class for
-      adding realtime input validation to Shiny apps. The Shiny app author
+      adding real-time input validation to Shiny apps. The Shiny app author
       can then add validation rules for each input field in their UI, using
       the `InputValidator$add_rule()` method. If an app contains multiple,
       independant forms then multiple `InputValidator` instances (with their
@@ -43,9 +43,9 @@ reference:
       This variety of `sv_*()` functions can be used to make comparison-type
       validations (e.g., is the input less than `10`?), verify that an email
       address has a valid construction, or check whether a value is even
-      present. The `compose_rules()` gives us the opportunity to combine
-      multiple `sv_*()` and even custom validation functions such that the first
-      failing validation will issue the failure message.
+      present. The `compose_rules()` function gives us the opportunity to
+      combine multiple `sv_*()` functions (and even custom validation functions) 
+      such that the first failing validation will issue the failure message.
     contents:
     - sv_numeric
     - sv_integer

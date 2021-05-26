@@ -1,6 +1,6 @@
 Package: shinyvalidate
 Title: Input Validation for Shiny Apps
-Version: 0.0.0.9002
+Version: 0.1.0
 Authors@R: c(
     person("Richard", "Iannone", , "rich@rstudio.com", c("aut", "cre"),
            comment = c(ORCID = "0000-0003-3925-190X")),
@@ -8,13 +8,12 @@ Authors@R: c(
     person(family = "RStudio", role = c("cph", "fnd"))
     )
 Description: Improves the user experience of Shiny apps by helping to
-    provide realtime feedback when required inputs are missing, or
-    input values are not valid.
+    provide feedback when required inputs are missing, or input values
+    are not valid.
 License: MIT + file LICENSE
 URL: https://rstudio.github.io/shinyvalidate/,
     https://github.com/rstudio/shinyvalidate
 Encoding: UTF-8
-LazyData: true
 Imports: 
     shiny (>= 1.6),
     htmltools (>= 0.5.1.1),
@@ -27,5 +26,4 @@ Suggests:
     knitr,
     rmarkdown,
     covr
-VignetteBuilder: knitr
 Config/testthat/edition: 3

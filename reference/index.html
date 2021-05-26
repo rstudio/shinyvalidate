@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyvalidate</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -137,7 +137,7 @@
       <tr>
         <th colspan="2">
           <h2 id="section-creation-of-input-validator-objects" class="hasAnchor"><a href="#section-creation-of-input-validator-objects" class="anchor"></a>Creation of Input Validator Objects</h2>
-          <p class="section-desc"><p>The <strong>shinyvalidate</strong> package offers an <code>InputValidator</code> R6 class for adding realtime input validation to Shiny apps. The Shiny app author can then add validation rules for each input field in their UI, using the <code>InputValidator$add_rule()</code> method. If an app contains multiple, independant forms then multiple <code>InputValidator</code> instances (with their own rules) can be created.</p></p>
+          <p class="section-desc"><p>The <strong>shinyvalidate</strong> package offers an <code>InputValidator</code> R6 class for adding real-time input validation to Shiny apps. The Shiny app author can then add validation rules for each input field in their UI, using the <code>InputValidator$add_rule()</code> method. If an app contains multiple, independant forms then multiple <code>InputValidator</code> instances (with their own rules) can be created.</p></p>
         </th>
       </tr>
       
@@ -168,7 +168,7 @@
       <tr>
         <th colspan="2">
           <h2 id="section-rule-functions" class="hasAnchor"><a href="#section-rule-functions" class="anchor"></a>Rule Functions</h2>
-          <p class="section-desc"><p>The <strong>shinyvalidate</strong> rule functions are used to perform the checking of input fields and they are assigned to and managed by a Validator object. This variety of <code>sv_*()</code> functions can be used to make comparison-type validations (e.g., is the input less than <code>10</code>?), verify that an email address has a valid construction, or check whether a value is even present. The <code><a href="../reference/compose_rules.html">compose_rules()</a></code> gives us the opportunity to combine multiple <code>sv_*()</code> and even custom validation functions such that the first failing validation will issue the failure message.</p></p>
+          <p class="section-desc"><p>The <strong>shinyvalidate</strong> rule functions are used to perform the checking of input fields and they are assigned to and managed by a Validator object. This variety of <code>sv_*()</code> functions can be used to make comparison-type validations (e.g., is the input less than <code>10</code>?), verify that an email address has a valid construction, or check whether a value is even present. The <code><a href="../reference/compose_rules.html">compose_rules()</a></code> function gives us the opportunity to combine multiple <code>sv_*()</code> functions (and even custom validation functions) such that the first failing validation will issue the failure message.</p></p>
         </th>
       </tr>
       

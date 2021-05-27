@@ -22,7 +22,6 @@
     "url": "https://github.com/rstudio/shinyvalidate/issues"
   },
   "homepage": "https://github.com/rstudio/shinyvalidate#readme",
-  "dependencies": {},
   "devDependencies": {
     "@babel/cli": "^7.12.10",
     "@babel/core": "^7.12.10",

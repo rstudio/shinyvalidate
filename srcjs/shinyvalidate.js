@@ -65,10 +65,10 @@ strategies.push(bindingStrategy);
  */
 const bsStrategy = {
   isBS3: function() {
-    if (!$.fn.tooltip) {
+    if (!$.fn.tab) {
       return false;
     }
-    return $.fn.tooltip.Constructor.VERSION.match(/^3\./);
+    return $.fn.tab.Constructor.VERSION.match(/^3\./);
   },
   findInputContainer: function(el) {
     el = $(el);

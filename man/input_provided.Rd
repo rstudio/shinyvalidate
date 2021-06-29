@@ -30,7 +30,7 @@ while a \code{\link[shiny:numericInput]{shiny::numericInput()}} is \code{NA}.
 }
 }
 \details{
-This function is based on \code{\link[shiny:req]{shiny::isTruthy()}} but tweaked here in
+This function is based on \code{\link[shiny:isTruthy]{shiny::isTruthy()}} but tweaked here in
 shinyvalidate to change the treatment of \code{FALSE} values: \code{isTruthy(FALSE)}
 returns \code{FALSE}, but \code{input_provided(FALSE)} returns \code{TRUE}. This difference
 is motivated by \code{shiny::checkboxInput()}, where \code{isTruthy()} answers the

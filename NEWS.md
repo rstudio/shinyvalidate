@@ -1,3 +1,5 @@
+# shinyvalidate (development version)
+
 # shinyvalidate 0.1.1
 
 * Fix an incompatibility between jQueryUI and shinyvalidate. (#32)

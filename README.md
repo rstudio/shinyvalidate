@@ -1,6 +1,7 @@
 # shinyvalidate
 
 <!-- badges: start -->
+[![CRAN](https://www.r-pkg.org/badges/version/shinyvalidate)](https://CRAN.R-project.org/package=shinyvalidate)
 [![R build status](https://github.com/rstudio/shinyvalidate/workflows/R-CMD-check/badge.svg)](https://github.com/rstudio/shinyvalidate/actions)
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 <!-- badges: end -->
@@ -11,10 +12,10 @@ shinyvalidate adds input validation capabilities to [Shiny](https://shiny.rstudi
 
 ## Installation
 
-shinyvalidate is not yet available on CRAN. In the meantime, you can install it from GitHub using the remotes package.
+To install the current release version:
 
-``` {.r}
-remotes::install_github("rstudio/shinyvalidate")
+```r
+install.packages("shinyvalidate")
 ```
 
 ## Basic usage

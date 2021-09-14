@@ -133,7 +133,7 @@ In this case, the module server function can create its own local `InputValidato
 ``` {r code=readLines(system.file("examples/04_module_1/app.R", package = "shinyvalidate")), eval = FALSE, results = 'hide'}
 ```
 
-[Source](https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/04_module_1/app.R), [Live demo](TODO)
+[Source](https://github.com/rstudio/shinyvalidate/blob/main/inst/examples/04_module_1/app.R), [Live demo](TODO)
 
 #### Module as sub-form
 
@@ -144,7 +144,7 @@ What this means, concretely, is that a Shiny module that contains an input (or m
 ``` {r code=readLines(system.file("examples/05_module_2/app.R", package = "shinyvalidate")), eval = FALSE, results = 'hide'}
 ```
 
-[Source](https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/05_module_2/app.R), [Live demo](TODO)
+[Source](https://github.com/rstudio/shinyvalidate/blob/main/inst/examples/05_module_2/app.R), [Live demo](TODO)
 
 #### Caller-provided validation rules for module inputs
 
@@ -211,4 +211,4 @@ Here is a complete example that illustrates this technique.
 ``` {r code=readLines(system.file("examples/06_module_3/app.R", package = "shinyvalidate")), eval = FALSE, results = 'hide'}
 ```
 
-[Source](https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/06_module_3/app.R), [Live demo](TODO)
+[Source](https://github.com/rstudio/shinyvalidate/blob/main/inst/examples/06_module_3/app.R), [Live demo](TODO)

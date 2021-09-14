@@ -11,7 +11,13 @@ shinyvalidate adds input validation capabilities to [Shiny](https://shiny.rstudi
 
 ## Installation
 
-shinyvalidate is not yet available on CRAN. In the meantime, you can install it from GitHub using the remotes package.
+Install the latest CRAN release:
+
+``` {.r}
+install.packages("shinyvalidate")
+```
+
+Or, you can install the latest development version from GitHub using the `remotes` package.
 
 ``` {.r}
 remotes::install_github("rstudio/shinyvalidate")

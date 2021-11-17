@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyvalidate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1.9000</span>
       </span>
     </div>
 
@@ -113,7 +113,7 @@
 <a href="#conditional-validation" class="anchor"></a>Conditional validation</h3>
 <p>Another feature we’ll need is the ability to temporarily turn validation rules on and off, depending on some reactive input or state. We’ll see below where this comes in handy; for right now I’ll just describe how the feature works.</p>
 <p>The <code>InputValidator</code> object has a <code>condition</code> method for this purpose: pass it either a formula or a zero-argument function that returns <code>TRUE</code> when the validation rules should be observed, and <code>FALSE</code> when they should be suspended.</p>
-<p>Here are three equivalent ways to apply the <code><a href="https://rdrr.io/r/base/Logic.html">isTRUE(input$filter_by_date)</a></code> condition to <code>iv</code>:</p>
+<p>Here are three equivalent ways to apply the <code>isTRUE(input$filter_by_date)</code> condition to <code>iv</code>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># As formula</span>
 <span class="va">iv</span><span class="op">$</span><span class="fu">condition</span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Logic.html">isTRUE</a></span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">filter_by_date</span><span class="op">)</span><span class="op">)</span>
@@ -212,7 +212,7 @@
       <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/showModal.html">showModal</a></span><span class="op">(</span>
         <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/modalDialog.html">modalDialog</a></span><span class="op">(</span>size <span class="op">=</span> <span class="st">"s"</span>, easyClose <span class="op">=</span> <span class="cn">FALSE</span>, title <span class="op">=</span> <span class="st">"Contact Us"</span>,
           footer <span class="op">=</span> <span class="cn">NULL</span>,
-          <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/tag.html">tagList</a></span><span class="op">(</span>
+          <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/tagList.html">tagList</a></span><span class="op">(</span>
             <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/textInput.html">textInput</a></span><span class="op">(</span><span class="fu">ns</span><span class="op">(</span><span class="st">"email"</span><span class="op">)</span>, <span class="st">"Your email"</span><span class="op">)</span>,
             <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/textAreaInput.html">textAreaInput</a></span><span class="op">(</span><span class="fu">ns</span><span class="op">(</span><span class="st">"message"</span><span class="op">)</span>, <span class="st">"Message"</span>, rows <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,
             <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/helpText.html">helpText</a></span><span class="op">(</span><span class="st">"Maximum 140 characters"</span><span class="op">)</span>,
@@ -253,7 +253,7 @@
 <span class="op">}</span>
 
 <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></code></pre></div>
-<p><a href="https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/04_module_1/app.R">Source</a>, <a href="TODO">Live demo</a></p>
+<p><a href="https://github.com/rstudio/shinyvalidate/blob/main/inst/examples/04_module_1/app.R">Source</a>, <a href="TODO">Live demo</a></p>
 </div>
 <div id="module-as-sub-form" class="section level4">
 <h4 class="hasAnchor">
@@ -307,7 +307,7 @@
 <span class="op">}</span>
 
 <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></code></pre></div>
-<p><a href="https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/05_module_2/app.R">Source</a>, <a href="TODO">Live demo</a></p>
+<p><a href="https://github.com/rstudio/shinyvalidate/blob/main/inst/examples/05_module_2/app.R">Source</a>, <a href="TODO">Live demo</a></p>
 </div>
 <div id="caller-provided-validation-rules-for-module-inputs" class="section level4">
 <h4 class="hasAnchor">
@@ -332,7 +332,7 @@
     <span class="op">}</span>
   <span class="op">}</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<p>The reason this is bad is because it requires the caller to know the input IDs used within the module (<code><a href="https://rdrr.io/pkg/shiny/man/NS.html">NS("password", "pw1")</a></code> in this case). This violates a module boundary that we should try hard to keep sacred!</p>
+<p>The reason this is bad is because it requires the caller to know the input IDs used within the module (<code>NS("password", "pw1")</code> in this case). This violates a module boundary that we should try hard to keep sacred!</p>
 <p>Instead, the module should take a validation rule—i.e., the second argument to <code>add_rule</code>—as a parameter. (If multiple inputs need to be validated, then one such parameter should be created for each input.)</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">password_input</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">password_rule</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span>
@@ -372,7 +372,7 @@
 <span class="va">password_input_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">value</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/NS.html">NS</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span>
   
-  <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/tag.html">tagList</a></span><span class="op">(</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/tagList.html">tagList</a></span><span class="op">(</span>
     <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/passwordInput.html">passwordInput</a></span><span class="op">(</span><span class="fu">ns</span><span class="op">(</span><span class="st">"pw1"</span><span class="op">)</span>, <span class="st">"Password"</span>, value <span class="op">=</span> <span class="va">value</span><span class="op">)</span>,
     <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/passwordInput.html">passwordInput</a></span><span class="op">(</span><span class="fu">ns</span><span class="op">(</span><span class="st">"pw2"</span><span class="op">)</span>, <span class="st">"Password (confirm)"</span>, value <span class="op">=</span> <span class="va">value</span><span class="op">)</span>
   <span class="op">)</span>
@@ -449,7 +449,7 @@
 <span class="op">}</span>
 
 <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></code></pre></div>
-<p><a href="https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/06_module_3/app.R">Source</a>, <a href="TODO">Live demo</a></p>
+<p><a href="https://github.com/rstudio/shinyvalidate/blob/main/inst/examples/06_module_3/app.R">Source</a>, <a href="TODO">Live demo</a></p>
 </div>
 </div>
 </div>

@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">shinyvalidate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1.9000</span>
       </span>
     </div>
 
@@ -95,8 +95,10 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>shinyvalidate is not yet available on CRAN. In the meantime, you can install it from GitHub using the remotes package.</p>
-<pre class="{.r}"><code><a href="https://remotes.r-lib.org/reference/install_github.html">remotes::install_github("rstudio/shinyvalidate")</a></code></pre>
+<p>Install the latest CRAN release:</p>
+<pre class="{.r}"><code>install.packages("shinyvalidate")</code></pre>
+<p>Or, you can install the latest development version from GitHub using the <code>remotes</code> package.</p>
+<pre class="{.r}"><code>remotes::install_github("rstudio/shinyvalidate")</code></pre>
 </div>
 <div id="basic-usage" class="section level2">
 <h2 class="hasAnchor">
@@ -109,7 +111,7 @@
 </ol>
 <p>That’s all you need to do to get validation messages to show up. Here is a simple example:</p>
 <p><img src="reference/figures/demo.gif" alt="Screencast of empty 'Name' and 'Email' fields showing error messages beneath them, and the user providing valid input that clears the errors" width="316"></p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.rstudio.com/">shiny</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyvalidate/">shinyvalidate</a></span><span class="op">)</span>
 

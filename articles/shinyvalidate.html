@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyvalidate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1.9000</span>
       </span>
     </div>
 
@@ -107,7 +107,7 @@
 <li><p>Guard calculations and operations that rely on valid inputs, by checking that <code>iv$is_valid()</code> returns <code>TRUE</code>.</p></li>
 </ol>
 <p>Note that all of these steps must be performed in your Shiny app’s <code>server</code> function.</p>
-<p>To see this in action, let’s look at the server function from the <code>01_simple</code> example app [<a href="https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/01_simple/app.R">source</a>, <a href="https://jcheng.shinyapps.io/01_simple/">live demo</a>].</p>
+<p>To see this in action, let’s look at the server function from the <code>01_simple</code> example app [<a href="https://github.com/rstudio/shinyvalidate/blob/main/inst/examples/01_simple/app.R">source</a>, <a href="https://jcheng.shinyapps.io/01_simple/">live demo</a>].</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
 
@@ -184,7 +184,7 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"email"</span>, <span class="op">~</span> <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu">is_valid_email</span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span> <span class="st">"Not a valid email"</span><span class="op">)</span></code></pre></div>
 <p>Validation formulas should test the <code>.</code> variable, and return either <code>NULL</code> if the value is acceptable, or else a single-element character vector describing why the value is problematic.</p>
-<p>(If you’re wondering why the formula in this example doesn’t end with <code>else NULL</code>, note that in R, <code>if</code> expressions automatically return <code><a href="https://rdrr.io/r/base/invisible.html">invisible(NULL)</a></code> when false and no <code>else</code> is present.)</p>
+<p>(If you’re wondering why the formula in this example doesn’t end with <code>else NULL</code>, note that in R, <code>if</code> expressions automatically return <code>invisible(NULL)</code> when false and no <code>else</code> is present.)</p>
 </div>
 <div id="rules-as-functions" class="section level3">
 <h3 class="hasAnchor">
@@ -215,7 +215,7 @@
 <p>Once you’ve created an <code>InputValidator</code> object and populated it with rules, shinyvalidate has the information it needs to check input values and report any problems it detects.</p>
 <p>However, it doesn’t do so by default. Instead, you must call <code>iv$enable()</code> at least once to get validation errors to appear. Once <code>iv$enable()</code> has been called, though, validation messages will appear, update, and disappear reactively; there’s no need to call <code>enable()</code> as input values change.</p>
 <p>The reason for this design is because many forms have an explicit “Submit” or “Continue” button, and in those cases, you may want to suppress the display of validation errors until the user actually attempts to submit the form. This is considered a better user experience than overwhelming the user with error messages before they’ve even started filling out the form.</p>
-<p>To defer validation until “Submit” or “Continue” time, simply call <code>iv$enable()</code> from within whatever <code>observeEvent</code> or <code>eventReactive</code> is triggered by the submit/continue button. You can see this in the 02_deferred example [<a href="https://github.com/rstudio/shinyvalidate/blob/master/inst/examples/02_deferred/app.R">source</a>, <a href="https://jcheng.shinyapps.io/02_deferred/">live demo</a>].</p>
+<p>To defer validation until “Submit” or “Continue” time, simply call <code>iv$enable()</code> from within whatever <code>observeEvent</code> or <code>eventReactive</code> is triggered by the submit/continue button. You can see this in the 02_deferred example [<a href="https://github.com/rstudio/shinyvalidate/blob/main/inst/examples/02_deferred/app.R">source</a>, <a href="https://jcheng.shinyapps.io/02_deferred/">live demo</a>].</p>
 <p>If, on the other hand, your app doesn’t have a notion of “Submit” or “Continue”, then just go ahead and call <code>iv$enable()</code> as soon as your <code>InputValidator</code> object is populated with rules.</p>
 </div>
 <div id="guarding-calculations-and-actions" class="section level2">
@@ -234,7 +234,7 @@
     <span class="op">)</span>
   <span class="op">}</span>
 <span class="op">}</span><span class="op">)</span></code></pre></div>
-<p>Or, if you don’t want to do anything besides silently abort the calculation/action/output, you can use <code><a href="https://rdrr.io/pkg/shiny/man/req.html">req(iv$is_valid())</a></code>:</p>
+<p>Or, if you don’t want to do anything besides silently abort the calculation/action/output, you can use <code>req(iv$is_valid())</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/reactive.html">reactive</a></span><span class="op">(</span><span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/req.html">req</a></span><span class="op">(</span><span class="va">iv</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>

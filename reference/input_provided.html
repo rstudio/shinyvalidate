@@ -85,7 +85,7 @@ A value that represents an unclicked shiny::actionButton()
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyvalidate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1.9000</span>
       </span>
     </div>
 
@@ -174,10 +174,10 @@ while a <code><a href='https://rdrr.io/pkg/shiny/man/numericInput.html'>shiny::n
     <p>A logical vector of length 1.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>This function is based on <code><a href='https://rdrr.io/pkg/shiny/man/req.html'>shiny::isTruthy()</a></code> but tweaked here in
-shinyvalidate to change the treatment of <code>FALSE</code> values: <code><a href='https://rdrr.io/pkg/shiny/man/req.html'>isTruthy(FALSE)</a></code>
+    <p>This function is based on <code><a href='https://rdrr.io/pkg/shiny/man/isTruthy.html'>shiny::isTruthy()</a></code> but tweaked here in
+shinyvalidate to change the treatment of <code>FALSE</code> values: <code>isTruthy(FALSE)</code>
 returns <code>FALSE</code>, but <code>input_provided(FALSE)</code> returns <code>TRUE</code>. This difference
-is motivated by <code><a href='https://rdrr.io/pkg/shiny/man/checkboxInput.html'>shiny::checkboxInput()</a></code>, where <code><a href='https://rdrr.io/pkg/shiny/man/req.html'>isTruthy()</a></code> answers the
+is motivated by <code><a href='https://rdrr.io/pkg/shiny/man/checkboxInput.html'>shiny::checkboxInput()</a></code>, where <code><a href='https://rdrr.io/pkg/shiny/man/isTruthy.html'>isTruthy()</a></code> answers the
 question of "is the input present <em>and checked</em>" while <code>input_provided</code> is
 just "is the input present".</p>
 

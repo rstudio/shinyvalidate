@@ -1,8 +1,5 @@
 url: https://rstudio.github.io/shinyvalidate/
 
-development:
-  mode: auto
-
 home:
   strip_header: true
 

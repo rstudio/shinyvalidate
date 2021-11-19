@@ -1,6 +1,7 @@
 # shinyvalidate
 
 <!-- badges: start -->
+[![CRAN](https://www.r-pkg.org/badges/version/shinyvalidate)](https://CRAN.R-project.org/package=shinyvalidate)
 [![R build status](https://github.com/rstudio/shinyvalidate/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rstudio/shinyvalidate/actions)
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 <!-- badges: end -->

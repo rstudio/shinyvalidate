@@ -153,7 +153,7 @@ default, a label will be automatically generated.}
 \subsection{Method \code{add_rule()}}{
 Add an input validation rule. Each input validation rule
 applies to a single input. You can add multiple validation rules for a
-single input, by calling \code{add_rules()} multiple times; the first
+single input by calling \code{add_rule()} multiple times; the first
 validation rule for an input that fails will be used, and will prevent
 subsequent rules for that input from executing.
 \subsection{Usage}{

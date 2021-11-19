@@ -153,7 +153,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     },
     #' @description Add an input validation rule. Each input validation rule
     #'   applies to a single input. You can add multiple validation rules for a
-    #'   single input, by calling `add_rules()` multiple times; the first
+    #'   single input by calling `add_rule()` multiple times; the first
     #'   validation rule for an input that fails will be used, and will prevent
     #'   subsequent rules for that input from executing.
     #'

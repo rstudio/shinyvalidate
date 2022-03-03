@@ -7,7 +7,7 @@ test_that("InputValidator can be constructed", {
       NA
     )
   })
-  
+
   # Explicit session
   expect_error(
     InputValidator$new(session = shiny::MockShinySession$new()),
@@ -26,7 +26,7 @@ test_that("InputValidator add_rule()", {
   session <- shiny::MockShinySession$new()
   shiny::withReactiveDomain(session, {
     iv <- InputValidator$new()
-    
+
     iv$add_rule("inputA", shiny::need, message = "Input A is required")
     iv$add_rule("inputB", function(value) {
       if (is.null(value)) {
@@ -34,27 +34,27 @@ test_that("InputValidator add_rule()", {
       }
     })
     iv$add_rule("inputC", ~ if (is.null(.)) "Input C is required")
-    
+
     expect_error(iv$is_valid(), "reactive context")
-    
+
     shiny::isolate({
       expect_false(iv$is_valid())
-      
+
       expect_identical(iv$validate(), rlang::list2(
-        !!session$ns("inputA") := list(type = "error", message = "Input A is required"),
-        !!session$ns("inputB") := list(type = "error", message = "Input B is required"),
-        !!session$ns("inputC") := list(type = "error", message = "Input C is required")
+        !!session$ns("inputA") := list(type = "error", message = "Input A is required", is_html = FALSE),
+        !!session$ns("inputB") := list(type = "error", message = "Input B is required", is_html = FALSE),
+        !!session$ns("inputC") := list(type = "error", message = "Input C is required", is_html = FALSE)
       ))
     })
-    
+
     session$setInputs(
       "inputB" = TRUE,
     )
     shiny::isolate({
       expect_false(iv$is_valid())
       expect_identical(iv$validate(), rlang::list2(
-        !!session$ns("inputA") := list(type = "error", message = "Input A is required"),
-        !!session$ns("inputC") := list(type = "error", message = "Input C is required"),
+        !!session$ns("inputA") := list(type = "error", message = "Input A is required", is_html = FALSE),
+        !!session$ns("inputC") := list(type = "error", message = "Input C is required", is_html = FALSE),
         !!session$ns("inputB") := NULL
       ))
     })
@@ -78,22 +78,22 @@ test_that("InputValidator add_rule() stops on first failing rule", {
   session <- shiny::MockShinySession$new()
   shiny::withReactiveDomain(session, {
     iv <- InputValidator$new()
-    
+
     iv$add_rule("a", ~ if (!identical(., TRUE)) "rule 1")
     iv$add_rule("a", ~ if (!identical(., FALSE)) "rule 2")
-    
+
     shiny::isolate({
       for (x in list(NULL, FALSE, "whatever")) {
         session$setInputs(a = x)
         expect_identical(iv$validate(), rlang::list2(
-          !!session$ns("a") := list(type = "error", message = "rule 1")
+          !!session$ns("a") := list(type = "error", message = "rule 1", is_html = FALSE)
         ))
       }
-      
+
       session$setInputs(a = TRUE)
-      
+
       expect_identical(iv$validate(), rlang::list2(
-        !!session$ns("a") := list(type = "error", message = "rule 2")
+        !!session$ns("a") := list(type = "error", message = "rule 2", is_html = FALSE)
       ))
     })
   })
@@ -119,7 +119,7 @@ test_that("InputValidator$fields recurses over child validators", {
       child_iv$add_rule("one", sv_required())
       child_iv$add_rule("one", sv_regex(".", "Must have a character"))
     })
-    
+
     iv <- InputValidator$new()
     iv$add_validator(child_iv)
     # Same name but different namespace
@@ -128,20 +128,20 @@ test_that("InputValidator$fields recurses over child validators", {
     shiny::isolate({
       expect_setequal(iv$fields(), names(iv$validate()))
       expect_length(iv$fields(), 2)
-      
+
       expect_false(child_iv$is_valid())
       expect_false(iv$is_valid())
-      
+
       # Let's also test conditionals while we're set up for it
-      
+
       child_iv$condition(~ FALSE)
       expect_true(child_iv$is_valid())
       expect_false(iv$is_valid())
-      
+
       iv$condition(~ FALSE)
       expect_true(child_iv$is_valid())
       expect_true(iv$is_valid())
-      
+
       child_iv$condition(~ TRUE)
       expect_false(child_iv$is_valid())
       expect_true(iv$is_valid())
@@ -171,7 +171,7 @@ test_that("`skip_validation()` works with a child validator", {
     shiny::isolate({
       expect_true(child_iv$is_valid())
     })
-    
+
     iv <- InputValidator$new(session)
     iv$add_validator(child_iv)
     shiny::isolate({
@@ -206,7 +206,7 @@ test_that("errors are correctly handled", {
     shiny::isolate({
       suppressWarnings(expect_warning(res <- iv$validate()))
       expect_snapshot_output(res)
-      
+
       op <- options(shiny.sanitize.errors = TRUE)
       on.exit(options(op), add = TRUE)
       suppressWarnings(expect_warning(res <- iv$validate()))

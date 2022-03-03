@@ -3373,7 +3373,8 @@
       inputContainer.children(".shiny-validation-message").remove();
       if (data.message) {
         var feedbackClass = this.isBS3() ? "help-block" : "invalid-feedback";
-        var msg = $(document.createElement("span")).addClass([feedbackClass, "shiny-validation-message"]).text(data.message);
+        var method = data.is_html ? "html" : "text";
+        var msg = $(document.createElement("span")).addClass([feedbackClass, "shiny-validation-message"])[method](data.message);
         msg.attr("style", function(i, s) {
           return (s || "") + "display: block !important;";
         });

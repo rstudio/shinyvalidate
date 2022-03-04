@@ -1,12 +1,12 @@
 pandoc: 2.7.3
-pkgdown: 1.6.1
+pkgdown: 2.0.2
 pkgdown_sha: ~
 articles:
   advanced: advanced.html
   displaying: displaying.html
   shinyvalidate: shinyvalidate.html
-last_built: 2021-11-19T19:06Z
+last_built: 2022-03-04T09:03Z
 urls:
-  reference: https://rstudio.github.io/shinyvalidate//reference
-  article: https://rstudio.github.io/shinyvalidate//articles
+  reference: https://rstudio.github.io/shinyvalidate/reference
+  article: https://rstudio.github.io/shinyvalidate/articles
 

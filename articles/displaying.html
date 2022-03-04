@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyvalidate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1.9001</span>
       </span>
     </div>
 
@@ -44,7 +46,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -64,7 +66,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/shinyvalidate/">
+  <a href="https://github.com/rstudio/shinyvalidate/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -83,10 +85,10 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Displaying validation errors</h1>
-                        <h4 class="author">Joe Cheng</h4>
+                        <h4 data-toc-skip class="author">Joe Cheng</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/rstudio/shinyvalidate/blob/master/vignettes/displaying.Rmd"><code>vignettes/displaying.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rstudio/shinyvalidate/blob/HEAD/vignettes/displaying.Rmd" class="external-link"><code>vignettes/displaying.Rmd</code></a></small>
       <div class="hidden name"><code>displaying.Rmd</code></div>
 
     </div>
@@ -110,9 +112,9 @@ span.delta {
 <strong>App-level overrides:</strong> App authors may find themselves using custom input widgets that are not shinyvalidate-compatible, or are unhappy with the default behavior of shinyvalidate or the customizations made by a widget author. These app authors should have some recourse that doesn’t require making changes to shinyvalidate or the widget package–though they will be required to know some JavaScript.</li>
 </ol>
 <p>These are implemented in JavaScript as three distinct “strategies”. When shinyvalidate’s display logic is invoked to show a specific error for a specific Shiny input, these strategies are tried in turn until one succeeds. The order that they are tried is the <em>reverse</em> of how they’re listed above (and below), though: app-level overrides take the highest priority, then widget-level support, then the default “it just works”.</p>
-<div id="it-just-works-built-in-support-for-bootstrap-3" class="section level2">
-<h2 class="hasAnchor">
-<a href="#it-just-works-built-in-support-for-bootstrap-3" class="anchor"></a>It Just Works: Built-in support for Bootstrap 3</h2>
+<div class="section level2">
+<h2 id="it-just-works-built-in-support-for-bootstrap-3">It Just Works: Built-in support for Bootstrap 3<a class="anchor" aria-label="anchor" href="#it-just-works-built-in-support-for-bootstrap-3"></a>
+</h2>
 <p>At the time of this writing, Shiny’s built-in user interface components are written using the Bootstrap CSS framework, version 3. Bootstrap 3 defines certain markup and CSS patterns to follow for creating input controls, and Shiny’s built-in components follow those patterns. Bootstrap also defines patterns for displaying validation errors, and if the input in question follows Bootstrap 3 conventions, then shinyvalidate will automatically use those patterns.</p>
 <p>Here, for example, is the HTML used to generate a simple text input in Shiny:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">cat</span>(<span class="kw">as.character</span>(shiny<span class="op">::</span><span class="kw">textInput</span>(<span class="st">"email"</span>, <span class="st">"Email address"</span>)))</span></code></pre></div>
@@ -128,27 +130,27 @@ span.delta {
   <span class="delta">&lt;span class="help-block shiny-validation-message"&gt;Required&lt;/span&gt;</span>
 &lt;/div&gt;</code></pre>
 <p>Note that this strategy covers, <em>but is not limited to</em>, the built-in Shiny input widgets. Any third-party Shiny input widget that uses a containing element with <code>.form-group</code> will be assumed to be compatible with this treatment.</p>
-<div id="a-note-about-bootstrap-v4" class="section level4">
-<h4 class="hasAnchor">
-<a href="#a-note-about-bootstrap-v4" class="anchor"></a>A note about Bootstrap v4</h4>
+<div class="section level4">
+<h4 id="a-note-about-bootstrap-v4">A note about Bootstrap v4<a class="anchor" aria-label="anchor" href="#a-note-about-bootstrap-v4"></a>
+</h4>
 <p>At the time of this writing, the Shiny team is in the midst of a large project to bring support for Bootstrap v4 to Shiny. As this effort gets closer to release, we plan to bring Bootstrap v4 compatibility to shinyvalidate as well; and in general, we hope to achieve “It Just Works” integration with whatever CSS frameworks are most commonly used with Shiny.</p>
 </div>
 </div>
-<div id="widget-level-support-input-binding-customization" class="section level2">
-<h2 class="hasAnchor">
-<a href="#widget-level-support-input-binding-customization" class="anchor"></a>Widget-level support: Input binding customization</h2>
-<p>Custom input widgets that don’t depend on Bootstrap can define their own behavior for displaying validation errors, by implementing two new methods on their JavaScript <a href="https://shiny.rstudio.com/articles/building-inputs.html#write-an-input-binding"><code>InputBinding</code> objects</a>.</p>
+<div class="section level2">
+<h2 id="widget-level-support-input-binding-customization">Widget-level support: Input binding customization<a class="anchor" aria-label="anchor" href="#widget-level-support-input-binding-customization"></a>
+</h2>
+<p>Custom input widgets that don’t depend on Bootstrap can define their own behavior for displaying validation errors, by implementing two new methods on their JavaScript <a href="https://shiny.rstudio.com/articles/building-inputs.html#write-an-input-binding" class="external-link"><code>InputBinding</code> objects</a>.</p>
 <ul>
 <li><p><code>binding.setInvalid(el, data)</code> will be called when a validation error should be displayed. The <code>data</code> object has two fields: <code>data.type</code> is currently always <code>"error"</code> (in the future we may add <code>"warning"</code> and <code>"info"</code> types), and <code>data.message</code> will be a non-empty string specifying the message to display. Besides displaying the message, other UI changes/CSS adjustments should be made to make it clear that the input is invalid (having the control label and border colors turn red, or background color turning pink, for example).</p></li>
 <li><p><code>binding.clearInvalid(el)</code> will be called when a validation error is no longer appropriate to be displayed. Any previously added validation message should be removed, and any CSS adjustments (like the aforementioned red labels and borders) should be reversed.</p></li>
 </ul>
 <p>Note that shinyvalidate will invoke <code>setInvalid</code> and <code>clearInvalid</code> in seemingly random order. It may repeatedly call <code>clearInvalid</code> on an input without intervening <code>setInvalid</code> calls. It may call <code>setInvalid</code> multiple times in a row with the same <code>data</code>. Therefore, both <code>setInvalid</code> and <code>clearInvalid</code> must be prepared to deal with inputs in “normal” or “error” states.</p>
-<p>Example 03_custom_inputs [<a href="https://github.com/rstudio/shinyvalidate/tree/main/inst/examples/03_custom_inputs">source</a>, live demo TODO] uses a custom input widget to implement a webcam capture input, and uses <code>setInvalid</code>/<code>clearInvalid</code> methods to overlay the validation message on top of the image preview:</p>
+<p>Example 03_custom_inputs [<a href="https://github.com/rstudio/shinyvalidate/tree/main/inst/examples/03_custom_inputs" class="external-link">source</a>, live demo TODO] uses a custom input widget to implement a webcam capture input, and uses <code>setInvalid</code>/<code>clearInvalid</code> methods to overlay the validation message on top of the image preview:</p>
 <p><img src="custom_input.png" alt="Screenshot of app, with error message displayed over a webcam image" width="282"></p>
 </div>
-<div id="app-level-overrides-event-handlers" class="section level2">
-<h2 class="hasAnchor">
-<a href="#app-level-overrides-event-handlers" class="anchor"></a>App-level overrides: Event handlers</h2>
+<div class="section level2">
+<h2 id="app-level-overrides-event-handlers">App-level overrides: Event handlers<a class="anchor" aria-label="anchor" href="#app-level-overrides-event-handlers"></a>
+</h2>
 <p>Since it’s always possible that something about your application causes the above strategies to not make sense, you can choose to override those strategies using jQuery event handlers.</p>
 <p>Here’s what the JavaScript code for this might look like:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">"shinyvalidate:show"</span><span class="op">,</span> <span class="kw">function</span>(event) <span class="op">{</span></span>
@@ -179,7 +181,7 @@ span.delta {
 <li><p><code>message</code> - A textual string (not HTML) indicating the message to be displayed.</p></li>
 </ul>
 <p><strong>Important:</strong> The <code>event</code> object’s <code>preventDefault()</code> method must be called to prevent the two other strategies (input binding and Bootstrap) from being attempted. (This allows event handlers to decide to handle error display for only a subset of inputs, for example.)</p>
-<p>If you haven’t needed to include custom JavaScript for your Shiny app before, see <a href="https://shiny.rstudio.com/articles/packaging-javascript.html">this article</a> to learn about the various options you have for doing so.</p>
+<p>If you haven’t needed to include custom JavaScript for your Shiny app before, see <a href="https://shiny.rstudio.com/articles/packaging-javascript.html" class="external-link">this article</a> to learn about the various options you have for doing so.</p>
 </div>
   </div>
 
@@ -194,11 +196,13 @@ span.delta {
 
 
       <footer><div class="copyright">
-  <p>Developed by Richard Iannone, Joe Cheng,  RStudio.</p>
+  <p></p>
+<p>Developed by Richard Iannone, Joe Cheng, RStudio.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
@@ -206,6 +210,8 @@ span.delta {
 
   
 
+
+  
 
   </body>
 </html>

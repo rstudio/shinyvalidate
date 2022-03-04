@@ -163,10 +163,10 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
     #'   `session$ns("x")`.)
     #' @param rule A function that takes (at least) one argument: the input's
     #'   value. The function should return `NULL` if it passes validation, and
-    #'   if not, a single-element character vector containing an error message
-    #'   to display to the user near the input. You can alternatively provide a
-    #'   single-sided formula instead of a function, using `.` as the variable
-    #'   name for the input value being validated.
+    #'   if not, a single-element character vector or HTML tag containing an
+    #'   error message to display to the user near the input. You can
+    #'   alternatively provide a single-sided formula instead of a function,
+    #'   using `.` as the variable name for the input value being validated.
     #' @param ... Optional: Additional arguments to pass to the `rule` function
     #'   whenever it is invoked.
     #' @param session. The session object to which the input belongs. (There's
@@ -324,6 +324,11 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
             }
           }
         )
+        result_is_html <- FALSE
+        if (any(class(result) %in% c("shiny.tag", "shiny.tag.list", "shiny.tag.function", "html"))) {
+          result <- as.character(result)
+          result_is_html <- TRUE
+        }
         # Validation rules are required to return one of the following:
         # * NULL: the value has passed the validation rule
         # * character(1): the rule didn't pass validation
@@ -350,7 +355,7 @@ InputValidator <- R6::R6Class("InputValidator", cloneable = FALSE,
           results[[fullname]] <<- TRUE
         } else {
           console_log("  ...Failed")
-          results[[fullname]] <<- list(type = "error", message = result)
+          results[[fullname]] <<- list(type = "error", message = result, is_html = result_is_html)
         }
       })
       # Change all TRUE entries to NULL. We have to use list(NULL) instead of

@@ -104,10 +104,11 @@ const bsStrategy = {
     inputContainer.children(".shiny-validation-message").remove();
     if (data.message) {
       const feedbackClass = this.isBS3() ? "help-block" : "invalid-feedback";
+      const method = data.is_html ? "html" : "text";
       const msg = $(document.createElement("span")).
-        addClass([feedbackClass, "shiny-validation-message"]).
-        text(data.message);
-      // Yes, this is a terrible hack to get feedback to display when 
+        addClass([feedbackClass, "shiny-validation-message"])
+        [method](data.message);
+      // Yes, this is a terrible hack to get feedback to display when
       // there is no .form-control in BS4
       msg.attr('style', function(i, s) { return (s || '') + 'display: block !important;' });
       inputContainer.append(msg);

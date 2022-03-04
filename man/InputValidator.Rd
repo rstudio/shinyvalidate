@@ -175,10 +175,10 @@ qualified by a module namespace; e.g. pass \code{"x"} and not
 
 \item{\code{rule}}{A function that takes (at least) one argument: the input's
 value. The function should return \code{NULL} if it passes validation, and
-if not, a single-element character vector containing an error message
-to display to the user near the input. You can alternatively provide a
-single-sided formula instead of a function, using \code{.} as the variable
-name for the input value being validated.}
+if not, a single-element character vector or HTML tag containing an
+error message to display to the user near the input. You can
+alternatively provide a single-sided formula instead of a function,
+using \code{.} as the variable name for the input value being validated.}
 
 \item{\code{...}}{Optional: Additional arguments to pass to the \code{rule} function
 whenever it is invoked.}

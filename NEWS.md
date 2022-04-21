@@ -1,4 +1,4 @@
-# shinyvalidate (development version)
+# shinyvalidate 0.1.2
 
 * Support HTML messages when failing a validation. (#55)
 

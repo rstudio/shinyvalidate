@@ -18,3 +18,4 @@
 vignettes
 ^.browserslistrc$
 ^yarn.lock$
+^revdep$

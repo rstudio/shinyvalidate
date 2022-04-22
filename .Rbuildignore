@@ -16,3 +16,7 @@
 ^babel.config.json$
 ^codecov\.yml$
 vignettes
+^.browserslistrc$
+^yarn.lock$
+^revdep$
+^cran-comments\.md$

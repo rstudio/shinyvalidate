@@ -443,14 +443,12 @@ input_provided <- function(val) {
   # * FALSE (or a logical vector containing only FALSEs) is not truthy, but it
   #   is provided.
   
-  if (inherits(val, 'try-error'))
-    return(FALSE)
-  
-  if (!is.atomic(val))
-    return(TRUE)
-  
   if (is.null(val))
     return(FALSE)
+  if (inherits(val, 'try-error'))
+    return(FALSE)
+  if (!is.atomic(val))
+    return(TRUE)
   if (length(val) == 0)
     return(FALSE)
   if (all(is.na(val)))

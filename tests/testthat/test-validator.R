@@ -23,6 +23,10 @@ test_that("InputValidator cannot be constructed without a session", {
 })
 
 test_that("InputValidator add_rule()", {
+  if (packageVersion("shiny") <= "1.7.5" && getRversion() > "4.3.1") {
+    skip("Skipping InputValidator add_rule() tests since shiny::need doesn't work as intended.")
+  }
+  
   session <- shiny::MockShinySession$new()
   shiny::withReactiveDomain(session, {
     iv <- InputValidator$new()

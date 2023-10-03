@@ -28,10 +28,7 @@ match the rule. The message can be customized by using the \code{"{left}"} and
 and \code{right} values. While the default message uses both of these string
 parameters, they are not required in a user-defined \code{message_fmt} string.}
 
-\item{allow_na}{If \code{FALSE} (the default for both options), then any
-\code{NA} or \code{NaN} element will cause validation to fail.}
-
-\item{allow_nan}{If \code{FALSE} (the default for both options), then any
+\item{allow_na, allow_nan}{If \code{FALSE} (the default for both options), then any
 \code{NA} or \code{NaN} element will cause validation to fail.}
 }
 \value{

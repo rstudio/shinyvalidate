@@ -19,7 +19,7 @@ Imports:
     htmltools (>= 0.5.1.1),
     rlang (>= 0.4.10),
     glue (>= 1.4.2)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Suggests:
     testthat,

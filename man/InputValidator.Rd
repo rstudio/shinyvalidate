@@ -32,22 +32,22 @@ that are completely unrelated to each other; each form would have its own
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{InputValidator$new()}}
-\item \href{#method-parent}{\code{InputValidator$parent()}}
-\item \href{#method-condition}{\code{InputValidator$condition()}}
-\item \href{#method-add_validator}{\code{InputValidator$add_validator()}}
-\item \href{#method-add_rule}{\code{InputValidator$add_rule()}}
-\item \href{#method-enable}{\code{InputValidator$enable()}}
-\item \href{#method-disable}{\code{InputValidator$disable()}}
-\item \href{#method-fields}{\code{InputValidator$fields()}}
-\item \href{#method-is_valid}{\code{InputValidator$is_valid()}}
-\item \href{#method-validate}{\code{InputValidator$validate()}}
-\item \href{#method-_validate_impl}{\code{InputValidator$_validate_impl()}}
+\item \href{#method-InputValidator-new}{\code{InputValidator$new()}}
+\item \href{#method-InputValidator-parent}{\code{InputValidator$parent()}}
+\item \href{#method-InputValidator-condition}{\code{InputValidator$condition()}}
+\item \href{#method-InputValidator-add_validator}{\code{InputValidator$add_validator()}}
+\item \href{#method-InputValidator-add_rule}{\code{InputValidator$add_rule()}}
+\item \href{#method-InputValidator-enable}{\code{InputValidator$enable()}}
+\item \href{#method-InputValidator-disable}{\code{InputValidator$disable()}}
+\item \href{#method-InputValidator-fields}{\code{InputValidator$fields()}}
+\item \href{#method-InputValidator-is_valid}{\code{InputValidator$is_valid()}}
+\item \href{#method-InputValidator-validate}{\code{InputValidator$validate()}}
+\item \href{#method-InputValidator-_validate_impl}{\code{InputValidator$_validate_impl()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-InputValidator-new"></a>}}
+\if{latex}{\out{\hypertarget{method-InputValidator-new}{}}}
 \subsection{Method \code{new()}}{
 Create a new validator object.
 \subsection{Usage}{
@@ -73,8 +73,8 @@ the default.)}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-parent"></a>}}
-\if{latex}{\out{\hypertarget{method-parent}{}}}
+\if{html}{\out{<a id="method-InputValidator-parent"></a>}}
+\if{latex}{\out{\hypertarget{method-InputValidator-parent}{}}}
 \subsection{Method \code{parent()}}{
 For internal use only.
 \subsection{Usage}{
@@ -90,8 +90,8 @@ For internal use only.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-condition"></a>}}
-\if{latex}{\out{\hypertarget{method-condition}{}}}
+\if{html}{\out{<a id="method-InputValidator-condition"></a>}}
+\if{latex}{\out{\hypertarget{method-InputValidator-condition}{}}}
 \subsection{Method \code{condition()}}{
 Gets or sets a condition that overrides all of the rules in
 this validator. Before performing validation, this validator will
@@ -120,8 +120,8 @@ returned.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_validator"></a>}}
-\if{latex}{\out{\hypertarget{method-add_validator}{}}}
+\if{html}{\out{<a id="method-InputValidator-add_validator"></a>}}
+\if{latex}{\out{\hypertarget{method-InputValidator-add_validator}{}}}
 \subsection{Method \code{add_validator()}}{
 Add another \code{InputValidator} object to this one, as a
 "child". Any time this validator object is asked for its validity, it
@@ -148,8 +148,8 @@ default, a label will be automatically generated.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_rule"></a>}}
-\if{latex}{\out{\hypertarget{method-add_rule}{}}}
+\if{html}{\out{<a id="method-InputValidator-add_rule"></a>}}
+\if{latex}{\out{\hypertarget{method-InputValidator-add_rule}{}}}
 \subsection{Method \code{add_rule()}}{
 Add an input validation rule. Each input validation rule
 applies to a single input. You can add multiple validation rules for a
@@ -190,8 +190,8 @@ almost never a reason to change this from the default.)}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-enable"></a>}}
-\if{latex}{\out{\hypertarget{method-enable}{}}}
+\if{html}{\out{<a id="method-InputValidator-enable"></a>}}
+\if{latex}{\out{\hypertarget{method-InputValidator-enable}{}}}
 \subsection{Method \code{enable()}}{
 Begin displaying input validation feedback in the user
 interface. Once enabled, this validator object will automatically keep
@@ -205,8 +205,8 @@ calls to \code{enable()} on this validator will be ignored.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-disable"></a>}}
-\if{latex}{\out{\hypertarget{method-disable}{}}}
+\if{html}{\out{<a id="method-InputValidator-disable"></a>}}
+\if{latex}{\out{\hypertarget{method-InputValidator-disable}{}}}
 \subsection{Method \code{disable()}}{
 Clear existing input validation feedback in the user
 interface for all inputs represented in this validator's ruleset, and
@@ -218,8 +218,8 @@ called to resume input validation.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-fields"></a>}}
-\if{latex}{\out{\hypertarget{method-fields}{}}}
+\if{html}{\out{<a id="method-InputValidator-fields"></a>}}
+\if{latex}{\out{\hypertarget{method-InputValidator-fields}{}}}
 \subsection{Method \code{fields()}}{
 Returns \code{TRUE} if all input validation rules currently pass,
 \code{FALSE} if not.
@@ -229,8 +229,8 @@ Returns \code{TRUE} if all input validation rules currently pass,
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_valid"></a>}}
-\if{latex}{\out{\hypertarget{method-is_valid}{}}}
+\if{html}{\out{<a id="method-InputValidator-is_valid"></a>}}
+\if{latex}{\out{\hypertarget{method-InputValidator-is_valid}{}}}
 \subsection{Method \code{is_valid()}}{
 Returns \code{TRUE} if all input validation rules currently pass,
 \code{FALSE} if not.
@@ -240,8 +240,8 @@ Returns \code{TRUE} if all input validation rules currently pass,
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-validate"></a>}}
-\if{latex}{\out{\hypertarget{method-validate}{}}}
+\if{html}{\out{<a id="method-InputValidator-validate"></a>}}
+\if{latex}{\out{\hypertarget{method-InputValidator-validate}{}}}
 \subsection{Method \code{validate()}}{
 Run validation rules and gather results. For advanced usage
 only; most apps should use the \code{is_valid()} and \code{enable()} methods
@@ -255,8 +255,8 @@ character vector describing a validation problem.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-_validate_impl"></a>}}
-\if{latex}{\out{\hypertarget{method-_validate_impl}{}}}
+\if{html}{\out{<a id="method-InputValidator-_validate_impl"></a>}}
+\if{latex}{\out{\hypertarget{method-InputValidator-_validate_impl}{}}}
 \subsection{Method \code{_validate_impl()}}{
 For internal use only.
 \subsection{Usage}{

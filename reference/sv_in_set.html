@@ -71,11 +71,11 @@ specified set of values.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">sv_in_set</span><span class="op">(</span>
-  <span class="va">set</span>,
-  message_fmt <span class="op">=</span> <span class="st">"Must be in the set of {values_text}."</span>,
-  set_limit <span class="op">=</span> <span class="fl">3</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sv_in_set</span><span class="op">(</span></span>
+<span>  <span class="va">set</span>,</span>
+<span>  message_fmt <span class="op">=</span> <span class="st">"Must be in the set of {values_text}."</span>,</span>
+<span>  set_limit <span class="op">=</span> <span class="fl">3</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -85,6 +85,8 @@ specified set of values.</p>
 part of (<code>value %in% set</code> must be <code>TRUE</code>) to pass validation. To allow an
 empty field, <code>NA</code> should be included in the <code>set</code> vector. Optionally, <code>NaN</code>
 can be included as well.</p></dd>
+
+
 <dt>message_fmt</dt>
 <dd><p>The validation error message to use if a value fails to
 match the rule. The message can be customized by using the
@@ -92,6 +94,8 @@ match the rule. The message can be customized by using the
 values (formatted internally as a text list and controlled via the
 <code>set_limit</code> parameter). While the default message uses this string
 parameter, it is not required in a user-defined <code>message_fmt</code> string.</p></dd>
+
+
 <dt>set_limit</dt>
 <dd><p>The limit of <code>set</code> values to include in the
 automatically-generated error message (i.e., when <code>message = NULL</code>, the
@@ -99,10 +103,13 @@ default). If the number of elements provided in <code>set</code> is greater than
 <code>set_limit</code> then only the first <code>&lt;message_limit&gt;</code> set elements will be
 echoed along with text that states how many extra elements are part of the
 <code>set</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A function suitable for use as an
+    
+
+<p>A function suitable for use as an
 <code><a href="InputValidator.html">InputValidator$add_rule()</a></code> rule.</p>
     </div>
     <div id="see-also">
@@ -129,35 +136,35 @@ between two boundary values.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## Only run examples in interactive R sessions</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.rstudio.com/" class="external-link">shiny</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyvalidate/">shinyvalidate</a></span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/fluidPage.html" class="external-link">fluidPage</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/textInput.html" class="external-link">textInput</a></span><span class="op">(</span><span class="st">"rating"</span>, <span class="st">"Rating"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">  </span>
-<span class="r-in">  <span class="co"># Validation rules are set in the server, start by</span></span>
-<span class="r-in">  <span class="co"># making a new instance of an `InputValidator()`</span></span>
-<span class="r-in">  <span class="va">iv</span> <span class="op">&lt;-</span> <span class="va"><a href="InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Basic usage: `sv_in_set()` requires a value</span></span>
-<span class="r-in">  <span class="co"># set given as a vector; a message will be</span></span>
-<span class="r-in">  <span class="co"># shown if the validation of `input$rating` fails</span></span>
-<span class="r-in">  <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"rating"</span>, <span class="fu">sv_in_set</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Finally, `enable()` the validation rules</span></span>
-<span class="r-in">  <span class="va">iv</span><span class="op">$</span><span class="fu">enable</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html" class="external-link">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Only run examples in interactive R sessions</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.posit.co/" class="external-link">shiny</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyvalidate/">shinyvalidate</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/fluidPage.html" class="external-link">fluidPage</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/textInput.html" class="external-link">textInput</a></span><span class="op">(</span><span class="st">"rating"</span>, <span class="st">"Rating"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># Validation rules are set in the server, start by</span></span></span>
+<span class="r-in"><span>  <span class="co"># making a new instance of an `InputValidator()`</span></span></span>
+<span class="r-in"><span>  <span class="va">iv</span> <span class="op">&lt;-</span> <span class="va"><a href="InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Basic usage: `sv_in_set()` requires a value</span></span></span>
+<span class="r-in"><span>  <span class="co"># set given as a vector; a message will be</span></span></span>
+<span class="r-in"><span>  <span class="co"># shown if the validation of `input$rating` fails</span></span></span>
+<span class="r-in"><span>  <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"rating"</span>, <span class="fu">sv_in_set</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Finally, `enable()` the validation rules</span></span></span>
+<span class="r-in"><span>  <span class="va">iv</span><span class="op">$</span><span class="fu">enable</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html" class="external-link">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -172,7 +179,7 @@ between two boundary values.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

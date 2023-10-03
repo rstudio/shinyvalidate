@@ -81,7 +81,7 @@
 
       
 
-      </header><script src="displaying_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Displaying validation errors</h1>
@@ -101,87 +101,171 @@ span.delta {
   background-color: #FFC;
 }
 </style>
-<p>This article is intended for developers of custom Shiny input widgets, or anyone familiar with HTML/JavaScript/CSS who wants to customize the display of validation errors raised by shinyvalidate.</p>
-<p>When it comes to error display, shinyvalidate provides three levels of support:</p>
+<p>This article is intended for developers of custom Shiny input
+widgets, or anyone familiar with HTML/JavaScript/CSS who wants to
+customize the display of validation errors raised by shinyvalidate.</p>
+<p>When it comes to error display, shinyvalidate provides three levels
+of support:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>It just works:</strong> The most common widgets are supported right out of the box. Certainly this includes the input controls that are included with the shiny package.</li>
+<strong>It just works:</strong> The most common widgets are
+supported right out of the box. Certainly this includes the input
+controls that are included with the shiny package.</li>
 <li>
-<strong>Widget-level support:</strong> Authors of custom input widgets have total control over the display of validation errors for their widgets, if they choose to provide an implementation.</li>
+<strong>Widget-level support:</strong> Authors of custom input
+widgets have total control over the display of validation errors for
+their widgets, if they choose to provide an implementation.</li>
 <li>
-<strong>App-level overrides:</strong> App authors may find themselves using custom input widgets that are not shinyvalidate-compatible, or are unhappy with the default behavior of shinyvalidate or the customizations made by a widget author. These app authors should have some recourse that doesn’t require making changes to shinyvalidate or the widget package–though they will be required to know some JavaScript.</li>
+<strong>App-level overrides:</strong> App authors may find
+themselves using custom input widgets that are not
+shinyvalidate-compatible, or are unhappy with the default behavior of
+shinyvalidate or the customizations made by a widget author. These app
+authors should have some recourse that doesn’t require making changes to
+shinyvalidate or the widget package–though they will be required to know
+some JavaScript.</li>
 </ol>
-<p>These are implemented in JavaScript as three distinct “strategies”. When shinyvalidate’s display logic is invoked to show a specific error for a specific Shiny input, these strategies are tried in turn until one succeeds. The order that they are tried is the <em>reverse</em> of how they’re listed above (and below), though: app-level overrides take the highest priority, then widget-level support, then the default “it just works”.</p>
+<p>These are implemented in JavaScript as three distinct “strategies”.
+When shinyvalidate’s display logic is invoked to show a specific error
+for a specific Shiny input, these strategies are tried in turn until one
+succeeds. The order that they are tried is the <em>reverse</em> of how
+they’re listed above (and below), though: app-level overrides take the
+highest priority, then widget-level support, then the default “it just
+works”.</p>
 <div class="section level2">
 <h2 id="it-just-works-built-in-support-for-bootstrap-3">It Just Works: Built-in support for Bootstrap 3<a class="anchor" aria-label="anchor" href="#it-just-works-built-in-support-for-bootstrap-3"></a>
 </h2>
-<p>At the time of this writing, Shiny’s built-in user interface components are written using the Bootstrap CSS framework, version 3. Bootstrap 3 defines certain markup and CSS patterns to follow for creating input controls, and Shiny’s built-in components follow those patterns. Bootstrap also defines patterns for displaying validation errors, and if the input in question follows Bootstrap 3 conventions, then shinyvalidate will automatically use those patterns.</p>
-<p>Here, for example, is the HTML used to generate a simple text input in Shiny:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">cat</span>(<span class="kw">as.character</span>(shiny<span class="op">::</span><span class="kw">textInput</span>(<span class="st">"email"</span>, <span class="st">"Email address"</span>)))</span></code></pre></div>
+<p>At the time of this writing, Shiny’s built-in user interface
+components are written using the Bootstrap CSS framework, version 3.
+Bootstrap 3 defines certain markup and CSS patterns to follow for
+creating input controls, and Shiny’s built-in components follow those
+patterns. Bootstrap also defines patterns for displaying validation
+errors, and if the input in question follows Bootstrap 3 conventions,
+then shinyvalidate will automatically use those patterns.</p>
+<p>Here, for example, is the HTML used to generate a simple text input
+in Shiny:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">cat</span>(<span class="fu">as.character</span>(shiny<span class="sc">::</span><span class="fu">textInput</span>(<span class="st">"email"</span>, <span class="st">"Email address"</span>)))</span></code></pre></div>
 <pre><code>&lt;div class="form-group shiny-input-container"&gt;
   &lt;label class="control-label" for="email"&gt;Email address&lt;/label&gt;
   &lt;input id="email" type="text" class="form-control" value=""/&gt;
 &lt;/div&gt;</code></pre>
-<p>shinyvalidate will take the input element and look at the element itself, then its containing elements, for the <code>form-group</code> CSS class. If this class is found, then a validation message will be displayed by 1) adding the <code>has-error</code> CSS class to the <code>form-group</code>, and 2) adding a new <code>&lt;span class="help-block shiny-validation-message"&gt;</code> element as the last child of the <code>form-group</code>.</p>
-<p>The following code snippet is the same as the above, except for these two changes, which are highlighted:</p>
+<p>shinyvalidate will take the input element and look at the element
+itself, then its containing elements, for the <code>form-group</code>
+CSS class. If this class is found, then a validation message will be
+displayed by 1) adding the <code>has-error</code> CSS class to the
+<code>form-group</code>, and 2) adding a new
+<code>&lt;span class="help-block shiny-validation-message"&gt;</code>
+element as the last child of the <code>form-group</code>.</p>
+<p>The following code snippet is the same as the above, except for these
+two changes, which are highlighted:</p>
 <pre><code>&lt;div class="form-group shiny-input-container <span class="delta">has-error</span>"&gt;
   &lt;label class="control-label" for="email"&gt;Email address&lt;/label&gt;
   &lt;input id="email" type="text" class="form-control" value=""/&gt;
   <span class="delta">&lt;span class="help-block shiny-validation-message"&gt;Required&lt;/span&gt;</span>
 &lt;/div&gt;</code></pre>
-<p>Note that this strategy covers, <em>but is not limited to</em>, the built-in Shiny input widgets. Any third-party Shiny input widget that uses a containing element with <code>.form-group</code> will be assumed to be compatible with this treatment.</p>
+<p>Note that this strategy covers, <em>but is not limited to</em>, the
+built-in Shiny input widgets. Any third-party Shiny input widget that
+uses a containing element with <code>.form-group</code> will be assumed
+to be compatible with this treatment.</p>
 <div class="section level4">
 <h4 id="a-note-about-bootstrap-v4">A note about Bootstrap v4<a class="anchor" aria-label="anchor" href="#a-note-about-bootstrap-v4"></a>
 </h4>
-<p>At the time of this writing, the Shiny team is in the midst of a large project to bring support for Bootstrap v4 to Shiny. As this effort gets closer to release, we plan to bring Bootstrap v4 compatibility to shinyvalidate as well; and in general, we hope to achieve “It Just Works” integration with whatever CSS frameworks are most commonly used with Shiny.</p>
+<p>At the time of this writing, the Shiny team is in the midst of a
+large project to bring support for Bootstrap v4 to Shiny. As this effort
+gets closer to release, we plan to bring Bootstrap v4 compatibility to
+shinyvalidate as well; and in general, we hope to achieve “It Just
+Works” integration with whatever CSS frameworks are most commonly used
+with Shiny.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="widget-level-support-input-binding-customization">Widget-level support: Input binding customization<a class="anchor" aria-label="anchor" href="#widget-level-support-input-binding-customization"></a>
 </h2>
-<p>Custom input widgets that don’t depend on Bootstrap can define their own behavior for displaying validation errors, by implementing two new methods on their JavaScript <a href="https://shiny.rstudio.com/articles/building-inputs.html#write-an-input-binding" class="external-link"><code>InputBinding</code> objects</a>.</p>
+<p>Custom input widgets that don’t depend on Bootstrap can define their
+own behavior for displaying validation errors, by implementing two new
+methods on their JavaScript <a href="https://shiny.rstudio.com/articles/building-inputs.html#write-an-input-binding" class="external-link"><code>InputBinding</code>
+objects</a>.</p>
 <ul>
-<li><p><code>binding.setInvalid(el, data)</code> will be called when a validation error should be displayed. The <code>data</code> object has two fields: <code>data.type</code> is currently always <code>"error"</code> (in the future we may add <code>"warning"</code> and <code>"info"</code> types), and <code>data.message</code> will be a non-empty string specifying the message to display. Besides displaying the message, other UI changes/CSS adjustments should be made to make it clear that the input is invalid (having the control label and border colors turn red, or background color turning pink, for example).</p></li>
-<li><p><code>binding.clearInvalid(el)</code> will be called when a validation error is no longer appropriate to be displayed. Any previously added validation message should be removed, and any CSS adjustments (like the aforementioned red labels and borders) should be reversed.</p></li>
+<li><p><code>binding.setInvalid(el, data)</code> will be called when a
+validation error should be displayed. The <code>data</code> object has
+two fields: <code>data.type</code> is currently always
+<code>"error"</code> (in the future we may add <code>"warning"</code>
+and <code>"info"</code> types), and <code>data.message</code> will be a
+non-empty string specifying the message to display. Besides displaying
+the message, other UI changes/CSS adjustments should be made to make it
+clear that the input is invalid (having the control label and border
+colors turn red, or background color turning pink, for
+example).</p></li>
+<li><p><code>binding.clearInvalid(el)</code> will be called when a
+validation error is no longer appropriate to be displayed. Any
+previously added validation message should be removed, and any CSS
+adjustments (like the aforementioned red labels and borders) should be
+reversed.</p></li>
 </ul>
-<p>Note that shinyvalidate will invoke <code>setInvalid</code> and <code>clearInvalid</code> in seemingly random order. It may repeatedly call <code>clearInvalid</code> on an input without intervening <code>setInvalid</code> calls. It may call <code>setInvalid</code> multiple times in a row with the same <code>data</code>. Therefore, both <code>setInvalid</code> and <code>clearInvalid</code> must be prepared to deal with inputs in “normal” or “error” states.</p>
-<p>Example 03_custom_inputs [<a href="https://github.com/rstudio/shinyvalidate/tree/main/inst/examples/03_custom_inputs" class="external-link">source</a>, live demo TODO] uses a custom input widget to implement a webcam capture input, and uses <code>setInvalid</code>/<code>clearInvalid</code> methods to overlay the validation message on top of the image preview:</p>
+<p>Note that shinyvalidate will invoke <code>setInvalid</code> and
+<code>clearInvalid</code> in seemingly random order. It may repeatedly
+call <code>clearInvalid</code> on an input without intervening
+<code>setInvalid</code> calls. It may call <code>setInvalid</code>
+multiple times in a row with the same <code>data</code>. Therefore, both
+<code>setInvalid</code> and <code>clearInvalid</code> must be prepared
+to deal with inputs in “normal” or “error” states.</p>
+<p>Example 03_custom_inputs [<a href="https://github.com/rstudio/shinyvalidate/tree/main/inst/examples/03_custom_inputs" class="external-link">source</a>,
+live demo TODO] uses a custom input widget to implement a webcam capture
+input, and uses <code>setInvalid</code>/<code>clearInvalid</code>
+methods to overlay the validation message on top of the image
+preview:</p>
 <p><img src="custom_input.png" alt="Screenshot of app, with error message displayed over a webcam image" width="282"></p>
 </div>
 <div class="section level2">
 <h2 id="app-level-overrides-event-handlers">App-level overrides: Event handlers<a class="anchor" aria-label="anchor" href="#app-level-overrides-event-handlers"></a>
 </h2>
-<p>Since it’s always possible that something about your application causes the above strategies to not make sense, you can choose to override those strategies using jQuery event handlers.</p>
+<p>Since it’s always possible that something about your application
+causes the above strategies to not make sense, you can choose to
+override those strategies using jQuery event handlers.</p>
 <p>Here’s what the JavaScript code for this might look like:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">"shinyvalidate:show"</span><span class="op">,</span> <span class="kw">function</span>(event) <span class="op">{</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a>  <span class="kw">let</span> el <span class="op">=</span> <span class="va">event</span>.<span class="at">el</span><span class="op">;</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a>  <span class="kw">let</span> binding <span class="op">=</span> <span class="va">event</span>.<span class="at">binding</span><span class="op">;</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a>  <span class="kw">let</span> id <span class="op">=</span> <span class="va">event</span>.<span class="at">id</span><span class="op">;</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a>  <span class="kw">let</span> type <span class="op">=</span> <span class="va">event</span>.<span class="at">type</span><span class="op">;</span> <span class="co">// always "error"</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a>  <span class="kw">let</span> message <span class="op">=</span> <span class="va">event</span>.<span class="at">message</span><span class="op">;</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a>  <span class="va">event</span>.<span class="at">preventDefault</span>()<span class="op">;</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a>  </span>
-<span id="cb2-9"><a href="#cb2-9"></a>  <span class="co">// Add logic to show (or replace) error message on element `el`</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a><span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a></span>
-<span id="cb2-12"><a href="#cb2-12"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">"shinyvalidate:clear"</span><span class="op">,</span> <span class="kw">function</span>(event) <span class="op">{</span></span>
-<span id="cb2-13"><a href="#cb2-13"></a>  <span class="kw">let</span> el <span class="op">=</span> <span class="va">event</span>.<span class="at">el</span><span class="op">;</span></span>
-<span id="cb2-14"><a href="#cb2-14"></a>  <span class="kw">let</span> binding <span class="op">=</span> <span class="va">event</span>.<span class="at">binding</span><span class="op">;</span></span>
-<span id="cb2-15"><a href="#cb2-15"></a>  <span class="kw">let</span> id <span class="op">=</span> <span class="va">event</span>.<span class="at">id</span><span class="op">;</span></span>
-<span id="cb2-16"><a href="#cb2-16"></a>  <span class="va">event</span>.<span class="at">preventDefault</span>()<span class="op">;</span></span>
-<span id="cb2-17"><a href="#cb2-17"></a>  </span>
-<span id="cb2-18"><a href="#cb2-18"></a>  <span class="co">// Add logic to clear error (if one exists) from element `el`</span></span>
-<span id="cb2-19"><a href="#cb2-19"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
-<p>The following properties are available on the <code>event</code> object:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">$</span>(<span class="bu">document</span>)<span class="op">.</span><span class="fu">on</span>(<span class="st">"shinyvalidate:show"</span><span class="op">,</span> <span class="kw">function</span>(<span class="bu">event</span>) {</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="kw">let</span> el <span class="op">=</span> <span class="bu">event</span><span class="op">.</span><span class="at">el</span><span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="kw">let</span> binding <span class="op">=</span> <span class="bu">event</span><span class="op">.</span><span class="at">binding</span><span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="kw">let</span> id <span class="op">=</span> <span class="bu">event</span><span class="op">.</span><span class="at">id</span><span class="op">;</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="kw">let</span> type <span class="op">=</span> <span class="bu">event</span><span class="op">.</span><span class="at">type</span><span class="op">;</span> <span class="co">// always "error"</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  <span class="kw">let</span> message <span class="op">=</span> <span class="bu">event</span><span class="op">.</span><span class="at">message</span><span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="bu">event</span><span class="op">.</span><span class="fu">preventDefault</span>()<span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  </span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="co">// Add logic to show (or replace) error message on element `el`</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">$</span>(<span class="bu">document</span>)<span class="op">.</span><span class="fu">on</span>(<span class="st">"shinyvalidate:clear"</span><span class="op">,</span> <span class="kw">function</span>(<span class="bu">event</span>) {</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>  <span class="kw">let</span> el <span class="op">=</span> <span class="bu">event</span><span class="op">.</span><span class="at">el</span><span class="op">;</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>  <span class="kw">let</span> binding <span class="op">=</span> <span class="bu">event</span><span class="op">.</span><span class="at">binding</span><span class="op">;</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>  <span class="kw">let</span> id <span class="op">=</span> <span class="bu">event</span><span class="op">.</span><span class="at">id</span><span class="op">;</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>  <span class="bu">event</span><span class="op">.</span><span class="fu">preventDefault</span>()<span class="op">;</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>  </span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>  <span class="co">// Add logic to clear error (if one exists) from element `el`</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p>The following properties are available on the <code>event</code>
+object:</p>
 <ul>
-<li><p><code>el</code> - The HTML element for the relevant input. This is a regular HTML element object, not a jQuery object–you’ll need to call <code>$(el)</code> yourself if you need jQuery functionality.</p></li>
-<li><p><code>binding</code> - The Shiny <code>InputBinding</code> object.</p></li>
+<li><p><code>el</code> - The HTML element for the relevant input. This
+is a regular HTML element object, not a jQuery object–you’ll need to
+call <code>$(el)</code> yourself if you need jQuery
+functionality.</p></li>
+<li><p><code>binding</code> - The Shiny <code>InputBinding</code>
+object.</p></li>
 <li><p><code>id</code> - A string indicating the input ID.</p></li>
-<li><p><code>type</code> - Currently hardcoded to <code>"error"</code>. (In the future, we may introduce other types like <code>"warning"</code> and <code>"info"</code>.)</p></li>
-<li><p><code>message</code> - A textual string (not HTML) indicating the message to be displayed.</p></li>
+<li><p><code>type</code> - Currently hardcoded to <code>"error"</code>.
+(In the future, we may introduce other types like <code>"warning"</code>
+and <code>"info"</code>.)</p></li>
+<li><p><code>message</code> - A textual string (not HTML) indicating the
+message to be displayed.</p></li>
 </ul>
-<p><strong>Important:</strong> The <code>event</code> object’s <code>preventDefault()</code> method must be called to prevent the two other strategies (input binding and Bootstrap) from being attempted. (This allows event handlers to decide to handle error display for only a subset of inputs, for example.)</p>
-<p>If you haven’t needed to include custom JavaScript for your Shiny app before, see <a href="https://shiny.rstudio.com/articles/packaging-javascript.html" class="external-link">this article</a> to learn about the various options you have for doing so.</p>
+<p><strong>Important:</strong> The <code>event</code> object’s
+<code>preventDefault()</code> method must be called to prevent the two
+other strategies (input binding and Bootstrap) from being attempted.
+(This allows event handlers to decide to handle error display for only a
+subset of inputs, for example.)</p>
+<p>If you haven’t needed to include custom JavaScript for your Shiny app
+before, see <a href="https://shiny.rstudio.com/articles/packaging-javascript.html" class="external-link">this
+article</a> to learn about the various options you have for doing
+so.</p>
 </div>
   </div>
 
@@ -202,7 +286,7 @@ span.delta {
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

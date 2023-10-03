@@ -75,14 +75,14 @@ default mode, the validation check will effectively be of the form <code>&lt;lef
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">sv_between</span><span class="op">(</span>
-  <span class="va">left</span>,
-  <span class="va">right</span>,
-  inclusive <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">TRUE</span><span class="op">)</span>,
-  message_fmt <span class="op">=</span> <span class="st">"Must be between {left} and {right}."</span>,
-  allow_na <span class="op">=</span> <span class="cn">FALSE</span>,
-  allow_nan <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sv_between</span><span class="op">(</span></span>
+<span>  <span class="va">left</span>,</span>
+<span>  <span class="va">right</span>,</span>
+<span>  inclusive <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  message_fmt <span class="op">=</span> <span class="st">"Must be between {left} and {right}."</span>,</span>
+<span>  allow_na <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  allow_nan <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -91,26 +91,32 @@ default mode, the validation check will effectively be of the form <code>&lt;lef
 <dd><p>The left and right boundary values. Inclusively for each of
 the boundaries is set with the <code>inclusive</code> argument; the defaults are set
 for inclusive bounds.</p></dd>
+
+
 <dt>inclusive</dt>
 <dd><p>A two-element logical vector that indicates whether the
 <code>left</code> and <code>right</code> bounds, respectively, should be inclusive. Both bounds
 are by default are inclusive, using <code>c(TRUE, TRUE)</code>.</p></dd>
+
+
 <dt>message_fmt</dt>
 <dd><p>The validation error message to use if a value fails to
 match the rule. The message can be customized by using the <code>"{left}"</code> and
 <code>"{right}"</code> string parameters, which allows for the insertion of the <code>left</code>
 and <code>right</code> values. While the default message uses both of these string
 parameters, they are not required in a user-defined <code>message_fmt</code> string.</p></dd>
-<dt>allow_na</dt>
+
+
+<dt>allow_na, allow_nan</dt>
 <dd><p>If <code>FALSE</code> (the default for both options), then any
 <code>NA</code> or <code>NaN</code> element will cause validation to fail.</p></dd>
-<dt>allow_nan</dt>
-<dd><p>If <code>FALSE</code> (the default for both options), then any
-<code>NA</code> or <code>NaN</code> element will cause validation to fail.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A function suitable for use as an
+    
+
+<p>A function suitable for use as an
 <code><a href="InputValidator.html">InputValidator$add_rule()</a></code> rule.</p>
     </div>
     <div id="see-also">
@@ -137,35 +143,35 @@ part of a specified set.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## Only run examples in interactive R sessions</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.rstudio.com/" class="external-link">shiny</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyvalidate/">shinyvalidate</a></span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/fluidPage.html" class="external-link">fluidPage</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/textInput.html" class="external-link">textInput</a></span><span class="op">(</span><span class="st">"count"</span>, <span class="st">"Count"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">  </span>
-<span class="r-in">  <span class="co"># Validation rules are set in the server, start by</span></span>
-<span class="r-in">  <span class="co"># making a new instance of an `InputValidator()`</span></span>
-<span class="r-in">  <span class="va">iv</span> <span class="op">&lt;-</span> <span class="va"><a href="InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Basic usage: `sv_between()` requires `left` and</span></span>
-<span class="r-in">  <span class="co"># `right` boundary values; a message will be</span></span>
-<span class="r-in">  <span class="co"># displayed if the validation of `input$count` fails</span></span>
-<span class="r-in">  <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"count"</span>, <span class="fu">sv_between</span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Finally, `enable()` the validation rules</span></span>
-<span class="r-in">  <span class="va">iv</span><span class="op">$</span><span class="fu">enable</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html" class="external-link">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Only run examples in interactive R sessions</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.posit.co/" class="external-link">shiny</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyvalidate/">shinyvalidate</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/fluidPage.html" class="external-link">fluidPage</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/textInput.html" class="external-link">textInput</a></span><span class="op">(</span><span class="st">"count"</span>, <span class="st">"Count"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># Validation rules are set in the server, start by</span></span></span>
+<span class="r-in"><span>  <span class="co"># making a new instance of an `InputValidator()`</span></span></span>
+<span class="r-in"><span>  <span class="va">iv</span> <span class="op">&lt;-</span> <span class="va"><a href="InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Basic usage: `sv_between()` requires `left` and</span></span></span>
+<span class="r-in"><span>  <span class="co"># `right` boundary values; a message will be</span></span></span>
+<span class="r-in"><span>  <span class="co"># displayed if the validation of `input$count` fails</span></span></span>
+<span class="r-in"><span>  <span class="va">iv</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span><span class="st">"count"</span>, <span class="fu">sv_between</span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Finally, `enable()` the validation rules</span></span></span>
+<span class="r-in"><span>  <span class="va">iv</span><span class="op">$</span><span class="fu">enable</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html" class="external-link">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -180,7 +186,7 @@ part of a specified set.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

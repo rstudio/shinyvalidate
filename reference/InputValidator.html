@@ -112,25 +112,25 @@ that are completely unrelated to each other; each form would have its own
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
-<ul><li><p><a href="#method-new"><code>InputValidator$new()</code></a></p></li>
-<li><p><a href="#method-parent"><code>InputValidator$parent()</code></a></p></li>
-<li><p><a href="#method-condition"><code>InputValidator$condition()</code></a></p></li>
-<li><p><a href="#method-add_validator"><code>InputValidator$add_validator()</code></a></p></li>
-<li><p><a href="#method-add_rule"><code>InputValidator$add_rule()</code></a></p></li>
-<li><p><a href="#method-enable"><code>InputValidator$enable()</code></a></p></li>
-<li><p><a href="#method-disable"><code>InputValidator$disable()</code></a></p></li>
-<li><p><a href="#method-fields"><code>InputValidator$fields()</code></a></p></li>
-<li><p><a href="#method-is_valid"><code>InputValidator$is_valid()</code></a></p></li>
-<li><p><a href="#method-validate"><code>InputValidator$validate()</code></a></p></li>
-<li><p><a href="#method-_validate_impl"><code>InputValidator$_validate_impl()</code></a></p></li>
-</ul></div><p></p><hr><a id="method-new"></a><div class="section">
+<ul><li><p><a href="#method-InputValidator-new"><code>InputValidator$new()</code></a></p></li>
+<li><p><a href="#method-InputValidator-parent"><code>InputValidator$parent()</code></a></p></li>
+<li><p><a href="#method-InputValidator-condition"><code>InputValidator$condition()</code></a></p></li>
+<li><p><a href="#method-InputValidator-add_validator"><code>InputValidator$add_validator()</code></a></p></li>
+<li><p><a href="#method-InputValidator-add_rule"><code>InputValidator$add_rule()</code></a></p></li>
+<li><p><a href="#method-InputValidator-enable"><code>InputValidator$enable()</code></a></p></li>
+<li><p><a href="#method-InputValidator-disable"><code>InputValidator$disable()</code></a></p></li>
+<li><p><a href="#method-InputValidator-fields"><code>InputValidator$fields()</code></a></p></li>
+<li><p><a href="#method-InputValidator-is_valid"><code>InputValidator$is_valid()</code></a></p></li>
+<li><p><a href="#method-InputValidator-validate"><code>InputValidator$validate()</code></a></p></li>
+<li><p><a href="#method-InputValidator-_validate_impl"><code>InputValidator$_validate_impl()</code></a></p></li>
+</ul></div><p></p><hr><a id="method-InputValidator-new"></a><div class="section">
 <h3 id="method-new-">Method <code><a href="https://rdrr.io/r/methods/new.html" class="external-link">new()</a></code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Create a new validator object.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>
-  priority <span class="op">=</span> <span class="fl">1000</span>,
-  session <span class="op">=</span> <span class="fu">shiny</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/domains.html" class="external-link">getDefaultReactiveDomain</a></span><span class="op">(</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/InputValidator.html">InputValidator</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  priority <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  session <span class="op">=</span> <span class="fu">shiny</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/domains.html" class="external-link">getDefaultReactiveDomain</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -151,11 +151,11 @@ the default.)</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-parent"></a><div class="section">
+</div><p></p><hr><a id="method-InputValidator-parent"></a><div class="section">
 <h3 id="method-parent-">Method <code>parent()</code><a class="anchor" aria-label="anchor" href="#method-parent-"></a></h3>
 <p>For internal use only.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">InputValidator</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="va">validator</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">InputValidator</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="va">validator</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -167,15 +167,15 @@ the default.)</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-condition"></a><div class="section">
-<h3 id="method-condition-">Method <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">condition()</a></code><a class="anchor" aria-label="anchor" href="#method-condition-"></a></h3>
+</div><p></p><hr><a id="method-InputValidator-condition"></a><div class="section">
+<h3 id="method-condition-">Method <code>condition()</code><a class="anchor" aria-label="anchor" href="#method-condition-"></a></h3>
 <p>Gets or sets a condition that overrides all of the rules in
 this validator. Before performing validation, this validator will
 execute the <code>cond</code> function. If <code>cond</code> returns <code>TRUE</code>, then
 validation continues as normal; if <code>FALSE</code>, then the validation rules
 will be skipped and treated as if they are all passing.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">InputValidator</span><span class="op">$</span><span class="fu">condition</span><span class="op">(</span><span class="va">cond</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">InputValidator</span><span class="op">$</span><span class="fu">condition</span><span class="op">(</span><span class="va">cond</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -197,7 +197,7 @@ function; if <code>cond</code> is provided, then nothing of consequence is
 returned.</p>
 </div>
 
-</div><p></p><hr><a id="method-add_validator"></a><div class="section">
+</div><p></p><hr><a id="method-InputValidator-add_validator"></a><div class="section">
 <h3 id="method-add-validator-">Method <code>add_validator()</code><a class="anchor" aria-label="anchor" href="#method-add-validator-"></a></h3>
 <p>Add another <code>InputValidator</code> object to this one, as a
 "child". Any time this validator object is asked for its validity, it
@@ -208,7 +208,7 @@ its child validators are enabled (or disabled) as well.</p>
 create its own <code>InputValidator</code> object and populate it with rules, then
 return that object to the caller.</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">InputValidator</span><span class="op">$</span><span class="fu">add_validator</span><span class="op">(</span><span class="va">validator</span>, label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/deparse.html" class="external-link">deparse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">substitute</a></span><span class="op">(</span><span class="va">validator</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">InputValidator</span><span class="op">$</span><span class="fu">add_validator</span><span class="op">(</span><span class="va">validator</span>, label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/deparse.html" class="external-link">deparse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">substitute</a></span><span class="op">(</span><span class="va">validator</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -225,7 +225,7 @@ default, a label will be automatically generated.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-add_rule"></a><div class="section">
+</div><p></p><hr><a id="method-InputValidator-add_rule"></a><div class="section">
 <h3 id="method-add-rule-">Method <code>add_rule()</code><a class="anchor" aria-label="anchor" href="#method-add-rule-"></a></h3>
 <p>Add an input validation rule. Each input validation rule
 applies to a single input. You can add multiple validation rules for a
@@ -233,12 +233,12 @@ single input by calling <code>add_rule()</code> multiple times; the first
 validation rule for an input that fails will be used, and will prevent
 subsequent rules for that input from executing.</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">InputValidator</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span>
-  <span class="va">inputId</span>,
-  <span class="va">rule</span>,
-  <span class="va">...</span>,
-  session. <span class="op">=</span> <span class="fu">shiny</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/domains.html" class="external-link">getDefaultReactiveDomain</a></span><span class="op">(</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">InputValidator</span><span class="op">$</span><span class="fu">add_rule</span><span class="op">(</span></span>
+<span>  <span class="va">inputId</span>,</span>
+<span>  <span class="va">rule</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  session. <span class="op">=</span> <span class="fu">shiny</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/domains.html" class="external-link">getDefaultReactiveDomain</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -272,7 +272,7 @@ almost never a reason to change this from the default.)</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-enable"></a><div class="section">
+</div><p></p><hr><a id="method-InputValidator-enable"></a><div class="section">
 <h3 id="method-enable-">Method <code>enable()</code><a class="anchor" aria-label="anchor" href="#method-enable-"></a></h3>
 <p>Begin displaying input validation feedback in the user
 interface. Once enabled, this validator object will automatically keep
@@ -281,40 +281,40 @@ on an already-enabled validator.) If this validator object has been
 added to another validator object using <code>InputValidator$add_validator</code>,
 calls to <code>enable()</code> on this validator will be ignored.</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">InputValidator</span><span class="op">$</span><span class="fu">enable</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">InputValidator</span><span class="op">$</span><span class="fu">enable</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 
-</div><p></p><hr><a id="method-disable"></a><div class="section">
+</div><p></p><hr><a id="method-InputValidator-disable"></a><div class="section">
 <h3 id="method-disable-">Method <code>disable()</code><a class="anchor" aria-label="anchor" href="#method-disable-"></a></h3>
 <p>Clear existing input validation feedback in the user
 interface for all inputs represented in this validator's ruleset, and
 stop providing feedback going forward. Once disabled, <code>enable()</code> can be
 called to resume input validation.</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">InputValidator</span><span class="op">$</span><span class="fu">disable</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">InputValidator</span><span class="op">$</span><span class="fu">disable</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 
-</div><p></p><hr><a id="method-fields"></a><div class="section">
+</div><p></p><hr><a id="method-InputValidator-fields"></a><div class="section">
 <h3 id="method-fields-">Method <code>fields()</code><a class="anchor" aria-label="anchor" href="#method-fields-"></a></h3>
 <p>Returns <code>TRUE</code> if all input validation rules currently pass,
 <code>FALSE</code> if not.</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">InputValidator</span><span class="op">$</span><span class="fu">fields</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">InputValidator</span><span class="op">$</span><span class="fu">fields</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 
-</div><p></p><hr><a id="method-is_valid"></a><div class="section">
+</div><p></p><hr><a id="method-InputValidator-is_valid"></a><div class="section">
 <h3 id="method-is-valid-">Method <code>is_valid()</code><a class="anchor" aria-label="anchor" href="#method-is-valid-"></a></h3>
 <p>Returns <code>TRUE</code> if all input validation rules currently pass,
 <code>FALSE</code> if not.</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">InputValidator</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">InputValidator</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 
-</div><p></p><hr><a id="method-validate"></a><div class="section">
+</div><p></p><hr><a id="method-InputValidator-validate"></a><div class="section">
 <h3 id="method-validate-">Method <code><a href="https://rdrr.io/pkg/shiny/man/validate.html" class="external-link">validate()</a></code><a class="anchor" aria-label="anchor" href="#method-validate-"></a></h3>
 <p>Run validation rules and gather results. For advanced usage
 only; most apps should use the <code>is_valid()</code> and <code>enable()</code> methods
@@ -323,11 +323,11 @@ names are (fully namespace qualified) input IDs, and the values are
 either <code>NULL</code> (if the input value is passing) or a single-element
 character vector describing a validation problem.</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">InputValidator</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">InputValidator</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 
-</div><p></p><hr><a id="method-_validate_impl"></a><div class="section">
+</div><p></p><hr><a id="method-InputValidator-_validate_impl"></a><div class="section">
 <h3 id="method-validate-impl-">Method <code>_validate_impl()</code><a class="anchor" aria-label="anchor" href="#method-validate-impl-"></a></h3>
 <p>For internal use only.</p><div class="section">
 <h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
@@ -359,7 +359,7 @@ character vector describing a validation problem.</p><div class="section">
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

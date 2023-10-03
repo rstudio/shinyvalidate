@@ -20,10 +20,7 @@ vector must be exactly one; if \code{TRUE}, then any length is allowed
 (including a length of zero; use \code{\link[=sv_required]{sv_required()}} if one or more values
 should be required).}
 
-\item{allow_na}{If \code{FALSE} (the default for both options), then any
-\code{NA} or \code{NaN} element will cause validation to fail.}
-
-\item{allow_nan}{If \code{FALSE} (the default for both options), then any
+\item{allow_na, allow_nan}{If \code{FALSE} (the default for both options), then any
 \code{NA} or \code{NaN} element will cause validation to fail.}
 }
 \value{

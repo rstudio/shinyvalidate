@@ -8,7 +8,7 @@
 
 ## Overview
 
-shinyvalidate adds input validation capabilities to [Shiny](https://shiny.rstudio.com).
+shinyvalidate adds input validation capabilities to [Shiny](https://shiny.posit.co/).
 
 ## Installation
 

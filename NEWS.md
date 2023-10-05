@@ -1,3 +1,7 @@
+# shinyvalidate 0.1.3
+
+* On r-devel (R > 4.3.1), `input_provided(NULL)` now returns `FALSE` (as it does with older versions of R). (#72)
+
 # shinyvalidate 0.1.2
 
 * Support HTML messages when failing a validation. (#55)
